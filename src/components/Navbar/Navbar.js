@@ -1,0 +1,101 @@
+import { NavLink, Link } from "react-router-dom";
+import styles from './Navbar.module.css';
+import Logo from '../../assets/images/Logo.png'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect, useState } from "react";
+
+const navSections = [
+   { label: "Home", link: "/" },
+   { label: "Courses", link: "/courses" },
+   { label: "Find Partner", link: "/findPartner" },
+   { label: 'Contributors', link: "/contributors" }
+];
+
+function Navbar() {
+
+   const [isMenuOpened, setIsMenuOpened] = useState(false);
+   const [enableTransition, setEnableTransition] = useState(false);
+
+   // ------ Add/Remove class to body to make the background transparent ------
+   const toggleMobileMenu = () => {
+      setEnableTransition(true); // Enable transition only when toggling the menu
+      setIsMenuOpened(!isMenuOpened);
+   }
+
+   // ------ Add/Remove class to body to make the background transparent ------
+   useEffect(() => {
+      if (isMenuOpened && window.innerWidth <= 768) {
+         document.body.classList.add(styles.transparent_background);
+      } else {
+         document.body.classList.remove(styles.transparent_background);
+      }
+   }, [isMenuOpened])
+
+   // -------------- Ensure the menu only appears in mobile mode --------------
+   useEffect(() => {
+      const handleResize = () => {
+         if (window.innerWidth > 768) {
+            setIsMenuOpened(false);
+            setEnableTransition(false); // Disable transition on resize
+         }
+      }
+      window.addEventListener('resize', handleResize);
+
+      return () => {
+         window.removeEventListener('resize', handleResize);
+      };
+   }, [])
+
+   return (
+      <nav className={styles.navbar}>
+         <div className={styles.navbar_container}>
+
+            {/* Logo */}
+            <Link to="/">
+               <img src={Logo} alt="Loog" className={styles.logo} />
+            </Link>
+
+            {/* nav sections */}
+            <div className={`
+               ${styles.nav_links_container} 
+               ${isMenuOpened ? styles.menu_opened : ''}
+               ${enableTransition? styles.with_transition : ''}
+            `}>
+               <ul className={styles.nav_menu}>
+                  {navSections.map((item, index) => (
+                     <li key={index} className={styles.nav_item}>
+                        <NavLink
+                           className={({ isActive }) =>
+                              `${styles.nav_link} ${isActive ? styles.active : ''}`
+                           }
+                           to={item.link}
+                        >
+                           {item.label}
+                        </NavLink>
+                     </li>
+                  ))}
+               </ul>
+
+               {/* Sign up and Log in links */}
+               <div className={styles.auth_buttons}>
+                  <button className={styles.nav_button}>
+                     Sign Up
+                  </button>
+
+                  <button className={styles.nav_button}>
+                     Log In
+                  </button>
+               </div>
+            </div>
+
+            <FontAwesomeIcon
+               icon={isMenuOpened ? 'times' : 'bars'}
+               onClick={toggleMobileMenu}
+               className={styles.icon}
+            />
+
+         </div>
+      </nav>
+   )
+}
+export default Navbar;

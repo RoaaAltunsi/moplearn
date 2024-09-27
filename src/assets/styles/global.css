@@ -1,0 +1,33 @@
+
+/* -------------------------- Colors -------------------------- */
+:root {
+    --black-color: #000;
+    --white-color: #fff;
+    --red-color: #CF142B;
+    --dark-grey-color: #4F5560;
+    --light-grey-color: #CCCACA;
+    --grey-background-color: #EEEEEE;
+    --primary-color: #222831;
+    --secondary-color: #588BC7;
+}
+
+/* ----------------------- General Styles ---------------------- */
+*, *::before, *::after { /* Include padding and border within the element's width and height */
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif; 
+    font-size: 16px;
+    color: --var(--black-color);
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: '100%';
+    padding: 120px 5% 50px;
+}
+
+
+

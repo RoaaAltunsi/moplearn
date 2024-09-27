@@ -1,0 +1,155 @@
+.navbar{
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    position: fixed;
+    overflow: hidden;
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 14px rgba(0,0,0,.1);
+}
+
+.navbar_container {
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.8vh;
+}
+
+.logo {
+    width: 80px;
+    height: auto;
+    margin-right: 5px;
+}
+
+.nav_links_container {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav_menu {
+    display: flex;
+    list-style-type: none;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.nav_item {
+    padding: 10px 20px;
+}
+
+.nav_link {
+    text-decoration: none;
+    color: var(--white-color);
+    position: relative;
+    transition: color 0.3s ease;
+    display: inline-block;
+}
+
+.nav_link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    background-color: var(--secondary-color);
+    transition: width 0.3s ease;
+    opacity: 0;  /* Initially, the line is transparent */
+}
+
+.nav_link:hover::after,
+.active::after {
+    width: 100%;
+    opacity: 1;  /* The line becomes visible on hover */
+}
+
+.nav_link:hover {
+    color: var(--secondary-color);
+}
+
+.auth_buttons {
+    display: flex;
+}
+
+.nav_button {
+    padding: 10px 20px;
+    border-style: solid;
+    border-width: 2;
+    border-color: var(--secondary-color);
+    background: none;
+    color: var(--white-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.nav_button:hover{
+    background-color: var(--secondary-color);
+}
+
+/* ------------- Responsive mobile section ------------- */
+.transparent_background{
+    background-color:  rgba(0, 0, 0, 0.5);
+    transition: background-color 0.5s ease-in-out;
+    pointer-events: none; /* Disable interactions with the underlying content */
+}
+
+.transparent_background * {
+    pointer-events: all; /* Allow interactions with the navbar */
+}
+
+.icon{
+    color: var(--white-color);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    display: none;
+    z-index: 2;
+}
+
+@media (max-width: 768px) {
+    .icon{
+        display: block;
+    }
+
+    .nav_links_container {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 14rem;
+        background-color: var(--primary-color);
+        padding: 60px 20px 20px;
+        flex-direction: column;
+        transform: translateX(100%); /* Move the element off-screen to the right, by 100% of its own width */
+        opacity: 0;
+    }
+
+    .nav_links_container.with_transition {
+        transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; 
+        /* Starts the transition slowly, speeds up in the middle, and slows down again at the end */
+    }
+
+    .nav_links_container.menu_opened {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .nav_menu {
+        flex-direction: column;
+    }
+
+    .auth_buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .nav_button {
+        margin: 5px;
+    }
+}
