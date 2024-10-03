@@ -1,0 +1,84 @@
+/* ----------------------- Common Styles ----------------------- */
+.section {
+	height: 100vh;
+	padding: 0 5vw;
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	align-items: center;
+	position: relative;
+	overflow: hidden;
+}
+
+.img {
+	height: auto;
+	flex: 2;
+}
+
+.svg_letter {
+	width: 12vw;
+	height: auto;
+	position: absolute;
+}
+
+.description {
+	flex: 1;
+	padding: 5vw;
+}
+
+.description h1 {
+	font-size: clamp(2rem, 4vw, 6rem);
+	color: var(--secondary-color);
+}
+
+/* ----------------------- Specific Styles ----------------------- */
+#sectionO {
+	flex-direction: row;
+	background-color: var(--grey-background-color);
+}
+
+#svgM {
+	top: 40vh;
+	left: 50vw;
+}
+
+#svgO {
+	top: 40vh;
+	left: 40vw;
+}
+
+#svgP {
+	top: 30vh;
+	left: 35vw;
+}
+
+/* -------------- Responsive Tablet/Mobile section --------------- */
+@media (max-width: 768px) {
+
+	.section,
+	#sectionO {
+		flex-direction: column;
+		height: auto;
+		padding: 2rem 5vw;
+	}
+
+	.img {
+		width: 80vw;
+	}
+
+	.svg_letter {
+		width: 20vw;
+		position: static;
+	}
+
+	.description {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	#svgP {
+		margin-left: 10vw;
+	}
+}

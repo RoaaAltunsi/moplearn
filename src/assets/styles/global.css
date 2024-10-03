@@ -1,4 +1,3 @@
-
 /* -------------------------- Colors -------------------------- */
 :root {
     --black-color: #000;
@@ -18,15 +17,22 @@
 
 body {
     font-family: 'Roboto', Arial, sans-serif; 
-    font-size: 16px;
+    font-size: clamp(0.8rem, 1.2vw, 2rem);
     color: --var(--black-color);
     margin: 0;
     padding: 0;
 }
 
+h1, h2, h3 {
+    margin: 0;
+    font-family: 'Asap Condensed';
+}
+
 .container {
-    width: '100%';
-    padding: 120px 5% 50px;
+    width: 100vw;
+    margin: 0 auto;
+    padding-top: 3.1rem; /* Equal to the minimum height of navbar */
+    position: relative;
 }
 
 
