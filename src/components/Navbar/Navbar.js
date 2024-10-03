@@ -16,22 +16,13 @@ function Navbar() {
    const [isMenuOpened, setIsMenuOpened] = useState(false);
    const [enableTransition, setEnableTransition] = useState(false);
 
-   // ------ Add/Remove class to body to make the background transparent ------
+   // --------------- Handle Opening and closing hamburger menu ---------------
    const toggleMobileMenu = () => {
       setEnableTransition(true); // Enable transition only when toggling the menu
       setIsMenuOpened(!isMenuOpened);
    }
 
-   // ------ Add/Remove class to body to make the background transparent ------
-   useEffect(() => {
-      if (isMenuOpened && window.innerWidth <= 768) {
-         document.body.classList.add(styles.transparent_background);
-      } else {
-         document.body.classList.remove(styles.transparent_background);
-      }
-   }, [isMenuOpened])
-
-   // -------------- Ensure the menu only appears in mobile mode --------------
+   // ----------- Ensure the menu only appears in Tablet/Mobile mode -----------
    useEffect(() => {
       const handleResize = () => {
          if (window.innerWidth > 768) {
@@ -55,11 +46,11 @@ function Navbar() {
                <img src={Logo} alt="Loog" className={styles.logo} />
             </Link>
 
-            {/* nav sections */}
+            {/* Nav sections */}
             <div className={`
                ${styles.nav_links_container} 
                ${isMenuOpened ? styles.menu_opened : ''}
-               ${enableTransition? styles.with_transition : ''}
+               ${enableTransition ? styles.with_transition : ''}
             `}>
                <ul className={styles.nav_menu}>
                   {navSections.map((item, index) => (
@@ -76,7 +67,7 @@ function Navbar() {
                   ))}
                </ul>
 
-               {/* Sign up and Log in links */}
+               {/* Sign up and Log in buttons */}
                <div className={styles.auth_buttons}>
                   <button className={styles.nav_button}>
                      Sign Up
@@ -95,6 +86,12 @@ function Navbar() {
             />
 
          </div>
+
+         {/* Hamburger's menu Transparent Background */}
+         <div className={`
+            ${styles.transparent_background} 
+            ${isMenuOpened ? styles.menu_opened : ''}
+         `} />
       </nav>
    )
 }

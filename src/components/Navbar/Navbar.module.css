@@ -1,6 +1,7 @@
 .navbar{
     top: 0;
     width: 100%;
+    height: auto;
     z-index: 1000;
     position: fixed;
     overflow: hidden;
@@ -9,17 +10,18 @@
 }
 
 .navbar_container {
-    padding: 15px 5%;
+    padding: 1vh 5vw;
     display: flex;
+    min-height: 3.2rem;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.8vh;
+    font-size: clamp(0.75rem, 0.9vw, 1.3rem);
 }
 
 .logo {
-    width: 80px;
+    width: 4.5rem;
     height: auto;
-    margin-right: 5px;
+    margin-right: 2rem;
 }
 
 .nav_links_container {
@@ -86,21 +88,22 @@
     transition: background-color 0.3s ease, transform 0.3s ease;
     border-radius: 4px;
     margin-left: 10px;
+    font-size: clamp(0.75rem, 0.9vw, 1.3rem);
 }
 
 .nav_button:hover{
     background-color: var(--secondary-color);
 }
 
-/* ------------- Responsive mobile section ------------- */
-.transparent_background{
-    background-color:  rgba(0, 0, 0, 0.5);
-    transition: background-color 0.5s ease-in-out;
-    pointer-events: none; /* Disable interactions with the underlying content */
-}
-
-.transparent_background * {
-    pointer-events: all; /* Allow interactions with the navbar */
+/* ------------- Responsive Tablet/Mobile styles ------------- */
+.transparent_background {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .icon{
@@ -109,7 +112,7 @@
     height: 18px;
     cursor: pointer;
     display: none;
-    z-index: 2;
+    z-index: 2; /* Display the icon above the hamburger menu */
 }
 
 @media (max-width: 768px) {
@@ -128,6 +131,7 @@
         flex-direction: column;
         transform: translateX(100%); /* Move the element off-screen to the right, by 100% of its own width */
         opacity: 0;
+        z-index: 2; /* Display the icon above the transparent background */
     }
 
     .nav_links_container.with_transition {
@@ -135,7 +139,7 @@
         /* Starts the transition slowly, speeds up in the middle, and slows down again at the end */
     }
 
-    .nav_links_container.menu_opened {
+    .menu_opened {
         transform: translateX(0);
         opacity: 1;
     }
