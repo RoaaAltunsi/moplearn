@@ -104,6 +104,7 @@
     background-color: rgba(0, 0, 0, 0.5);
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none; /* Disable pointer events by default */
 }
 
 .icon{
@@ -142,6 +143,10 @@
     .menu_opened {
         transform: translateX(0);
         opacity: 1;
+    }
+
+    .transparent_background.menu_opened {
+        pointer-events: auto;
     }
 
     .nav_menu {

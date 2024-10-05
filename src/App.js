@@ -1,24 +1,30 @@
 import { Route, Routes } from 'react-router-dom';
 import './assets/styles/global.css';
-import Homepage from './pages/Homepage/Homepage.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import * as Icons from '@fortawesome/free-solid-svg-icons';
-import Navbar from './components/Navbar/Navbar.js';
+import Navbar from './components/navbar/Navbar.js';
+import Homepage from './pages/homepage/Homepage.js';
+import Footer from './components/footer/Footer.js';
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
+import * as brandIcons from '@fortawesome/free-brands-svg-icons';
 
-// Dynamically add all icons to the library
-const iconList = Object.keys(Icons)
-  .filter((key) => key !== 'fas' && key !== 'prefix')
-  .map((icon) => Icons[icon]);
+// Dynamically add all icons from solid and brands packs
+const iconList = [
+  ...Object.keys(solidIcons),
+  ...Object.keys(brandIcons),
+]
+  .filter((key) => key !== 'fas' && key !== 'prefix') // Filter out internal FontAwesome properties
+  .map((icon) => solidIcons[icon] || brandIcons[icon]);
 library.add(...iconList);
 
 function App() {
   return (
-    <div>
+    <>
       <Navbar />
       <Routes>
         <Route index element={<Homepage />} />
       </Routes>
-    </div>
+      <Footer />
+    </>
   );
 }
 
