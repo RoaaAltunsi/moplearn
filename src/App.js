@@ -3,6 +3,7 @@ import './assets/styles/global.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import Navbar from './components/navbar/Navbar.js';
 import Homepage from './pages/homepage/Homepage.js';
+import Signup from './pages/signup/Signup.js';
 import Footer from './components/footer/Footer.js';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import * as brandIcons from '@fortawesome/free-brands-svg-icons';
@@ -22,6 +23,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route index element={<Homepage />} />
+        <Route path="signup" element={<Signup />} />
       </Routes>
       <Footer />
     </>

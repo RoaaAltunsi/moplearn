@@ -1,0 +1,104 @@
+/* ------------------ Common styles ------------------ */
+.container {
+    width: 100%;
+    margin: 4% 0;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    position: relative;
+}
+
+.container label {
+    position: absolute;
+    top: -1.2vh;
+    left: 3%;
+    padding: 0 5px;
+    pointer-events: none;
+    color: var(--light-grey-color);
+    font-size: clamp(0.8rem, 1.1vw, 2rem);
+    background-color: var(--white-color);
+}
+
+.input_box {
+    flex: 1;
+    display: flex;
+    padding: 1.5vh 4%;
+    outline: none;
+    border-radius: 0.5vw;
+    border: 0.1vw solid var(--light-grey-color);
+}
+
+/* Change input box border color on focus or filled */
+.input_box:focus-within,
+.input_box.open_dropdown,
+.input_box.filled {
+    border-color: var(--secondary-color);
+}
+
+/* Change label color on focus or filled */
+.container:focus-within label,
+.container label.open_dropdown,
+.container label.filled {
+    color: var(--secondary-color);
+}
+
+.box_icon {
+    width: 5%;
+    min-width: 1rem;
+    cursor: pointer;
+    color: var(--light-grey-color);
+}
+
+.text_input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: clamp(0.7rem, 1vw, 1.8rem);
+}
+
+.text_input::placeholder {
+    font-size: clamp(0.6rem, 0.9vw, 1.7rem);
+    color: var(--light-grey-color);
+}
+
+/* ------------- Text input field styles ------------- */
+.text_container {
+    display: flex;
+    width: 100%;
+    padding: 0;
+}
+
+/* Hide the default password visibility toggle icon */
+.text_input[type="password"]::-ms-reveal,
+.text_input[type="password"]::-ms-clear {
+    display: none;
+}
+
+.input_box textarea {
+    resize: none;
+}
+
+/* ------------ Select input field styles ------------ */
+.dropdown {
+    background-color: var(--white-color);
+    position: absolute;
+    top: 110%;
+    width: 100%;
+    border-radius: 5px;
+    z-index: 5;
+    box-shadow: 0 2px 4px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.08);
+    border: 0.1vw solid var(--light-grey-color);
+    max-height: 7rem;
+    overflow-y: auto;
+}
+
+.dropdown li {
+    padding: 5px 4%;
+    color: var(--dark-grey-color);
+    font-size: clamp(0.7rem, 1vw, 1.8rem);
+}
+
+.highlighted {
+    background-color: var(--grey-background-color);
+    color: var(--black-color) !important;
+}
