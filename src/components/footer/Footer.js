@@ -18,13 +18,13 @@ const followData = [
 
 function Footer() {
    return (
-      <footer id={styles.container}>
+      <footer className={styles.container}>
          {/* Logo */}
-         <div id={styles.logo}>
+         <div className={styles.logo}>
             <img src={FullLogo} alt="Loog" />
          </div>
 
-         <div id={styles.sections}>
+         <div className={styles.sections}>
             {/* Contact Section */}
             <div>
                <h3> Contact Us </h3>
@@ -53,7 +53,7 @@ function Footer() {
             {/* Follow Section */}
             <div>
                <h3> Follow Us </h3>
-               <div id={styles.social_media}>
+               <div className={styles.social_media}>
                   {followData.map((item, index) => (
                      <Link key={index} to={item.link}>
                         <FontAwesomeIcon className={styles.icon} icon={item.icon} />

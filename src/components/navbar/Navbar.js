@@ -3,6 +3,7 @@ import styles from './Navbar.module.css';
 import Logo from '../../assets/images/Logo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const navSections = [
    { label: "Home", link: "/" },
@@ -13,6 +14,7 @@ const navSections = [
 
 function Navbar() {
 
+   const naviagte = useNavigate();
    const [isMenuOpened, setIsMenuOpened] = useState(false);
    const [enableTransition, setEnableTransition] = useState(false);
 
@@ -69,7 +71,7 @@ function Navbar() {
 
                {/* Sign up and Log in buttons */}
                <div className={styles.auth_buttons}>
-                  <button className={styles.nav_button}>
+                  <button className={styles.nav_button} onClick={() => naviagte('signup')}>
                      Sign Up
                   </button>
 
