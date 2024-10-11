@@ -1,0 +1,12 @@
+.curve_line {
+    width: 100%;
+    height: auto;
+    stroke-width: 2;
+}
+
+/* ------------- Responsive Tablet/Mobile styles ------------- */
+@media(max-width: 768px) {
+    .curve_line {
+        stroke-width: 4;
+    }
+}
