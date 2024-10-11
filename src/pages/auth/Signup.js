@@ -1,9 +1,10 @@
-import styles from './Signup.module.css';
+import styles from './Auth.module.css';
 import { ReactComponent as SignupSVG } from '../../assets/images/signup.svg';
 import useFormFields from '../../hooks/useFormFields';
 import TextInput from '../../components/inputFields/TextInput';
 import SelectInput from '../../components/inputFields/SelectInput';
 import MainButton from '../../components/button/MainButton';
+import { Link } from 'react-router-dom';
 
 const textFields = [
    { label: 'Name' },
@@ -31,7 +32,7 @@ function Signup() {
 
             {/* ------------- Left Section ------------- */}
             <div className={styles.section}>
-               <h2>Create Account</h2>
+               <h2> Create Account </h2>
                <form>
                   {/* Text input fields */}
                   {textFields.map((item, index) => {
@@ -59,10 +60,15 @@ function Signup() {
                {/* Submit Button */}
                <div className={styles.btn_container}>
                   <MainButton
-                     label="Submit"
+                     label="Sign up"
                      onClick={() => console.log("Button Clicked!")}
                   />
                </div>
+
+               {/* Log in link */}
+               <p> Already have an account?
+                  <Link to="/login" className={styles.text_link}> Log in </Link>
+               </p>
             </div>
 
             {/* ------------- Right Section ------------- */}

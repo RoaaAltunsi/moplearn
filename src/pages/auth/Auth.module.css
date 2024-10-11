@@ -28,6 +28,21 @@
     margin-top: 2rem;
 }
 
+.section p {
+    margin: 3vh 0;
+    font-size: clamp(0.6rem, 0.9vw, 1.7rem);
+}
+
+.text_link {
+    text-decoration: none;
+    color: var(--secondary-color);
+    font-size: clamp(0.6rem, 0.9vw, 1.7rem);
+}
+
+.forgot_pass {
+    margin-bottom: 8%;
+}
+
 .rectangle {
     width: 50%;
     height: 100%;
@@ -58,4 +73,3 @@
         width: 80%;
     }
 }
-
