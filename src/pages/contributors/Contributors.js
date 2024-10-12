@@ -2,12 +2,14 @@ import styles from './Contributors.module.css';
 import { ReactComponent as ContributorsSVG } from '../../assets/images/contributors.svg';
 import MainButton from '../../components/button/MainButton';
 import CurvedLine from '../../components/curvedLine/CurvedLine';
+import { useNavigate } from 'react-router-dom';
 
 // Get all platforms' logos
 const images = require.context('../../assets/images/platforms', false, /\.(png|jpe?g|svg)$/);
 
 function Contributors() {
 
+   const navigate = useNavigate();
    const imagePaths = images.keys().map(image => images(image));
 
    return (
@@ -23,7 +25,7 @@ function Contributors() {
                   <div className={styles.btn_container}>
                      <MainButton
                         label="Contribute with us"
-                        onClick={() => console.log("Button Clicked!")}
+                        onClick={() => navigate('/contribute-form')}
                      />
                   </div>
                </div>

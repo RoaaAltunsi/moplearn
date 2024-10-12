@@ -9,7 +9,7 @@ const contactData = [
 ];
 const aboutData = [
    { link: '/', label: 'Who we are?' },
-   { link: '/', label: 'Work with us' }
+   { link: '/contribute-form', label: 'Contribute with us' }
 ];
 const followData = [
    { icon: 'fa-brands fa-instagram', link: '/' },
