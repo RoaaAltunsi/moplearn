@@ -62,6 +62,7 @@ function Navbar() {
                               `${styles.nav_link} ${isActive ? styles.active : ''}`
                            }
                            to={item.link}
+                           onClick={() => setIsMenuOpened(false)}
                         >
                            {item.label}
                         </NavLink>
@@ -71,11 +72,17 @@ function Navbar() {
 
                {/* Sign up and Log in buttons */}
                <div className={styles.auth_buttons}>
-                  <button className={styles.nav_button} onClick={() => naviagte('signup')}>
+                  <button className={styles.nav_button} onClick={() => {
+                     naviagte('signup');
+                     setIsMenuOpened(false)
+                  }}>
                      Sign Up
                   </button>
 
-                  <button className={styles.nav_button} onClick={() => naviagte('login')}>
+                  <button className={styles.nav_button} onClick={() => {
+                     naviagte('login');
+                     setIsMenuOpened(false)
+                  }}>
                      Log In
                   </button>
                </div>
