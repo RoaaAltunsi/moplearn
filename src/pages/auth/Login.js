@@ -36,7 +36,12 @@ function Login() {
                </form>
 
                {/* Forgot Password link */}
-               <Link to="/" className={`${styles.text_link} ${styles.forgot_pass}`}> Forgot Password? </Link>
+               <Link
+                  to="/reset-password"
+                  className={`${styles.text_link} ${styles.forgot_pass}`}
+               >
+                  Forgot Password?
+               </Link>
 
                {/* Submit Button */}
                <div className={styles.btn_container}>

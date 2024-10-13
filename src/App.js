@@ -5,6 +5,7 @@ import Navbar from './components/navbar/Navbar.js';
 import Homepage from './pages/homepage/Homepage.js';
 import Signup from './pages/auth/Signup.js';
 import Login from './pages/auth/Login.js';
+import ResetPassword from './pages/auth/ResetPassword.js';
 import Contributors from './pages/contributors/Contributors.js';
 import ContributeForm from './pages/contributeForm/ContributeForm.js';
 import Footer from './components/footer/Footer.js';
@@ -28,6 +29,7 @@ function App() {
         <Route index element={<Homepage />} />
         <Route path="signup" element={<Signup />} />
         <Route path="login" element={<Login />} />
+        <Route path="reset-password" element={<ResetPassword />} />
         <Route path="contributors" element={<Contributors />} />
         <Route path="contribute-form" element={<ContributeForm />} />
       </Routes>
