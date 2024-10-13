@@ -2,12 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import './assets/styles/global.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import Navbar from './components/navbar/Navbar.js';
-import Homepage from './pages/homepage/Homepage.js';
-import Signup from './pages/auth/Signup.js';
-import Login from './pages/auth/Login.js';
-import ResetPassword from './pages/auth/ResetPassword.js';
-import Contributors from './pages/contributors/Contributors.js';
-import ContributeForm from './pages/contributeForm/ContributeForm.js';
+import routes from './routes.js';
 import Footer from './components/footer/Footer.js';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import * as brandIcons from '@fortawesome/free-brands-svg-icons';
@@ -26,12 +21,9 @@ function App() {
     <>
       <Navbar />
       <Routes>
-        <Route index element={<Homepage />} />
-        <Route path="signup" element={<Signup />} />
-        <Route path="login" element={<Login />} />
-        <Route path="reset-password" element={<ResetPassword />} />
-        <Route path="contributors" element={<Contributors />} />
-        <Route path="contribute-form" element={<ContributeForm />} />
+        {routes.map((route, index) => (
+          <Route key={index} path={route.path} element={route.element} />
+        ))}
       </Routes>
       <Footer />
     </>
