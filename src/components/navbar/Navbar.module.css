@@ -1,26 +1,12 @@
+/* ---------------------- General styles ---------------------- */
 .navbar{
     top: 0;
     width: 100%;
     height: auto;
     z-index: 1000;
     position: sticky;
-    overflow: hidden;
     background-color: var(--primary-color);
     box-shadow: 0 4px 14px rgba(0,0,0,.1);
-}
-
-.navbar_container {
-    padding: 1.5vh 5vw;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: clamp(0.75rem, 0.9vw, 1.5rem);
-}
-
-.logo {
-    width: clamp(4rem, 6vw, 8rem);
-    height: auto;
-    margin-right: 2rem;
 }
 
 .nav_links_container {
@@ -30,13 +16,23 @@
     align-items: center;
 }
 
-.nav_menu {
+.icon {
+    display: none;
+    color: var(--white-color);
+    height: 18px;
+    cursor: pointer;
+}
+
+.main_list,
+.courses_list,
+.auth_buttons {
     display: flex;
     align-items: center;
 }
 
 .nav_item {
     padding: 10px 20px;
+    text-wrap: nowrap;
 }
 
 .nav_link {
@@ -44,10 +40,29 @@
     color: var(--white-color);
     position: relative;
     transition: color 0.3s ease;
-    display: inline-block;
 }
 
-.nav_link::after {
+.nav_link:hover {
+    color: var(--secondary-color);
+}
+
+/* ------------- Specific styles for main section ------------ */
+.main_section {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2vh 5vw;
+    font-size: clamp(0.75rem, 0.9vw, 1.5rem);
+}
+
+.logo {
+    width: clamp(4rem, 6vw, 8rem);
+    height: auto;
+    margin-right: 2rem;
+}
+
+.main_list .nav_link::after {
     content: "";
     position: absolute;
     left: 0;
@@ -59,25 +74,15 @@
     opacity: 0;  /* Initially, the line is transparent */
 }
 
-.nav_link:hover::after,
-.active::after {
+.main_list .nav_link:hover::after,
+.main_list .active::after {
     width: 100%;
-    opacity: 1;  /* The line becomes visible on hover */
-}
-
-.nav_link:hover {
-    color: var(--secondary-color);
-}
-
-.auth_buttons {
-    display: flex;
+    opacity: 1;  /* The line becomes visible */
 }
 
 .nav_button {
     padding: 10px 20px;
-    border-style: solid;
-    border-width: 2;
-    border-color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
     background: none;
     color: var(--white-color);
     cursor: pointer;
@@ -91,6 +96,58 @@
     background-color: var(--secondary-color);
 }
 
+/* ----------- Specific styles for courses section ----------- */
+.courses_section {
+    display: none;
+    padding: 0 5vw;
+    font-size: clamp(0.70rem, 0.85vw, 1.4rem);
+    border-top: 1px solid var(--dark-grey-color);
+}
+
+.courses_section.visible {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.courses_list .active {
+    color: var(--secondary-color);
+}
+
+.courses_list {
+    flex-wrap: wrap;
+    overflow-y: hidden;
+    max-height: 4.6vh;
+}
+
+@media(min-width: 769px) {
+    .courses_list li:first-child {
+        padding-left: 0;
+    }
+}
+
+.courses_dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 5vw;
+    width: 20vw;
+    padding: 1vh 0;
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 14px rgba(0,0,0,.1);
+    border-top: 1px solid var(--dark-grey-color);
+}
+
+.courses_dropdown.visible,
+.icon.visible {
+    display: block;
+}
+
+.courses_dropdown .nav_item {
+    font-size: clamp(0.70rem, 0.85vw, 1.4rem);
+}
+
 /* ------------- Responsive Tablet/Mobile styles ------------- */
 .transparent_background {
     position: fixed;
@@ -98,63 +155,74 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none; /* Disable pointer events by default */
+    pointer-events: auto;
 }
 
-.icon{
-    color: var(--white-color);
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    display: none;
-    z-index: 2; /* Display the icon above the hamburger menu */
+.hamburger_menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 14rem;
+    padding: 2vh 5vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--primary-color);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; 
+}
+
+.hamburger_menu.menu_opened {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.hamburger_menu .icon {
+    align-self: flex-end;
 }
 
 @media (max-width: 768px) {
-    .icon{
+    .main_section .icon {
         display: block;
     }
 
     .nav_links_container {
-        position: fixed;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: 14rem;
-        background-color: var(--primary-color);
-        padding: 60px 20px 20px;
-        flex-direction: column;
-        transform: translateX(100%); /* Move the element off-screen to the right, by 100% of its own width */
-        opacity: 0;
-        z-index: 2; /* Display the icon above the transparent background */
+        display: none;
     }
 
-    .nav_links_container.with_transition {
-        transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; 
-        /* Starts the transition slowly, speeds up in the middle, and slows down again at the end */
-    }
-
-    .menu_opened {
-        transform: translateX(0);
-        opacity: 1;
-    }
-
-    .transparent_background.menu_opened {
-        pointer-events: auto;
-    }
-
-    .nav_menu {
-        flex-direction: column;
+    .nav_item { /* Remove horizontal padding */
+        padding: 10px 0;
     }
 
     .auth_buttons {
+        flex-grow: 1;
         flex-direction: column;
-        width: 100%;
+        justify-content: flex-end;
     }
 
     .nav_button {
+        width: 100%;
         margin: 5px;
+    }
+
+    .main_list,
+    .courses_list {
+        flex-direction: column;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .main_list {
+        padding: 2.5vh 0;
+    }
+
+    .courses_list {
+        align-items: flex-start;
+        max-height: 15rem;
+        flex-wrap: nowrap;
+        padding: 2.5vh 0;
+        border-top: 1px solid var(--dark-grey-color);
     }
 }
