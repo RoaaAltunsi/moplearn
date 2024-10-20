@@ -9,11 +9,13 @@ function MainButton({
    width,
    color,
    backgroundColor,
-   onClick
+   onClick,
+   tooltip, // Descriptive msg on hover
 }) {
    return (
       <button
          onClick={onClick}
+         title={tooltip}
          className={`
             ${isCircular ? styles.circular_btn : styles.rectangle_btn}
             ${isDestructive ? styles.x_btn : styles.btn}
@@ -26,7 +28,7 @@ function MainButton({
       >
          {
             isCircular
-               ? <FontAwesomeIcon icon={iconName} />
+               ? <FontAwesomeIcon icon={iconName} className={styles.icon} />
                : label
          }
       </button>
