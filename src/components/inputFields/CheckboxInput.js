@@ -16,7 +16,7 @@ function CheckboxInput({
    }
 
    return (
-      <label className={styles.custom_ckeckbox}>
+      <label className={`${styles.custom_ckeckbox} small_font`}>
          <input
             type="checkbox"
             checked={isChecked}

@@ -117,9 +117,9 @@
 }
 
 .custom_ckeckbox .checkmark {
-    height: 20px;
-    width: 20px;
-    margin-right: 8px;
+    height: 1vw;
+    width: 1vw;
+    margin-right: 0.5vw;
     position: relative;
     border-radius: 4px;
     border: 2px solid var(--dark-grey-color);
@@ -135,10 +135,10 @@
     content: '';
     position: absolute;
     display: none;
-    left: 7px;
-    top: 2px;
-    width: 5px;
-    height: 10px;
+    left: 30%;
+    top: 10%;
+    width: 40%;
+    height: 70%;
     border: solid var(--white-color);
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
@@ -156,5 +156,13 @@
 
     .input_box {
         padding: 1.5vh 0.4rem;
+    }
+}
+
+@media(max-width: 1024px) {
+    .custom_ckeckbox .checkmark {
+        height: 15px;
+        width: 15px;
+        margin-right: 8px;
     }
 }

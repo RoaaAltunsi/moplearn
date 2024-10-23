@@ -43,7 +43,7 @@ function CourseCard({
             <div className={styles.card_content}>
                <div className={styles.price_section}>
                   <h3 className={styles.price}>
-                     $ {price}
+                     {price===0? 'Free' : `$ ${price}`}
                   </h3>
                   {oldPrice && (
                      <span className={styles.old_price}>
@@ -52,18 +52,20 @@ function CourseCard({
                   )}
                </div>
 
-               <p className={styles.title}> {title} </p>
+               <p className={`${styles.title} small_font`}> {title} </p>
 
                <div className={styles.course_meta_section}>
-                  <span> {platformName} </span>
-                  <div className={styles.rating_subsection}>
-                     <h3> {rating} </h3>
-                     <FontAwesomeIcon
-                        icon="fa-solid fa-star"
-                        style={{ color: 'var(--yellow-color)' }}
-                     />
-                     <span> ({ratingNum}) </span>
-                  </div>
+                  <span className='small_font'> {platformName} </span>
+                  {(rating || ratingNum) && (
+                     <div className={styles.rating_subsection}>
+                        <h3> {rating} </h3>
+                        <FontAwesomeIcon
+                           icon="fa-solid fa-star"
+                           style={{ color: 'var(--yellow-color)' }}
+                        />
+                        <span className='small_font'> ({ratingNum}) </span>
+                     </div>
+                  )}
                </div>
 
                <div className={styles.partner_section}>
