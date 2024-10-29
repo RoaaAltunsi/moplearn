@@ -8,9 +8,11 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import CurvedLine from '../../components/curvedLine/CurvedLine';
 import CourseCard from '../../components/courseCard/CourseCard';
 import CourseImage from '../../assets/images/course-img-test.png';
+import { useState } from 'react';
 
 const courses = [
    {
+      id: 1,
       link: "https://www.udemy.com/course/php-mvc-from-scratch/",
       image: CourseImage,
       price: 14.99,
@@ -21,6 +23,7 @@ const courses = [
       ratingNum: 3093
    },
    {
+      id: 2,
       link: "https://www.udemy.com/course/php-mvc-from-scratch/",
       image: CourseImage,
       price: 0,
@@ -31,6 +34,7 @@ const courses = [
       ratingNum: 3093
    },
    {
+      id: 3,
       link: "https://www.udemy.com/course/php-mvc-from-scratch/",
       image: CourseImage,
       price: 14.99,
@@ -41,6 +45,7 @@ const courses = [
       ratingNum: 3093
    },
    {
+      id: 4,
       link: "https://www.udemy.com/course/php-mvc-from-scratch/",
       image: CourseImage,
       price: 14.99,
@@ -55,8 +60,15 @@ const courses = [
 
 function Courses() {
 
+   const [partnerChecked, setPartnerChecked] = useState({}); // For partner list checkbox
+
    // ----------- Add/Remove user from partner list -----------
-   const handlePartnerCheckboxChange = (isChecked) => {
+   const handlePartnerCheckboxChange = (courseId, isChecked) => {
+      setPartnerChecked(prevState => ({
+         ...prevState,
+         [courseId]: isChecked
+      }));
+      
       if (isChecked) {
          console.log("POST user to partner list");
       } else {
@@ -94,11 +106,11 @@ function Courses() {
                      }}
                      autoplay={{
                         delay: 3000,
-                        disableOnInteraction: true, // Atop autoplay after user interaction
+                        disableOnInteraction: true, // Stop autoplay after user interaction
                      }}
                   >
-                     {courses.map((course, index) => (
-                        <SwiperSlide key={index} className={styles.card_container}>
+                     {courses.map(course => (
+                        <SwiperSlide key={course.id} className={styles.card_container}>
                            <CourseCard
                               link={course.link}
                               image={course.image}
@@ -108,7 +120,8 @@ function Courses() {
                               platformName={course.platformName}
                               rating={course.rating}
                               ratingNum={course.ratingNum}
-                              handleCheckboxChange={handlePartnerCheckboxChange}
+                              isChecked={!!partnerChecked[course.id]}
+                              handleCheckboxChange={isChecked => handlePartnerCheckboxChange(course.id, isChecked)}
                            />
                         </SwiperSlide>
                      ))}

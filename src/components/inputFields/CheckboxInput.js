@@ -1,26 +1,17 @@
-import { useState } from 'react';
 import styles from './InputFields.module.css';
 
 function CheckboxInput({
    label,
-   handleChange
+   isChecked,
+   onChange
 }) {
-
-   const [isChecked, setIsChecked] = useState(false);
-
-   // ---- Trigger the passed-in handler function with the checked state ----
-   const handleCheckboxChange = (event) => {
-      const checked = event.target.checked;
-      setIsChecked(checked);
-      handleChange(checked);
-   }
 
    return (
       <label className={`${styles.custom_ckeckbox} small_font`}>
          <input
             type="checkbox"
-            checked={isChecked}
-            onChange={handleCheckboxChange}
+            checked={isChecked} // Receive checked value from the parent
+            onChange={(e) => onChange(e.target.checked)}
          />
          <span className={styles.checkmark} />
          {label}

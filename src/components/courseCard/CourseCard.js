@@ -12,6 +12,7 @@ function CourseCard({
    platformName,
    rating,
    ratingNum,
+   isChecked, // For partner list checkbox
    handleCheckboxChange
 }) {
 
@@ -71,7 +72,8 @@ function CourseCard({
                <div className={styles.partner_section}>
                   <CheckboxInput
                      label="Add Me to Partner List"
-                     handleChange={handleCheckboxChange}
+                     isChecked={isChecked}
+                     onChange={handleCheckboxChange}
                   />
                </div>
             </div>
