@@ -12,21 +12,30 @@ function SelectInput({
    const selectRef = useRef(null);
    const [searchTerm, setSearchTerm] = useState('');
    const [selectedValue, setSelectedValue] = useState('');
-   const [highlightedIndex, sethigHlightedIndex] = useState(-1);
+   const [highlightedIndex, setHighlightedIndex] = useState(-1);
    const [isOpen, setIsOpen] = useState(false);
+   
+   // Add "No selection" option at the beginning
+   const updatedOptions = ["No selection", ...options];
 
    // Filtered options based on search term
    const filteredOptinos = searchTerm
-      ? options.filter(option => option.toLowerCase().startsWith(searchTerm.toLowerCase()))
-      : options;
+      ? updatedOptions.filter(option => option.toLowerCase().startsWith(searchTerm.toLowerCase()))
+      : updatedOptions;
 
    // ----------------- Handle selecting an option -----------------
    const handleOptionClick = (option, index) => {
-      setSelectedValue(option);
+      if (option === 'No selection') {
+         setSelectedValue(''); // Reset selected value
+         setHighlightedIndex(-1);
+         onChange(''); // Pass empty value to the parent
+      } else {
+         setSelectedValue(option);
+         setHighlightedIndex(index);
+         onChange(option.toLowerCase()); // Pass the selected value to the parent via onChange
+      }
       setSearchTerm('');
-      sethigHlightedIndex(index);
       setIsOpen(false);
-      onChange(option.toLowerCase()); // Pass the selected value to the parent via onChange
    };
    // ------- Handle searching for a specific value in list ---------
    const handleOptionSearch = (value) => {
@@ -46,11 +55,11 @@ function SelectInput({
       if (isOpen) {
          if (e.key === 'ArrowDown') {
             e.preventDefault(); // Prevent page scroll down
-            sethigHlightedIndex(prevIndex => (prevIndex + 1) % filteredOptinos.length);
+            setHighlightedIndex(prevIndex => (prevIndex + 1) % filteredOptinos.length);
 
          } else if (e.key === 'ArrowUp') {
             e.preventDefault();
-            sethigHlightedIndex(prevIndex => (prevIndex - 1 + filteredOptinos.length) % filteredOptinos.length);
+            setHighlightedIndex(prevIndex => (prevIndex - 1 + filteredOptinos.length) % filteredOptinos.length);
 
          } else if (e.key === 'Enter' && highlightedIndex >= 0) {
             handleOptionClick(filteredOptinos[highlightedIndex], highlightedIndex);
@@ -117,8 +126,9 @@ function SelectInput({
                   filteredOptinos.map((option, index) => (
                      <li
                         key={index}
+                        style={{color: index===0? 'var(--light-grey-color)' : 'var(--dark-grey-color)'}}
                         onClick={() => handleOptionClick(option, index)}
-                        onMouseEnter={() => sethigHlightedIndex(index)} // hover with mouse
+                        onMouseEnter={() => setHighlightedIndex(index)} // hover with mouse
                         className={highlightedIndex === index ? styles.highlighted : ''}
                      >
                         {option}

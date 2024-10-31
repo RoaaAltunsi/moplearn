@@ -88,13 +88,12 @@
     z-index: 5;
     box-shadow: 0 2px 4px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.08);
     border: 0.1vw solid var(--light-grey-color);
-    max-height: 7rem;
+    max-height: 8rem;
     overflow-y: auto;
 }
 
 .dropdown li {
     padding: 5px 4%;
-    color: var(--dark-grey-color);
     font-size: clamp(0.7rem, 1vw, 1.8rem);
 }
 
