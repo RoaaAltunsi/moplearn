@@ -51,5 +51,9 @@ ul {
     font-size: clamp(0.6rem, 0.9vw, 2rem);
 }
 
+.no_scroll {
+    overflow: hidden;
+}
+
 
 
