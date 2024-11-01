@@ -11,6 +11,7 @@ function MainButton({
    backgroundColor,
    onClick,
    tooltip, // Descriptive msg on hover
+   borderStyles,
 }) {
    return (
       <button
@@ -23,7 +24,8 @@ function MainButton({
          style={{ // Dynamic styles
             width: width,
             color: color,
-            backgroundColor: backgroundColor
+            backgroundColor: backgroundColor,
+            border: borderStyles
          }}
       >
          {

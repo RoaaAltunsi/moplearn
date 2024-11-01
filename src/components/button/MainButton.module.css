@@ -24,6 +24,7 @@ button::before { /* For hover effect */
     padding: 1.3vh 3rem;
     min-width: 12vw;
     border-radius: 0.5vw;
+    font-weight: bold;
     font-size: clamp(0.75rem, 1vw, 1.8rem);
 }
 
@@ -63,5 +64,12 @@ button::before { /* For hover effect */
     .circular_btn {
         width: 2.7rem;
         height: 2.7rem;
+    }
+}
+
+@media(max-width: 768px) {
+    .btn:hover::before,
+    .x_btn:hover::before {
+        filter: none; /* Override hover effect */
     }
 }

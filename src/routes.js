@@ -15,7 +15,7 @@ const routes = [
   { path: "contributors", element: <Contributors /> },
   { path: "contribute-form", element: <ContributeForm /> },
   { path: "courses", element: <Courses /> },
-  { path: "course/:courseName", element: <CourseCategory/> }, // Dynamic route
+  { path: "course/:courseCategory", element: <CourseCategory/> }, // Dynamic route
 ];
 
 export default routes;
