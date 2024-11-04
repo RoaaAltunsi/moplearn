@@ -6,6 +6,7 @@ import Contributors from './pages/contributors/Contributors.js';
 import ContributeForm from './pages/contributeForm/ContributeForm.js';
 import Courses from './pages/courses/Courses.js';
 import CourseCategory from './pages/courseCategory/CourseCategory.js';
+import FindPartner from './pages/findPartner/FindPartner.js';
 
 const routes = [
   { path: "/", element: <Homepage />, index: true }, // Default route
@@ -15,7 +16,8 @@ const routes = [
   { path: "contributors", element: <Contributors /> },
   { path: "contribute-form", element: <ContributeForm /> },
   { path: "courses", element: <Courses /> },
-  { path: "course/:courseCategory", element: <CourseCategory/> }, // Dynamic route
+  { path: "course/:courseCategory", element: <CourseCategory /> }, // Dynamic route
+  { path: "find-partner/:courseTitle?", element: <FindPartner /> } // Optional sub-route
 ];
 
 export default routes;

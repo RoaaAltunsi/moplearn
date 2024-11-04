@@ -2,8 +2,10 @@ import styles from './CourseCard.module.css';
 import MainButton from '../button/MainButton';
 import CheckboxInput from '../inputFields/CheckboxInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router-dom';
 
 function CourseCard({
+   id,
    link,
    image,
    price,
@@ -16,6 +18,26 @@ function CourseCard({
    handleCheckboxChange
 }) {
 
+   const navigate = useNavigate();
+
+   // ---------------- Format Course Title for URL -----------------
+   const formatTitleForURL = () => {
+      return title
+         .toLowerCase()
+         .replace(/and|,|\.|etc/g, '')           // Remove specific words and symbols
+         .replace(/\s+/g, '-')                   // Replace spaces with hyphens
+         .replace(/:.*/, '')                     // Remove text after a colon
+         .replace(/[^a-z0-9-]/g, '')             // Remove any other non-alphanumeric characters
+         .replace(/^-+|-+$/g, '');               // Trim extra hyphens at start/end
+   };
+
+   // ------- Find Partners to Specific Course by Passing ID -------
+   const handleFindPartnerClick = () => {
+      const formatedTitle = formatTitleForURL(title);
+      navigate(`/find-partner/${formatedTitle}`, { state: { id } });
+   };
+
+
    return (
       <div className={styles.container}>
 
@@ -25,6 +47,7 @@ function CourseCard({
                isCircular={true}
                tooltip="Find Partner"
                iconName={"fa-solid fa-user-plus"}
+               onClick={handleFindPartnerClick}
             />
          </div>
 
@@ -44,7 +67,7 @@ function CourseCard({
             <div className={styles.card_content}>
                <div className={styles.price_section}>
                   <h3 className={styles.price}>
-                     {price===0? 'Free' : `$ ${price}`}
+                     {price === 0 ? 'Free' : `$ ${price}`}
                   </h3>
                   {oldPrice && (
                      <span className={styles.old_price}>

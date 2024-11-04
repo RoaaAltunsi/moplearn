@@ -9,7 +9,7 @@ import slugify from "slugify";
 const navSections = [
    { label: "Home", link: "/" },
    { label: "Courses", link: "/courses" },
-   { label: "Find Partner", link: "/findPartner" },
+   { label: "Find Partner", link: "/find-partner" },
    { label: 'Contributors', link: "/contributors" }
 ];
 

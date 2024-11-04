@@ -242,6 +242,7 @@ function CourseCategory() {
                         {currentItems.map(course => (
                            <CourseCard
                               key={course.id}
+                              id={course.id}
                               link={course.link}
                               image={course.image}
                               price={course.price}

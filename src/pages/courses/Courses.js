@@ -112,6 +112,7 @@ function Courses() {
                      {courses.map(course => (
                         <SwiperSlide key={course.id} className={styles.card_container}>
                            <CourseCard
+                              id={course.id}
                               link={course.link}
                               image={course.image}
                               price={course.price}
