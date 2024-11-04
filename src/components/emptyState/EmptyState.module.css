@@ -6,13 +6,19 @@
     justify-content: center;
 }
 
-.image {
+.container img {
     width: 30%;
     height: auto;
 }
 
 .container h3 {
-    padding-top: 2vh;
     font-size: clamp(1.5rem, 2.5vw, 4rem);
     color: var(--light-grey-color);
+}
+
+/* ------------- Responsive Tablet/Mobile styles ------------- */
+@media(max-width: 768px) {
+    .container img {
+        width: 45%;
+    }
 }

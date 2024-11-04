@@ -6,15 +6,13 @@ import routes from './routes.js';
 import Footer from './components/footer/Footer.js';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import * as brandIcons from '@fortawesome/free-brands-svg-icons';
+import * as regularIcons from '@fortawesome/free-regular-svg-icons';
 
-// Dynamically add all icons from solid and brands packs
-const iconList = [
-  ...Object.keys(solidIcons),
-  ...Object.keys(brandIcons),
-]
-  .filter((key) => key !== 'fas' && key !== 'prefix') // Filter out internal FontAwesome properties
-  .map((icon) => solidIcons[icon] || brandIcons[icon]);
-library.add(...iconList);
+library.add(
+  ...Object.values(solidIcons).filter(icon => icon.iconName), 
+  ...Object.values(brandIcons).filter(icon => icon.iconName), 
+  ...Object.values(regularIcons).filter(icon => icon.iconName)
+);
 
 function App() {
   return (
