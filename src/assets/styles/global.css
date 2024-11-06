@@ -18,7 +18,7 @@
 
 body {
     font-family: 'Roboto', Arial, sans-serif; 
-    font-size: clamp(0.8rem, 1.1vw, 2rem); /* general font size */
+    font-size: clamp(0.7rem, 1vw, 2rem); /* general font size */
     color: --var(--black-color);
     margin: 0;
     padding: 0;

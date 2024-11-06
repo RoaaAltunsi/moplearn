@@ -8,7 +8,7 @@ const contactData = [
    { icon: 'phone', value: 'xxx xxx xxx' }
 ];
 const aboutData = [
-   { link: '/', label: 'Who we are?' },
+   { link: '/about-us', label: 'Who we are?' },
    { link: '/contribute-form', label: 'Contribute with us' }
 ];
 const followData = [
