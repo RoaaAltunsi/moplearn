@@ -1,0 +1,45 @@
+.container {
+    width: 100%;
+    padding: 0.8vw;
+    border-radius: 0.5vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--white-color);
+    box-shadow: 0 2px 7px rgba(0,0,0,.1);
+}
+
+.divider {
+    font-size: 1.3rem;
+    color: var(--light-grey-color);
+}
+
+.tab_item {
+    flex: 1;
+    padding: 0 1rem;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+}
+
+.tab_item h3 {
+    color: var(--light-grey-color);
+    transition: color 0.3s ease;
+    font-size: clamp(1rem, 1.7vw, 2.5rem);
+}
+
+.tab_item h3:hover,
+.tab_item.active h3 {
+    color: var(--secondary-color);
+}
+
+.active::after {
+    content: '';
+    position: absolute;
+    bottom: -55%;
+    left: 30%;
+    right: 30%;
+    height: 3px;
+    background-color: var(--secondary-color);
+    border-radius: 1px;
+}

@@ -12,6 +12,7 @@ function MainButton({
    onClick,
    tooltip, // Descriptive msg on hover
    borderStyles,
+   customStyles,
 }) {
    return (
       <button
@@ -25,7 +26,8 @@ function MainButton({
             width: width,
             color: color,
             backgroundColor: backgroundColor,
-            border: borderStyles
+            border: borderStyles,
+            ...customStyles
          }}
       >
          {

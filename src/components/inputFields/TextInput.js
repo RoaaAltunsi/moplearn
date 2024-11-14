@@ -6,6 +6,7 @@ function TextInput({
    label,
    value,
    placeholder,
+   icon,
    isPassword,
    isMulitLine,
    onChange
@@ -31,13 +32,22 @@ function TextInput({
                />
             ) : (
                // Single text field
-               <input
-                  value={value}
-                  placeholder={placeholder}
-                  type={(isPassword && securePass) ? 'password' : 'text'}
-                  onChange={(e) => onChange(e.target.value)}
-                  className={styles.text_input}
-               />
+               <>
+                  {icon && (
+                     <FontAwesomeIcon
+                        icon={icon}
+                        className={styles.box_icon}
+                        style={{ paddingRight: '0.5vw' }}
+                     />
+                  )}
+                  <input
+                     value={value}
+                     placeholder={placeholder}
+                     type={(isPassword && securePass) ? 'password' : 'text'}
+                     onChange={(e) => onChange(e.target.value)}
+                     className={styles.text_input}
+                  />
+               </>
             )}
 
             {/* Display eye icon for password */}

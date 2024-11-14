@@ -27,6 +27,7 @@
 }
 
 .link {
+    flex: 1;
     text-decoration: none;
     color: inherit;
 }

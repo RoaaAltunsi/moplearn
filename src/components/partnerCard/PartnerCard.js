@@ -27,6 +27,13 @@ function PartnerCard({
       }
    };
 
+   // ------------------ Format Username for URL ------------------
+   const formatNameForURL = () => {
+      return name
+         .toLowerCase()
+         .replaceAll(' ', '-');
+   };
+
 
    // ------------- Control Displaying Interests Tags -------------
    useEffect(() => {
@@ -41,7 +48,10 @@ function PartnerCard({
       <div className={styles.container}>
 
          <Link
-            to="/"
+            to={{
+               pathname: `/profile/${formatNameForURL(name)}`,
+               state: { id }
+            }}
             className={styles.link}
          >
             {/* ---------- Descriptive User Information ---------- */}

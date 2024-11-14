@@ -43,8 +43,8 @@
 }
 
 .box_icon {
-    width: 5%;
     min-width: 1rem;
+    align-self: center;
     cursor: pointer;
     color: var(--light-grey-color);
 }

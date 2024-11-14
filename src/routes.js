@@ -8,6 +8,7 @@ import Courses from './pages/courses/Courses.js';
 import CourseCategory from './pages/courseCategory/CourseCategory.js';
 import FindPartner from './pages/findPartner/FindPartner.js';
 import AboutUs from './pages/aboutUs/AboutUs.js';
+import Profile from './pages/profile/Profile.js';
 
 const routes = [
   { path: "/", element: <Homepage />, index: true }, // Default route
@@ -20,6 +21,7 @@ const routes = [
   { path: "course/:courseCategory", element: <CourseCategory /> }, // Dynamic route
   { path: "find-partner/:courseTitle?", element: <FindPartner /> }, // Optional sub-route
   { path: "about-us", element: <AboutUs /> },
+  { path: "profile/:username", element: <Profile /> },
 ];
 
 export default routes;
