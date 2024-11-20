@@ -8,7 +8,7 @@ import EmptyState from '../../components/emptyState/EmptyState';
 import Pagination from '../../components/pagination/Pagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 // ------------ Account section component ------------
@@ -41,6 +41,7 @@ function Profile() {
       interests: null,
       partners: null
    });
+   const navigate = useNavigate();
    const location = useLocation();
    const headerDropMenuRef = useRef(null);
    const imageInputRef = useRef(null);
@@ -149,8 +150,8 @@ function Profile() {
          languages: ['Arabic', 'English'],
          interests: ['Astronomy', 'Writing'],
          partners: [
-            { full_name: 'Rana Hafez', specialization: 'Programmer' },
-            { full_name: 'Doha Mohammed', specialization: 'Writer' }
+            { full_name: 'Rana Hafez', username: 'ran87', specialization: 'Programmer' },
+            { full_name: 'Doha Mohammed', username: 'dohamm', specialization: 'Writer' },
          ]
       }
       setProfileData(fetchedData);
@@ -351,7 +352,10 @@ function Profile() {
                         {currentItems.map((partner, index) => (
                            <div key={index} className={`${styles.section} ${styles.partners}`}>
                               <div className={styles.left_subsection}>
-                                 <div className={styles.partnet_img}>
+                                 <div
+                                    className={styles.partnet_img}
+                                    onClick={() => navigate(`/profile/${partner.username}`)}
+                                 >
                                     <img src={partner.profileImg ? partner.profileImg : DefaultImg} alt="" />
                                  </div>
                                  <div>

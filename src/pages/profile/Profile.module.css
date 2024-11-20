@@ -196,6 +196,7 @@
     width: 5vw;
     height: 5vw;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .partners .right_subsection {
@@ -231,6 +232,10 @@
     .profile_img {
         width: 6rem;
         height: 6rem;
+    }
+
+    .info_container {
+        border-radius: 0.5rem;
     }
 
     .edit_icon,
