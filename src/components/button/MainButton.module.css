@@ -67,6 +67,11 @@ button::before { /* For hover effect */
 }
 
 @media(max-width: 768px) {
+    .rectangle_btn {
+        border-radius: 0.5rem;
+        min-width: 8rem;
+    }
+
     .btn:hover::before,
     .x_btn:hover::before {
         filter: none; /* Override hover effect */

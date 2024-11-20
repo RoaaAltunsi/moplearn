@@ -1,6 +1,7 @@
 import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import styles from './Navbar.module.css';
-import Logo from '../../assets/images/Logo.png'
+import Logo from '../../assets/images/Logo.png';
+import DefaultImg from '../../assets/images/default-profile.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import slugify from "slugify";
@@ -26,7 +27,7 @@ const coursesCategories = [
 ];
 
 // ---------- Reusable NavItem component ----------
-const NavItem = ({ item, onClick = () => { } }) => (
+const NavItem = ({ item, icon, onClick = () => { } }) => (
    <li className={styles.nav_item}>
       <NavLink
          className={({ isActive }) =>
@@ -35,14 +36,15 @@ const NavItem = ({ item, onClick = () => { } }) => (
          to={item.link}
          onClick={onClick}
       >
+         {icon && (<FontAwesomeIcon icon={icon} className={styles.nav_item_icon} />)}
          {item.label}
       </NavLink>
    </li>
-)
+);
 
 // --------------- Main navbar list ---------------
 const MainNavList = ({ onClick = () => { } }) => (
-   <ul className={styles.main_list}>
+   <ul className={`${styles.flex_row} ${styles.main_list}`}>
       {navSections.map((item, index) => (
          <NavItem key={index} item={item} onClick={onClick} />
       ))}
@@ -57,7 +59,7 @@ const CoursesList = forwardRef(({ onClick = () => { } }, ref) => (
             key={index}
             item={{
                label: item,
-               link: `/course/${slugify(item, { lower: true })}` // Dynamically generate the link
+               link: `/courses/${slugify(item, { lower: true })}` // Dynamically generate the link
             }}
             onClick={onClick}
          />
@@ -70,7 +72,7 @@ const AuthButtons = ({
    onClickSignup = () => { },
    onClickLogin = () => { }
 }) => (
-   <div className={styles.auth_buttons}>
+   <div className={styles.auth_container}>
       <button className={styles.nav_button} onClick={onClickSignup}>
          Sign Up
       </button>
@@ -79,31 +81,70 @@ const AuthButtons = ({
          Log In
       </button>
    </div>
-)
+);
+
+// ----------- Dropdown list conponent ------------
+const PopUpList = forwardRef(({ isVisible, width, items, onClose }, ref) => (
+   <ul
+      ref={ref}
+      className={`${styles.popup_list} ${isVisible ? styles.visible : ''}`}
+      style={{ width: width }}
+   >
+      {items.map((item, index) => (
+         <NavItem
+            key={index}
+            item={{
+               label: item.label,
+               link: item.link
+            }}
+            icon={item.icon}
+            onClick={onClose}
+         />
+      ))}
+   </ul>
+));
 
 function Navbar() {
 
    const navigate = useNavigate();
    const location = useLocation(); // Get the current route
-   const iconRef = useRef(null);
+   const coursesIconRef = useRef(null);
    const mobileMenuRef = useRef(null);
    const coursesListRef = useRef(null);
    const coursesDropMenu = useRef(null);
+   const dtUserProfileRef = useRef(null); // User icon in desktop sizes
+   const mbUserProfileRef = useRef(null); // User icon in mobile sizes
+   const dtProfileDropRef = useRef(null);
+   const mbProfileDropRef = useRef(null);
    const [isMenuOpened, setIsMenuOpened] = useState(false); // Navbar in tablet/mobile mode
    const [hiddenCourses, setHiddenCourses] = useState([]);
-   const [isDropMenuOpened, setIsDropMenuOpened] = useState(false); // Courses drop menu
+   const [isCoursesDropMenuOpened, setIsCoursesDropMenuOpened] = useState(false);
+   const [isProfileDtDropOpened, setIsProfileDtDropOpened] = useState(false);
+   const [isProfileMbDropOpened, setIsProfileMbDropOpened] = useState(false);
 
 
    // ---------- Close menu when clicking outside the component ----------
    const handleClickOutside = useCallback((e) => {
-      if (iconRef.current && iconRef.current.contains(e.target)) return; // Ignore clicks on the icon itself
+      // Helper function to check if the click is inside any element
+      const isClickInside = (refs) => refs.some(ref => ref?.current?.contains(e.target));
+      // Define the refs to ignore clicks for
+      const ignoreRefs = [coursesIconRef, dtUserProfileRef, mbUserProfileRef];
+      if (isClickInside(ignoreRefs)) return;
+
       if (isMenuOpened && mobileMenuRef?.current && !mobileMenuRef.current.contains(e.target)) {
          setIsMenuOpened(false);
+         setIsProfileMbDropOpened(false);
       }
-      if (isDropMenuOpened && coursesDropMenu?.current && !coursesDropMenu.current.contains(e.target)) {
-         setIsDropMenuOpened(false);
+      if (isCoursesDropMenuOpened && coursesDropMenu?.current && !coursesDropMenu.current.contains(e.target)) {
+         setIsCoursesDropMenuOpened(false);
       }
-   }, [isDropMenuOpened, isMenuOpened]);
+      if (isProfileDtDropOpened && dtProfileDropRef?.current && !dtProfileDropRef.current.contains(e.target)) {
+         setIsProfileDtDropOpened(false);
+      }
+      if (isProfileMbDropOpened && mbProfileDropRef?.current && !mbProfileDropRef.current.contains(e.target)) {
+         setIsProfileMbDropOpened(false);
+      }
+   }, [isCoursesDropMenuOpened, isProfileDtDropOpened, isMenuOpened, isProfileMbDropOpened]);
 
    // ---------- Update hidden courses based on container width ----------
    const updateHiddenCourses = () => {
@@ -123,10 +164,10 @@ function Navbar() {
       setHiddenCourses(newHiddenCourses);
    };
 
-
-   // -------------- Apply update logic only in custom routes -------------
+   // ------------- Update courses list only in custom routes ------------
    useEffect(() => {
-      if (location.pathname.startsWith('/course')) {
+      const isCourseCategoryPage = /^\/courses\/[^/]+$/.test(location.pathname);
+      if (isCourseCategoryPage) {
          // Wait for the browser to update the layout and then update the visible courses
          requestAnimationFrame(() => {
             updateHiddenCourses();
@@ -147,13 +188,24 @@ function Navbar() {
       };
    }, [handleClickOutside]);
 
+   // ------- Prevent scrolling when mobile menu is opened ------------
+   useEffect(() => {
+      if (isMenuOpened) {
+         document.body.classList.add('no_scroll');
+      } else {
+         document.body.classList.remove('no_scroll');
+      }
+   }, [isMenuOpened]);
+
    // ----- Ensure each menu only appears in its designed window size -----
    useEffect(() => {
       const handleResize = () => {
          if (window.innerWidth > 768) {
             setIsMenuOpened(false);
+            setIsProfileMbDropOpened(false);
          } else {
-            setIsDropMenuOpened(false);
+            setIsCoursesDropMenuOpened(false);
+            setIsProfileDtDropOpened(false);
          }
       }
       window.addEventListener('resize', handleResize);
@@ -169,16 +221,25 @@ function Navbar() {
 
          {/* ---------------------- Main Nav Section ---------------------- */}
          <div className={styles.main_section}>
-            {/* Logo */}
-            <Link to="/">
-               <img src={Logo} alt="Loog" className={styles.logo} />
-            </Link>
+            <div className={styles.flex_row}>
+               {/* Hamburger icon for tablet/mobile mode */}
+               <FontAwesomeIcon
+                  icon="fa-solid fa-bars"
+                  onClick={() => setIsMenuOpened(true)}
+                  className={styles.icon}
+               />
+               {/* Logo */}
+               <Link to="/">
+                  <img src={Logo} alt="Loog" className={styles.logo} />
+               </Link>
+            </div>
 
             {/* Main nav list container */}
             <div className={styles.nav_links_container}>
                <MainNavList />
 
-               <AuthButtons
+               {/* Sign up / Log in buttons */}
+               {/* <AuthButtons
                   onClickSignup={() => {
                      navigate('signup');
                      setIsMenuOpened(false);
@@ -187,30 +248,59 @@ function Navbar() {
                      navigate('login');
                      setIsMenuOpened(false);
                   }}
-               />
+               /> */}
+
+               {/* User's account list */}
+               <div className={`${styles.flex_row} ${styles.user_logged}`}>
+                  <FontAwesomeIcon
+                     icon="fa-solid fa-comment-dots"
+                     className={styles.icon}
+                     onClick={() => console.log("Chat")}
+                  />
+                  <FontAwesomeIcon
+                     icon="fa-solid fa-user-group"
+                     className={styles.icon}
+                     onClick={() => navigate('partners-requests')}
+                  />
+                  <div
+                     ref={dtUserProfileRef}
+                     className={styles.profile_pic}
+                     onClick={() => setIsProfileDtDropOpened(!isProfileDtDropOpened)}
+                  >
+                     <div className={styles.img_container}>
+                        <img src={DefaultImg} alt="" />
+                     </div>
+                     <FontAwesomeIcon icon="fa-solid fa-caret-down" />
+                  </div>
+               </div>
             </div>
 
-            {/* Hamburger icon for tablet/mobile mode */}
-            <FontAwesomeIcon
-               icon="fa-solid fa-bars"
-               onClick={() => setIsMenuOpened(true)}
-               className={styles.icon}
+            {/* User's profile dropdown menu */}
+            <PopUpList
+               ref={dtProfileDropRef}
+               isVisible={isProfileDtDropOpened}
+               width='15vw'
+               items={[
+                  { label: 'Profile', link: '/profile/ola', icon: 'fa-solid fa-user' },
+                  { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' }
+               ]}
+               onClose={() => setIsProfileDtDropOpened(false)}
             />
          </div>
 
          {/* --------------------- Courses Nav Section -------------------- */}
          <div className={`
                   ${styles.courses_section}
-                  ${location.pathname.startsWith('/course') ? styles.visible : ''}
+                  ${location.pathname.startsWith('/courses') ? styles.visible : ''}
                `}
          >
             <div className={styles.nav_links_container}>
                <CoursesList ref={coursesListRef} />
 
                <FontAwesomeIcon
-                  ref={iconRef}
+                  ref={coursesIconRef}
                   icon="fa-solid fa-ellipsis-vertical"
-                  onClick={() => setIsDropMenuOpened(!isDropMenuOpened)}
+                  onClick={() => setIsCoursesDropMenuOpened(!isCoursesDropMenuOpened)}
                   className={`
                      ${styles.icon}
                      ${hiddenCourses.length > 0 ? styles.visible : ''}
@@ -220,23 +310,16 @@ function Navbar() {
          </div>
 
          {/* -- Drop down menu if courses exceed the available nav width -- */}
-         <ul
+         <PopUpList
             ref={coursesDropMenu}
-            className={`
-               ${styles.courses_dropdown}
-               ${(hiddenCourses.length > 0 && isDropMenuOpened) ? styles.visible : ''}
-               `}>
-            {hiddenCourses.map((item, index) => (
-               <NavItem
-                  key={index}
-                  item={{
-                     label: item,
-                     link: `/course/${slugify(item, { lower: true })}` // Dynamically generate the link
-                  }}
-                  onClick={() => setIsDropMenuOpened(false)}
-               />
-            ))}
-         </ul>
+            isVisible={hiddenCourses.length > 0 && isCoursesDropMenuOpened}
+            width='20vw'
+            items={hiddenCourses.map(course => ({
+               label: course,
+               link: `/courses/${slugify(course, { lower: true })}` // Dynamically generate the link
+            }))}
+            onClose={() => setIsCoursesDropMenuOpened(false)}
+         />
 
          {/* ----------- Hamburger's Menu for Tablet/Mobile Mode ---------- */}
          <div>
@@ -250,18 +333,26 @@ function Navbar() {
                ref={mobileMenuRef}
                className={`${styles.hamburger_menu} ${isMenuOpened ? styles.menu_opened : ''}`}
             >
-               <FontAwesomeIcon
-                  icon="fa-solid fa-xmark"
-                  className={styles.icon}
-                  onClick={() => setIsMenuOpened(false)}
-               />
+               {/* Logo && Close icon */}
+               <div className={styles.header}>
+                  <Link to="/">
+                     <img src={Logo} alt="Loog" className={styles.logo} />
+                  </Link>
+                  <FontAwesomeIcon
+                     icon="fa-solid fa-xmark"
+                     className={styles.icon}
+                     onClick={() => setIsMenuOpened(false)}
+                  />
+               </div>
 
+               {/* Main nav list items */}
                <MainNavList onClick={() => setIsMenuOpened(false)} />
 
-               {location.pathname === '/courses' && (
+               {location.pathname.startsWith('/courses') && (
                   <CoursesList onClick={() => setIsMenuOpened(false)} />
                )}
 
+               {/* Sign up / Log in buttons */}
                <AuthButtons
                   onClickSignup={() => {
                      navigate('signup');
@@ -272,10 +363,39 @@ function Navbar() {
                      setIsMenuOpened(false);
                   }}
                />
+
+               {/* User's account picture */}
+               {/* <div className={styles.auth_container}>
+                  <div
+                     ref={mbUserProfileRef}
+                     className={`${styles.flex_row} ${styles.user_logged}`}
+                     onClick={() => setIsProfileMbDropOpened(!isProfileMbDropOpened)}
+                  >
+                     <div className={styles.img_container}>
+                        <img src={DefaultImg} alt="" />
+                     </div>
+                     <h3> Ola Saber </h3>
+                  </div>
+               </div> */}
+
+               {/* User's account popup menu */}
+               <PopUpList
+                  ref={mbProfileDropRef}
+                  isVisible={isProfileMbDropOpened}
+                  width='8rem'
+                  items={[
+                     { label: 'Profile', link: '/profile/ola', icon: 'fa-solid fa-user' },
+                     { label: 'Chats', link: '', icon: 'fa-solid fa-comment-dots' },
+                     { label: 'Requests', link: '', icon: 'fa-solid fa-user-group' },
+                     { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' },
+                  ]}
+                  onClose={() => { setIsProfileMbDropOpened(false); setIsMenuOpened(false) }}
+               />
+
             </div>
          </div>
 
-      </nav>
+      </nav >
    )
 }
 export default Navbar;
