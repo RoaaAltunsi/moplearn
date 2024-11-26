@@ -1,0 +1,140 @@
+.content_wrap {
+    width: 90%;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    padding: 5vw;
+    min-height: 100vh;
+}
+
+.flex_row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10vw;
+}
+
+.info_container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 5vh 0;
+    border-radius: 0.5vw;
+    background-color: var(--white-color);
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .1);
+}
+
+.section {
+    width: 100%;
+    padding: 3vh 3vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile_img {
+    width: 8vw;
+    height: 8vw;
+    align-self: center;
+    border-radius: 50%;
+    position: relative;
+}
+
+.profile_img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.edit_img_btn {
+    width: 2.5vw;
+    height: 2.5vw;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.edit_menu {
+    display: none;
+    width: 12vw;
+    min-width: 7rem;
+    position: absolute;
+    left: 90%;
+    top: 90%;
+    z-index: 1;
+    background-color: var(--white-color);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
+}
+
+.visible {
+    display: block;
+}
+
+.edit_menu>* {
+    cursor: pointer;
+    padding: 2vh 1.5vw;
+}
+
+.edit_menu>* span {
+    padding-left: 1vw;
+}
+
+.edit_menu>*:hover {
+    background-color: var(--grey-background-color);
+}
+
+.delete_sec {
+    border-top: 1px solid var(--grey-background-color);
+}
+
+.delete_sec h3 {
+    font-size: clamp(1rem, 1.7vw, 2.5rem);
+    color: var(--red-color);
+}
+
+.modal_btns {
+    margin-top: 8vh;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal_btns> :first-child {
+    margin-right: 1vw;
+}
+
+/* ------------- Responsive Tablet/Mobile styles ------------- */
+@media(max-width: 1024px) {
+    .edit_img_btn {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+
+@media(max-width: 768px) {
+    .content_wrap {
+        padding: 5vh 5vw;
+    }
+    
+    .flex_row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .info_container {
+        border-radius: 0.5rem;
+    }
+    
+    .profile_img {
+        width: 4rem;
+        height: 4rem;
+    }
+
+    .section {
+        padding: 3vh 1.5rem;
+    }
+
+    .edit_menu>* {
+        padding: 2vh 1rem;
+    }
+}

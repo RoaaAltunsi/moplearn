@@ -282,6 +282,7 @@ function Navbar() {
                width='15vw'
                items={[
                   { label: 'Profile', link: '/profile/ola', icon: 'fa-solid fa-user' },
+                  { label: 'Settings', link: '/edit-account?tab=settings', icon: 'fa-solid fa-gear' },
                   { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' }
                ]}
                onClose={() => setIsProfileDtDropOpened(false)}
@@ -386,7 +387,8 @@ function Navbar() {
                   items={[
                      { label: 'Profile', link: '/profile/ola', icon: 'fa-solid fa-user' },
                      { label: 'Chats', link: '', icon: 'fa-solid fa-comment-dots' },
-                     { label: 'Requests', link: '', icon: 'fa-solid fa-user-group' },
+                     { label: 'Requests', link: '/partners-requests', icon: 'fa-solid fa-user-group' },
+                     { label: 'Settings', link: '/edit-account?tab=settings', icon: 'fa-solid fa-gear' },
                      { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' },
                   ]}
                   onClose={() => { setIsProfileMbDropOpened(false); setIsMenuOpened(false) }}

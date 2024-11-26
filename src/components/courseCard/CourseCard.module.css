@@ -8,6 +8,8 @@
 }
 
 .find_partner {
+    width: 4vw;
+    height: 4vw;
     position: absolute;
     top: -2%;
     right: -7%;
@@ -107,6 +109,11 @@
 @media(max-width: 1024px) {
     .container {
         min-height: 270px;
+    }
+
+    .find_partner {
+        width: 2.7rem;
+        height: 2.7rem;
     }
 }
 

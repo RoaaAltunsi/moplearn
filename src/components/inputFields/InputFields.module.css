@@ -30,14 +30,12 @@
 
 /* Change input box border color on focus or filled */
 .input_box:focus-within,
-.input_box.open_dropdown,
 .input_box.filled {
     border-color: var(--secondary-color);
 }
 
 /* Change label color on focus or filled */
 .container:focus-within label,
-.container label.open_dropdown,
 .container label.filled {
     color: var(--secondary-color);
 }
@@ -79,6 +77,34 @@
 }
 
 /* ------------ Select input field styles ------------ */
+.tags_container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8vh;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5vh 1vw;
+    border-radius: 0.5vw;
+    background-color: var(--grey-background-color);
+}
+
+.close_icon {
+    margin-right: 0.5rem;
+    font-size: 0.8vw;
+    color: var(--dark-grey-color);
+    cursor: pointer;
+}
+
+.multi_text_container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
 .dropdown {
     background-color: var(--white-color);
     position: absolute;
@@ -86,14 +112,14 @@
     width: 100%;
     border-radius: 5px;
     z-index: 5;
-    box-shadow: 0 2px 4px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.08);
+    box-shadow: 0 2px 4px rgba(0,0,0,.08);
     border: 0.1vw solid var(--light-grey-color);
     max-height: 8rem;
     overflow-y: auto;
 }
 
 .dropdown li {
-    padding: 5px 4%;
+    padding: 5px 1vw;
     font-size: clamp(0.7rem, 1vw, 1.8rem);
 }
 
@@ -158,6 +184,10 @@
         padding: 1.5vh 0.4rem;
         border-radius: 0.5rem;
     }
+
+    .dropdown li {
+        padding: 5px 0.4rem;
+    }
 }
 
 @media(max-width: 1024px) {
@@ -165,5 +195,14 @@
         height: 15px;
         width: 15px;
         margin-right: 8px;
+    }
+
+    .tag {
+        padding: 0.5vh 0.5rem;
+        border-radius: 0.2rem;
+    }
+
+    .close_icon {
+        font-size: 0.6rem;
     }
 }

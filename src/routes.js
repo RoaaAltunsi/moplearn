@@ -10,6 +10,7 @@ import FindPartner from './pages/findPartner/FindPartner.js';
 import AboutUs from './pages/aboutUs/AboutUs.js';
 import Profile from './pages/profile/Profile.js';
 import PartnersRequests from './pages/partnersRequests/PartnersRequests.js';
+import EditAccount from './pages/editAccount/EditAccount.js';
 
 const routes = [
   { path: "/", element: <Homepage />, index: true }, // Default route
@@ -23,7 +24,8 @@ const routes = [
   { path: "find-partner/:courseTitle?", element: <FindPartner /> }, // Optional sub-route
   { path: "about-us", element: <AboutUs /> },
   { path: "profile/:username", element: <Profile /> },
-  {  path: "partners-requests", element: <PartnersRequests /> },
+  { path: "partners-requests", element: <PartnersRequests /> },
+  { path: "edit-account", element: <EditAccount /> },
 ];
 
 export default routes;

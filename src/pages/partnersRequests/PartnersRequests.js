@@ -5,8 +5,8 @@ import Modal from '../../components/modal/Modal';
 import EmptyState from '../../components/emptyState/EmptyState';
 import DefaultImg from '../../assets/images/default-profile.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 
 const receivedRequests = [
@@ -24,7 +24,9 @@ function PartnersRequests() {
 
    const navigate = useNavigate();
    const tabs = ['Received', 'Sent'];
-   const [activeTab, setActiveTab] = useState('Received');
+   const [searchParams] = useSearchParams();
+   const activeTabFromURL = searchParams.get('tab') || 'received';
+   const [activeTab, setActiveTab] = useState(activeTabFromURL);
    const [isModalOpened, setIsModalOpened] = useState(false);
    const [modalAction, setModalAction] = useState(null);
 
@@ -51,6 +53,20 @@ function PartnersRequests() {
    const modalConfirmAction = modalAction === 'removeReceivedReq' ? handleRemoveReceivedReq : handleRemoveSentReq;
 
 
+   // Synchronize state with URL query parameters on mount and back/forward navigation
+   useEffect(() => {
+      setActiveTab(activeTabFromURL);
+   }, [activeTabFromURL]);
+
+   // -------------- Update URL when changing the tab --------------
+   useEffect(() => {
+      const formattedTab = activeTab.toLowerCase().replaceAll(' ', '-');
+      if (formattedTab !== searchParams.get('tab')) {
+         navigate(`?tab=${formattedTab}`, { replace: true }); // Use replace to avoid unnecessary history entries
+      }
+   }, [activeTab, navigate, searchParams]);
+
+
    return (
       <div className='container'>
          <div className={styles.content_wrap}>
@@ -60,11 +76,11 @@ function PartnersRequests() {
             <Tabs
                tabs={tabs}
                activeTab={activeTab}
-               onTabChange={(tab) => setActiveTab(tab)}
+               onTabChange={setActiveTab}
             />
 
             <div className={styles.info_container}>
-               {activeTab === 'Received' ? (
+               {activeTab === 'received' ? (
                   // ---------------- Received Requests -----------------
                   (!receivedRequests || receivedRequests.length === 0) ? (
                      <EmptyState />

@@ -7,6 +7,12 @@ function Tabs({
    onTabChange
 }) {
 
+   // -------------- Format tab title for URL --------------
+   const formatTabTitle = (tab) => {
+      return tab.toLowerCase().replaceAll(' ', '-')
+   };
+
+   
    return (
       <div className={styles.container}>
 
@@ -14,8 +20,8 @@ function Tabs({
             <Fragment key={index}>
                {/* Tab title */}
                <div
-                  className={`${styles.tab_item} ${tab === activeTab ? styles.active : ''}`}
-                  onClick={() => onTabChange(tab)}
+                  className={`${styles.tab_item} ${formatTabTitle(tab) === activeTab ? styles.active : ''}`}
+                  onClick={() => onTabChange(formatTabTitle(tab))}
                >
                   <h3> {tab} </h3>
                </div>

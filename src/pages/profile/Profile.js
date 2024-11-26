@@ -8,7 +8,7 @@ import EmptyState from '../../components/emptyState/EmptyState';
 import Pagination from '../../components/pagination/Pagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 
 // ------------ Account section component ------------
@@ -37,9 +37,9 @@ function Profile() {
       specialization: '',
       bio: '',
       location: '',
-      languages: null,
-      interests: null,
-      partners: null
+      languages: [],
+      interests: [],
+      partners: []
    });
    const navigate = useNavigate();
    const location = useLocation();
@@ -47,8 +47,9 @@ function Profile() {
    const imageInputRef = useRef(null);
    const editBtnRef = useRef(null);
    const tabs = ['Account', 'Partners'];
-
-   const [activeTab, setActiveTab] = useState('Account');
+   const [searchParams] = useSearchParams();
+   const activeTabFromURL = searchParams.get('tab') || 'account';
+   const [activeTab, setActiveTab] = useState(activeTabFromURL);
    const [tempHeader, setTempHeader] = useState(null);
    const [isDropMenuOpened, setIsDropMenuOpened] = useState(false); // Edit header drop menu
    const [dragging, setDragging] = useState(false);
@@ -135,6 +136,19 @@ function Profile() {
       }
    }, [isDropMenuOpened]);
 
+
+   // Synchronize state with URL query parameters on mount and back/forward navigation
+   useEffect(() => {
+      setActiveTab(activeTabFromURL);
+   }, [activeTabFromURL]);
+
+   // -------------- Update URL when changing the tab --------------
+   useEffect(() => {
+      const formattedTab = activeTab.toLowerCase().replaceAll(' ', '-');
+      if (formattedTab !== searchParams.get('tab')) {
+         navigate(`?tab=${formattedTab}`, { replace: true }); // Use replace to avoid unnecessary history entries
+      }
+   }, [activeTab, navigate, searchParams]);
 
    // ------------ Fetch user profile information from DB -----------
    useEffect(() => {
@@ -276,6 +290,7 @@ function Profile() {
                <FontAwesomeIcon
                   icon="fa-solid fa-pen"
                   className={styles.edit_icon}
+                  onClick={() => navigate('/edit-account')}
                />
             </div>
 
@@ -287,7 +302,7 @@ function Profile() {
             />
 
             <div className={styles.info_container}>
-               {activeTab === 'Account' ? (
+               {activeTab === 'account' ? (
                   // Account section
                   isAccountEmpty ? (
                      <EmptyState />
@@ -383,7 +398,7 @@ function Profile() {
             </div>
 
             {/* Pagination section */}
-            {(activeTab === 'Partners' && profileData.partners?.length > itemsPerPage) && (
+            {(activeTab === 'partners' && profileData.partners?.length > itemsPerPage) && (
                <Pagination
                   itemsLength={profileData.partners?.length}
                   itemsPerPage={itemsPerPage}
