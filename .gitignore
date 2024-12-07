@@ -3,19 +3,52 @@
 
 # Visual Studio Code settings
 .vscode/
+.idea/                      
+*.swp                       
+*.sublime-project
+*.sublime-workspace
 
-# build output
-/dist
-/build
-
-# dotenv environment variables file
-.env
-
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# OS-specific files
+# Ignore system files
 .DS_Store
 Thumbs.db
+
+# Ignore logs
+npm-debug.log*
+yarn-debug.log*
+*.log
+
+# Frontend (React)
+frontend/node_modules/       # Node.js dependencies for React
+frontend/build/              # Build output for React
+frontend/dist/               # Distribution folder (if applicable)
+frontend/.env                # Frontend environment file
+frontend/.cache/             # Cache folder used by tools like Parcel or Gatsby
+
+# Backend (Laravel)
+backend/vendor/              # Laravel vendor dependencies (installed via Composer)
+backend/storage/*.key        # Encryption keys
+backend/storage/logs/        # Log files
+backend/storage/framework/cache/  # Cache storage
+backend/storage/framework/sessions/  # Session files
+backend/storage/framework/views/     # Compiled views
+backend/.env                 # Backend environment file
+backend/.env.backup          # Backup environment file
+backend/.env.production      # Production environment file
+backend/.phpactor.json       # PHP Actor cache
+backend/.phpunit.cache       # PHPUnit cache
+backend/node_modules
+backend/.phpunit.result.cache
+backend/.fleet               # JetBrains Fleet IDE settings
+backend/.idea/               # IntelliJ IDEA settings
+backend/.nova/               # Laravel Nova files
+backend/public/build/        # Public build files
+backend/public/hot           # Hot reload indicator
+backend/public/storage/      # Symlink to storage
+backend/storage/pail         # Unused files
+backend/Homestead.json       # Homestead configuration
+backend/Homestead.yaml       # Homestead configuration
+backend/auth.json            # Composer authentication file
+
+# Misc
+*.bak                       # Backup files
+*.tmp                       # Temporary files
