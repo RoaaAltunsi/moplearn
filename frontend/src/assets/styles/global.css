@@ -55,5 +55,10 @@ ul {
     overflow: hidden;
 }
 
+.error {
+    color: var(--red-color) !important;
+    border-color: var(--red-color) !important;
+}
+
 
 

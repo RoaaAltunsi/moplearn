@@ -9,7 +9,8 @@ function TextInput({
    icon,
    isPassword,
    isMulitLine,
-   onChange
+   onChange,
+   error
 }) {
 
    const [securePass, setSecurePass] = useState(true);
@@ -19,9 +20,9 @@ function TextInput({
 
    return (
       <div className={styles.container}>
-         <label className={`${value ? styles.filled : ''}`}> {label} </label>
+         <label className={`${value ? styles.filled : ''} ${error? 'error' : ''}`}> {label} </label>
 
-         <div className={`${styles.input_box} ${value ? styles.filled : ''}`}>
+         <div className={`${styles.input_box} ${value ? styles.filled : ''} ${error? 'error' : ''}`}>
             {isMulitLine ? (
                // Multilines text field
                <textarea
@@ -65,6 +66,11 @@ function TextInput({
                />
             )}
          </div>
+
+         {/* Display Error message if it exist */}
+         {!!error && (
+            <span className='error'> {error} </span>
+         )}
 
       </div>
    );

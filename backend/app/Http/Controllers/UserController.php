@@ -42,7 +42,8 @@ class UserController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => 'Something went wrong, please try again later',
+                'message' => 'Failed to register new user',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

@@ -7,7 +7,8 @@ function SelectInput({
    value,
    options,
    isMultiOptions,
-   onChange
+   onChange,
+   error
 }) {
 
    const selectRef = useRef(null);
@@ -138,7 +139,7 @@ function SelectInput({
    return (
       <div className={styles.container} ref={selectRef}>
          <label
-            className={`${(isMultiOptions? selectedTags.length > 0 : value) ? styles.filled : ''}`}>
+            className={`${(isMultiOptions? selectedTags.length > 0 : value) ? styles.filled : ''} ${error? 'error' : ''}`}>
             {label}
          </label>
 
@@ -147,6 +148,7 @@ function SelectInput({
             className={`
                ${styles.input_box}
                ${selectedValue || selectedTags.length > 0 || searchTerm ? styles.filled : ''}
+               ${error? 'error' : ''}
             `}
          >
             {isMultiOptions ? (
@@ -214,6 +216,11 @@ function SelectInput({
                )}
 
             </ul>
+         )}
+
+         {/* Display Error message if it exist */}
+         {!!error && !isOpen && (
+            <span className='error'> {error} </span>
          )}
       </div>
    );

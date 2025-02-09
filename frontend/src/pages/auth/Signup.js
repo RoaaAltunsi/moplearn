@@ -5,26 +5,28 @@ import TextInput from '../../components/inputFields/TextInput';
 import SelectInput from '../../components/inputFields/SelectInput';
 import MainButton from '../../components/button/MainButton';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { addUser } from '../../redux/slices/authSlice';
 
-const textFields = [
-   { label: 'Name' },
-   { label: 'Email' },
-   { label: 'Password' },
-   { label: 'Re Password' },
-   { label: 'Speciality', placeholder: 'e.g. Web developer' },
-]
+const textFields = [ 'Username', 'Email', 'Password', 'Password Confirmation' ];
 
 function Signup() {
 
    const initialValues = {
-      name: '',
+      username: '',
       email: '',
       password: '',
-      re_password: '',
-      speciality: '',
+      password_confirmation: '',
       gender: '',
    }
+   const dispatch = useDispatch();
    const { fields, handleChange } = useFormFields(initialValues);
+   const { validationErrors, error } = useSelector((state) => state.auth);
+
+   // --------------- Handle submit register form ---------------
+   const handleSubmission = () => {
+      dispatch(addUser(fields));
+   };
 
    return (
       <div className='container'>
@@ -36,14 +38,14 @@ function Signup() {
                <form>
                   {/* Text input fields */}
                   {textFields.map((item, index) => {
-                     const labelkey = item.label.toLowerCase().replace(' ', '_');
+                     const labelkey = item.toLowerCase().replace(' ', '_');
                      return (
                         <TextInput
                            key={index}
-                           label={item.label}
+                           label={item}
                            value={fields[labelkey]}
-                           placeholder={item.placeholder}
-                           isPassword={labelkey === 'password' || labelkey === 're_password'}
+                           isPassword={labelkey === 'password' || labelkey === 'password_confirmation'}
+                           error={validationErrors[labelkey] ? validationErrors[labelkey][0] : ""}
                            onChange={(value) => handleChange(labelkey, value)}
                         />
                      )
@@ -53,15 +55,21 @@ function Signup() {
                      label={'Gender'}
                      value={fields['gender']}
                      options={['Male', 'Female']}
+                     error={validationErrors['gender'] ? validationErrors['gender'][0] : ""}
                      onChange={(value) => handleChange('gender', value)}
                   />
                </form>
+
+               {/* Display general error msg if it exist */}
+               {!!error && (
+                  <span className='error'> {error} </span>
+               )}
 
                {/* Submit Button */}
                <div className={styles.btn_container}>
                   <MainButton
                      label="Sign up"
-                     onClick={() => console.log("Button Clicked!")}
+                     onClick={handleSubmission}
                   />
                </div>
 
