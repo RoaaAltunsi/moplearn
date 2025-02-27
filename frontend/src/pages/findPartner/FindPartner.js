@@ -7,7 +7,7 @@ import SelectInput from '../../components/inputFields/SelectInput';
 import CheckboxInput from '../../components/inputFields/CheckboxInput';
 import PartnerCard from '../../components/partnerCard/PartnerCard';
 import Pagination from '../../components/pagination/Pagination';
-import EmptyState from '../../components/emptyState/EmptyState';
+import EmptyState from '../../components/UIStates/EmptyState';
 
 const languages = [
    'English', 'Arabic', 'Chinese', 'Italian', 'French', 'Korean', 'Japanese', 'Russian', 'Turkish',

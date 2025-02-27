@@ -3,7 +3,8 @@ import { ReactComponent as OpportunitiesSVG } from '../../assets/images/opportin
 import { ReactComponent as PartnerSVG } from '../../assets/images/partner.svg';
 import useIntersectionAnimation from '../../hooks/useIntersectionAnimation';
 import styles from './Homepage.module.css';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 
 const sectionsData = [
    {
@@ -71,12 +72,23 @@ function Homepage() {
          </div>
 
          {/* Image */}
-         <Image className={styles.img} />  
+         <Image className={styles.img} />
       </div>
    );
 
+   // ------------ Display registration toaster -----------
+   useEffect(() => {
+      if (localStorage.getItem('signup_success')) {
+         toast.success("Successful Registration!");
+         localStorage.removeItem('signup_success');
+      }
+   }, []);
+   
+
    return (
       <div className="container">
+         <ToastContainer />
+         
          {sectionsData.map((item, index) => (
             <HomepageSection
                key={index}

@@ -2,19 +2,47 @@ import styles from './Auth.module.css';
 import { ReactComponent as LoginSVG } from '../../assets/images/login.svg';
 import TextInput from '../../components/inputFields/TextInput';
 import MainButton from '../../components/button/MainButton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useFormFields from '../../hooks/useFormFields';
+import LoadingState from '../../components/UIStates/LoadingState';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { login } from '../../redux/slices/authSlice';
+import { toast } from 'react-toastify';
 
 function Login() {
 
    const initialValues = {
       email: '',
       password: ''
-   }
+   };
+   const navigate = useNavigate();
+   const dispatch = useDispatch();
    const { fields, handleChange } = useFormFields(initialValues);
+   const { validationErrors, isAuthenticated, loading } = useSelector((state) => state.auth);
+
+   const handleSubmission = async (e) => {
+      e.preventDefault();
+      try {
+         await dispatch(login(fields)).unwrap();
+      } catch (err) {
+         // Show error toast
+         toast.error(err.error);
+      }
+   };
+
+   // --------- Redirect to homepage after login ---------
+   useEffect(() => {
+      if (isAuthenticated) {
+         navigate('/');
+      }
+   }, [isAuthenticated, navigate]);
+
 
    return (
       <div className='container'>
+         {loading && <LoadingState />}
+
          <div className={styles.content_wrap}>
 
             {/* ------------- Left Section ------------- */}
@@ -25,12 +53,14 @@ function Login() {
                   <TextInput
                      label="Email"
                      value={fields['email']}
+                     error={validationErrors['email'] ? validationErrors['email'][0] : ""}
                      onChange={(value) => handleChange('email', value)}
                   />
                   <TextInput
                      label="Password"
                      value={fields['password']}
                      isPassword={true}
+                     error={validationErrors['password'] ? validationErrors['password'][0] : ""}
                      onChange={(value) => handleChange('password', value)}
                   />
                </form>
@@ -47,7 +77,7 @@ function Login() {
                <div className={styles.btn_container}>
                   <MainButton
                      label="Log in"
-                     onClick={() => console.log("Button Clicked!")}
+                     onClick={handleSubmission}
                   />
                </div>
 

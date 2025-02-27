@@ -5,7 +5,11 @@ import DefaultImg from '../../assets/images/default-profile.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import slugify from "slugify";
-
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
+import { persistor } from "../../redux/store"; 
+import { toast, ToastContainer } from "react-toastify";
+import LoadingState from "../UIStates/LoadingState";
 
 const navSections = [
    { label: "Home", link: "/" },
@@ -98,7 +102,13 @@ const PopUpList = forwardRef(({ isVisible, width, items, onClose }, ref) => (
                link: item.link
             }}
             icon={item.icon}
-            onClick={onClose}
+            onClick={(e) => {
+               if (item.action) {
+                  e.preventDefault();
+                  item.action(); // Call the action
+               }
+               onClose(); // Close the popup after clicking
+            }}
          />
       ))}
    </ul>
@@ -107,6 +117,7 @@ const PopUpList = forwardRef(({ isVisible, width, items, onClose }, ref) => (
 function Navbar() {
 
    const navigate = useNavigate();
+   const dispatch = useDispatch();
    const location = useLocation(); // Get the current route
    const coursesIconRef = useRef(null);
    const mobileMenuRef = useRef(null);
@@ -121,6 +132,7 @@ function Navbar() {
    const [isCoursesDropMenuOpened, setIsCoursesDropMenuOpened] = useState(false);
    const [isProfileDtDropOpened, setIsProfileDtDropOpened] = useState(false);
    const [isProfileMbDropOpened, setIsProfileMbDropOpened] = useState(false);
+   const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
 
 
    // ---------- Close menu when clicking outside the component ----------
@@ -163,6 +175,17 @@ function Navbar() {
       });
       setHiddenCourses(newHiddenCourses);
    };
+
+   // ---------------- Logout user and clear global state ----------------
+   const handleLogout = async() => {
+      try {
+         await dispatch(logout()).unwrap();
+         persistor.purge(); // Clear persisted data
+         navigate("/");
+      } catch (error) {
+         toast.error(error?.error);
+      }
+   }
 
    // ------------- Update courses list only in custom routes ------------
    useEffect(() => {
@@ -218,6 +241,9 @@ function Navbar() {
 
    return (
       <nav className={styles.navbar}>
+         {loading && <LoadingState />}
+
+         <ToastContainer />
 
          {/* ---------------------- Main Nav Section ---------------------- */}
          <div className={styles.main_section}>
@@ -238,55 +264,62 @@ function Navbar() {
             <div className={styles.nav_links_container}>
                <MainNavList />
 
-               {/* Sign up / Log in buttons */}
-               {/* <AuthButtons
-                  onClickSignup={() => {
-                     navigate('signup');
-                     setIsMenuOpened(false);
-                  }}
-                  onClickLogin={() => {
-                     navigate('login');
-                     setIsMenuOpened(false);
-                  }}
-               /> */}
-
-               {/* User's account list */}
-               <div className={`${styles.flex_row} ${styles.user_logged}`}>
-                  <FontAwesomeIcon
-                     icon="fa-solid fa-comment-dots"
-                     className={styles.icon}
-                     onClick={() => console.log("Chat")}
-                  />
-                  <FontAwesomeIcon
-                     icon="fa-solid fa-user-group"
-                     className={styles.icon}
-                     onClick={() => navigate('partners-requests')}
-                  />
-                  <div
-                     ref={dtUserProfileRef}
-                     className={styles.profile_pic}
-                     onClick={() => setIsProfileDtDropOpened(!isProfileDtDropOpened)}
-                  >
-                     <div className={styles.img_container}>
-                        <img src={DefaultImg} alt="" />
+               {isAuthenticated ? (
+                  <>
+                     {/* User's account list */}
+                     <div className={`${styles.flex_row} ${styles.user_logged}`}>
+                        <FontAwesomeIcon
+                           icon="fa-solid fa-comment-dots"
+                           className={styles.icon}
+                           onClick={() => console.log("Chat")}
+                        />
+                        <FontAwesomeIcon
+                           icon="fa-solid fa-user-group"
+                           className={styles.icon}
+                           onClick={() => navigate('partners-requests')}
+                        />
+                        <div
+                           ref={dtUserProfileRef}
+                           className={styles.profile_pic}
+                           onClick={() => setIsProfileDtDropOpened(!isProfileDtDropOpened)}
+                        >
+                           <div className={styles.img_container}>
+                              <img src={DefaultImg} alt="" />
+                           </div>
+                           <FontAwesomeIcon icon="fa-solid fa-caret-down" />
+                        </div>
                      </div>
-                     <FontAwesomeIcon icon="fa-solid fa-caret-down" />
-                  </div>
-               </div>
-            </div>
 
-            {/* User's profile dropdown menu */}
-            <PopUpList
-               ref={dtProfileDropRef}
-               isVisible={isProfileDtDropOpened}
-               width='15vw'
-               items={[
-                  { label: 'Profile', link: '/profile/ola', icon: 'fa-solid fa-user' },
-                  { label: 'Settings', link: '/edit-account?tab=settings', icon: 'fa-solid fa-gear' },
-                  { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' }
-               ]}
-               onClose={() => setIsProfileDtDropOpened(false)}
-            />
+                     {/* User's profile dropdown menu */}
+                     <PopUpList
+                        ref={dtProfileDropRef}
+                        isVisible={isProfileDtDropOpened}
+                        width='15vw'
+                        items={[
+                           { label: 'Profile', link: `/profile/${user.username}`, icon: 'fa-solid fa-user' },
+                           { label: 'Settings', link: '/edit-account?tab=settings', icon: 'fa-solid fa-gear' },
+                           { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket', action: handleLogout }
+                        ]}
+                        onClose={() => setIsProfileDtDropOpened(false)}
+                     />
+                  </>
+
+               ) : (
+                  <>
+                     {/* Sign up / Log in buttons */}
+                     <AuthButtons
+                        onClickSignup={() => {
+                           navigate('signup');
+                           setIsMenuOpened(false);
+                        }}
+                        onClickLogin={() => {
+                           navigate('login');
+                           setIsMenuOpened(false);
+                        }}
+                     />
+                  </>
+               )}
+            </div>
          </div>
 
          {/* --------------------- Courses Nav Section -------------------- */}
@@ -353,46 +386,52 @@ function Navbar() {
                   <CoursesList onClick={() => setIsMenuOpened(false)} />
                )}
 
-               {/* Sign up / Log in buttons */}
-               <AuthButtons
-                  onClickSignup={() => {
-                     navigate('signup');
-                     setIsMenuOpened(false);
-                  }}
-                  onClickLogin={() => {
-                     navigate('login');
-                     setIsMenuOpened(false);
-                  }}
-               />
-
-               {/* User's account picture */}
-               {/* <div className={styles.auth_container}>
-                  <div
-                     ref={mbUserProfileRef}
-                     className={`${styles.flex_row} ${styles.user_logged}`}
-                     onClick={() => setIsProfileMbDropOpened(!isProfileMbDropOpened)}
-                  >
-                     <div className={styles.img_container}>
-                        <img src={DefaultImg} alt="" />
+               {isAuthenticated ? (
+                  <>
+                     {/* User's account picture */}
+                     <div className={styles.auth_container}>
+                        <div
+                           ref={mbUserProfileRef}
+                           className={`${styles.flex_row} ${styles.user_logged}`}
+                           onClick={() => setIsProfileMbDropOpened(!isProfileMbDropOpened)}
+                        >
+                           <div className={styles.img_container}>
+                              <img src={DefaultImg} alt="" />
+                           </div>
+                           <h3> Ola Saber </h3>
+                        </div>
                      </div>
-                     <h3> Ola Saber </h3>
-                  </div>
-               </div> */}
 
-               {/* User's account popup menu */}
-               <PopUpList
-                  ref={mbProfileDropRef}
-                  isVisible={isProfileMbDropOpened}
-                  width='8rem'
-                  items={[
-                     { label: 'Profile', link: '/profile/ola', icon: 'fa-solid fa-user' },
-                     { label: 'Chats', link: '', icon: 'fa-solid fa-comment-dots' },
-                     { label: 'Requests', link: '/partners-requests', icon: 'fa-solid fa-user-group' },
-                     { label: 'Settings', link: '/edit-account?tab=settings', icon: 'fa-solid fa-gear' },
-                     { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' },
-                  ]}
-                  onClose={() => { setIsProfileMbDropOpened(false); setIsMenuOpened(false) }}
-               />
+                     {/* User's account popup menu */}
+                     <PopUpList
+                        ref={mbProfileDropRef}
+                        isVisible={isProfileMbDropOpened}
+                        width='8rem'
+                        items={[
+                           { label: 'Profile', link: `/profile/${user.username}`, icon: 'fa-solid fa-user' },
+                           { label: 'Chats', link: '', icon: 'fa-solid fa-comment-dots' },
+                           { label: 'Requests', link: '/partners-requests', icon: 'fa-solid fa-user-group' },
+                           { label: 'Settings', link: '/edit-account?tab=settings', icon: 'fa-solid fa-gear' },
+                           { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' },
+                        ]}
+                        onClose={() => { setIsProfileMbDropOpened(false); setIsMenuOpened(false) }}
+                     />
+                  </>
+               ) : (
+                  <>
+                     {/* Sign up / Log in buttons */}
+                     <AuthButtons
+                        onClickSignup={() => {
+                           navigate('signup');
+                           setIsMenuOpened(false);
+                        }}
+                        onClickLogin={() => {
+                           navigate('login');
+                           setIsMenuOpened(false);
+                        }}
+                     />
+                  </>
+               )}
 
             </div>
          </div>

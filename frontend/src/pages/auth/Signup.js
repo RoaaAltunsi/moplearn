@@ -2,13 +2,15 @@ import styles from './Auth.module.css';
 import { ReactComponent as SignupSVG } from '../../assets/images/signup.svg';
 import useFormFields from '../../hooks/useFormFields';
 import TextInput from '../../components/inputFields/TextInput';
-import SelectInput from '../../components/inputFields/SelectInput';
 import MainButton from '../../components/button/MainButton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { addUser } from '../../redux/slices/authSlice';
+import { register } from '../../redux/slices/authSlice';
+import LoadingState from '../../components/UIStates/LoadingState';
+import { useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 
-const textFields = [ 'Username', 'Email', 'Password', 'Password Confirmation' ];
+const textFields = ['Username', 'Email', 'Password', 'Password Confirmation'];
 
 function Signup() {
 
@@ -17,19 +19,37 @@ function Signup() {
       email: '',
       password: '',
       password_confirmation: '',
-      gender: '',
    }
    const dispatch = useDispatch();
+   const navigate = useNavigate();
    const { fields, handleChange } = useFormFields(initialValues);
-   const { validationErrors, error } = useSelector((state) => state.auth);
+   const { validationErrors, isAuthenticated, loading } = useSelector((state) => state.auth);
 
    // --------------- Handle submit register form ---------------
-   const handleSubmission = () => {
-      dispatch(addUser(fields));
+   const handleSubmission = async (e) => {
+      e.preventDefault();
+      
+      try {
+         await dispatch(register(fields)).unwrap();
+      } catch (error) {
+         // Show error toast
+         toast.error(error.error);
+      }
    };
+
+   // --------- Redirect to homepage after registration ---------
+   useEffect(() => {
+      if (isAuthenticated) {
+         localStorage.setItem('signup_success', true);
+         navigate('/');
+      }
+   }, [isAuthenticated, navigate]);
+
 
    return (
       <div className='container'>
+         {loading && <LoadingState />}
+
          <div className={styles.content_wrap}>
 
             {/* ------------- Left Section ------------- */}
@@ -50,20 +70,7 @@ function Signup() {
                         />
                      )
                   })}
-                  {/* Selection input fields */}
-                  <SelectInput
-                     label={'Gender'}
-                     value={fields['gender']}
-                     options={['Male', 'Female']}
-                     error={validationErrors['gender'] ? validationErrors['gender'][0] : ""}
-                     onChange={(value) => handleChange('gender', value)}
-                  />
                </form>
-
-               {/* Display general error msg if it exist */}
-               {!!error && (
-                  <span className='error'> {error} </span>
-               )}
 
                {/* Submit Button */}
                <div className={styles.btn_container}>
@@ -71,6 +78,7 @@ function Signup() {
                      label="Sign up"
                      onClick={handleSubmission}
                   />
+                  <ToastContainer />
                </div>
 
                {/* Log in link */}

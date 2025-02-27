@@ -4,7 +4,7 @@ import Filter from '../../components/filter/Filter';
 import CourseCard from '../../components/courseCard/CourseCard';
 import SelectInput from '../../components/inputFields/SelectInput';
 import Pagination from '../../components/pagination/Pagination';
-import EmptyState from '../../components/emptyState/EmptyState';
+import EmptyState from '../../components/UIStates/EmptyState';
 import { useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 

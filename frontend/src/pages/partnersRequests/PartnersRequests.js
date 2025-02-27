@@ -2,7 +2,7 @@ import styles from './PartnersRequests.module.css';
 import Tabs from '../../components/tabs/Tabs';
 import MainButton from '../../components/button/MainButton';
 import Modal from '../../components/modal/Modal';
-import EmptyState from '../../components/emptyState/EmptyState';
+import EmptyState from '../../components/UIStates/EmptyState';
 import DefaultImg from '../../assets/images/default-profile.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState, useEffect } from 'react';

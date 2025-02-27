@@ -4,7 +4,7 @@ import MainButton from '../../components/button/MainButton';
 import TextInput from '../../components/inputFields/TextInput';
 import Modal from '../../components/modal/Modal';
 import Tabs from '../../components/tabs/Tabs';
-import EmptyState from '../../components/emptyState/EmptyState';
+import EmptyState from '../../components/UIStates/EmptyState';
 import Pagination from '../../components/pagination/Pagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useRef, useState } from 'react';

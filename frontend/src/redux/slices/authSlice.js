@@ -3,22 +3,22 @@ import apiClient from "../apiClient";
 
 const initialState = {
    user: {},
-   token: null,
    validationErrors: {},
+   isAuthenticated: false,
    loading: false,
    error: ''
 };
 
 
 // --------------------- Async Reducer Functions --------------------- 
-// ADD USER: register new user
-export const addUser = createAsyncThunk('auth/addUser', async (userData, thunkAPI) => {
+// REGISTER: register new user
+export const register = createAsyncThunk('auth/register', async (userData, thunkAPI) => {
    try {
-      const response = await apiClient.post('users', userData);
+      const response = await apiClient.post('register', userData);
       return response.data;
 
    } catch (error) {
-      if (error.response && error.response.status == 422) {
+      if (error.response?.status === 422) {
          // Validation errors returned with status = 422
          return thunkAPI.rejectWithValue({
             validationErrors: error.response.data?.errors
@@ -26,8 +26,39 @@ export const addUser = createAsyncThunk('auth/addUser', async (userData, thunkAP
       }
       // General errors
       return thunkAPI.rejectWithValue({
-         error: error.response?.data?.error || error.response?.data.message
+         error: error.response?.data?.message || 'Register Failed'
       })
+   }
+});
+
+// LOGIN: authenticate user
+export const login = createAsyncThunk('auth/login', async (credentials, thunkAPI) => {
+   try {
+      const response = await apiClient.post('login', credentials);
+      return response.data;
+
+   } catch (error) {
+      if (error.response?.status === 422) {
+         // Validation errors returned with status = 422
+         return thunkAPI.rejectWithValue({
+            validationErrors: error.response.data?.errors
+         })
+      }
+      // General errors
+      return thunkAPI.rejectWithValue({
+         error: error.response?.data?.message || 'Log in Failed'
+      })
+   }
+})
+
+// LOGOUT: logout user from the system
+export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
+   try {
+      await apiClient.post('logout');
+   } catch (error) {
+      return thunkAPI.rejectWithValue({
+         error: error.response?.data?.message || 'Logout Failed'
+      });
    }
 });
 
@@ -38,29 +69,56 @@ const authSlice = createSlice({
    reducers: {},
    extraReducers: (builder) => {
       builder
-      // --------------------- addUser ---------------------
-         .addCase(addUser.pending, (state) => {
+         // --------------------- register ---------------------
+         .addCase(register.pending, (state) => {
             state.loading = true;
          })
-
-         .addCase(addUser.fulfilled, (state, action) => {
+         .addCase(register.fulfilled, (state, action) => {
             state.loading = false;
             state.user = action.payload?.user;
-            state.token = action.payload?.token;
-            if (action.payload?.token) {
-               localStorage.setItem('token', state.token);
-            }
+            state.isAuthenticated = true;
             state.validationErrors = {};
             state.error = '';
          })
-         
-         .addCase(addUser.rejected, (state, action) => {
+         .addCase(register.rejected, (state, action) => {
             state.loading = false;
             state.validationErrors = action.payload?.validationErrors || {};
             state.error = action.payload?.error || '';
-         });
+         })
+
+         // --------------------- login ----------------------
+         .addCase(login.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(login.fulfilled, (state, action) => {
+            state.loading = false;
+            state.user = action.payload?.user;
+            state.isAuthenticated = true;
+            state.validationErrors = {};
+            state.error = '';
+         })
+         .addCase(login.rejected, (state, action) => {
+            state.loading = false;
+            state.validationErrors = action.payload?.validationErrors || {};
+            state.error = action.payload?.error || '';
+         })
+
+         // --------------------- logout ---------------------
+         .addCase(logout.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(logout.fulfilled, (state) => {
+            state.loading = false;
+            state.user = {};
+            state.isAuthenticated = false;
+            state.validationErrors = {};
+            state.error = '';
+         })
+         .addCase(logout.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload?.error || '';
+         })
    }
 });
 
-// export const { addUser } = authSlice.actions;
 export default authSlice.reducer;
