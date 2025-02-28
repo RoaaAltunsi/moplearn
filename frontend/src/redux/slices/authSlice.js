@@ -56,17 +56,56 @@ export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
    try {
       await apiClient.post('logout');
    } catch (error) {
-      return thunkAPI.rejectWithValue({
-         error: error.response?.data?.message || 'Logout Failed'
-      });
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Logout Failed');
    }
 });
+
+// VALIDATE-EMAIL: validate user's email
+export const validateEmail = createAsyncThunk('auth/validate-email', async (email, thunkAPI) => {
+   try {
+      await apiClient.post('validate-email', email);
+   } catch (error) {
+      if (error.response?.status === 422) {
+         // Validation errors returned with status = 422
+         return thunkAPI.rejectWithValue({
+            validationErrors: error.response.data?.errors
+         })
+      }
+      // General errors
+      return thunkAPI.rejectWithValue({
+         error: error.response?.data?.message || 'Validation Fails'
+      })
+   }
+});
+
+// RESET-PASSWORD: reset user's password
+export const resetPassword = createAsyncThunk('auth/reset-password', async (data, thunkAPI) => {
+   try {
+      await apiClient.post('reset-password', data);
+   } catch (error) {
+      if (error.response?.status === 422) {
+         // Validation errors returned with status = 422
+         return thunkAPI.rejectWithValue({
+            validationErrors: error.response.data?.errors
+         })
+      }
+      // General errors
+      return thunkAPI.rejectWithValue({
+         error: error.response?.data?.message || 'Reset Password Fails'
+      })
+   }
+})
 
 
 const authSlice = createSlice({
    name: 'auth',
    initialState,
-   reducers: {},
+   reducers: {
+      clearErrors: (state) => {
+         state.error = '';
+         state.validationErrors = {};
+      }
+   },
    extraReducers: (builder) => {
       builder
          // --------------------- register ---------------------
@@ -116,9 +155,40 @@ const authSlice = createSlice({
          })
          .addCase(logout.rejected, (state, action) => {
             state.loading = false;
+            state.error = action.payload || '';
+         })
+
+         // ----------------- validate email ------------------
+         .addCase(validateEmail.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(validateEmail.fulfilled, (state) => {
+            state.loading = false;
+            state.validationErrors = {};
+            state.error = '';
+         })
+         .addCase(validateEmail.rejected, (state, action) => {
+            state.loading = false;
+            state.validationErrors = action.payload?.validationErrors || {};
+            state.error = action.payload?.error || '';
+         })
+
+         // ----------------- reset password ------------------
+         .addCase(resetPassword.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(resetPassword.fulfilled, (state) => {
+            state.loading = false;
+            state.validationErrors = {};
+            state.error = '';
+         })
+         .addCase(resetPassword.rejected, (state, action) => {
+            state.loading = false;
+            state.validationErrors = action.payload?.validationErrors || {};
             state.error = action.payload?.error || '';
          })
    }
 });
 
+export const { clearErrors } = authSlice.actions;
 export default authSlice.reducer;

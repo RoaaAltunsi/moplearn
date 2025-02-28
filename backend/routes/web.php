@@ -10,6 +10,8 @@ Route::get('/csrf-token', function() {
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('validate-email', [AuthController::class, 'validateEmail']);
+Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth')->group(function () {
     Route::get('user', [AuthController::class, 'getUser']);

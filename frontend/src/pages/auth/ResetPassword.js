@@ -4,27 +4,49 @@ import useFormFields from '../../hooks/useFormFields';
 import TextInput from '../../components/inputFields/TextInput';
 import MainButton from '../../components/button/MainButton';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { validateEmail, resetPassword } from '../../redux/slices/authSlice';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 function ResetPassword() {
 
+   const navigate = useNavigate();
+   const dispatch = useDispatch();
    const initialValues = {
       email: '',
       password: '',
-      re_password: '',
+      password_confirmation: '',
    }
    const { fields, handleChange } = useFormFields(initialValues);
    const [isEmailValid, setIsEmailValid] = useState(false);
+   const { validationErrors } = useSelector((state) => state.auth);
 
    // ----------------- Handle Submission -----------------
-   // It will be modified later with the required logic from backend
-   const handleSubmission = () => {
+   const handleSubmission = async (e) => {
+      e.preventDefault();
       if (!isEmailValid) {
-         // Logic to validate email
-         setIsEmailValid(true);
+         // Validate email
+         try {
+            await dispatch(validateEmail({ "email": fields.email })).unwrap();
+            setIsEmailValid(true);
+         } catch (err) {
+            toast.error(err.error);
+         }
+
       } else {
-         // Logic to reset password
+         // Reset password
+         try {
+            await dispatch(resetPassword(fields)).unwrap();
+            toast.success("Your password has been successfully reset");
+            setTimeout(() => {
+               navigate('/login');
+            }, 2000);
+         } catch (err) {
+            toast.error(err.error);
+         }
       }
-   }
+   };
 
    return (
       <div className='container'>
@@ -39,6 +61,7 @@ function ResetPassword() {
                      <TextInput
                         label="Email"
                         value={fields['email']}
+                        error={validationErrors['email'] ? validationErrors['email'][0] : ""}
                         onChange={(value) => handleChange('email', value)}
                      />
                   ) : (
@@ -47,13 +70,15 @@ function ResetPassword() {
                            label="New Password"
                            value={fields['password']}
                            isPassword={true}
+                           error={validationErrors['password'] ? validationErrors['password'][0] : ""}
                            onChange={(value) => handleChange('password', value)}
                         />
                         <TextInput
-                           label="Re New Password"
-                           value={fields['re_password']}
+                           label="Password Confirmation"
+                           value={fields['password_confirmation']}
                            isPassword={true}
-                           onChange={(value) => handleChange('re_password', value)}
+                           error={validationErrors['password_confirmation'] ? validationErrors['password_confirmation'][0] : ""}
+                           onChange={(value) => handleChange('password_confirmation', value)}
                         />
                      </>
                   )}
@@ -62,7 +87,7 @@ function ResetPassword() {
                {/* Submit Button */}
                <div className={styles.btn_container}>
                   <MainButton
-                     label={isEmailValid? 'Reset Password' : 'Send'}
+                     label={isEmailValid ? 'Reset Password' : 'Send'}
                      onClick={handleSubmission}
                   />
                </div>

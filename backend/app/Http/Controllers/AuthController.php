@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class AuthController extends Controller
@@ -91,4 +92,48 @@ class AuthController extends Controller
         ], 200);
     }
 
+    /**
+     * Validate user's email
+    */
+    public function validateEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email'
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Email is valid'
+        ], 200);
+    }
+
+    /**
+     * Reset user's Password
+    */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required|string|min:8'
+        ]);
+
+        // Find user by email
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        // Update Password
+        $user->password = Hash::make($request->password);
+        $user->save();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password has been successfully reset'
+        ], 200);
+
+    }
+    
 }
