@@ -4,7 +4,6 @@ import TextInput from '../../components/inputFields/TextInput';
 import MainButton from '../../components/button/MainButton';
 import { Link, useNavigate } from 'react-router-dom';
 import useFormFields from '../../hooks/useFormFields';
-import LoadingState from '../../components/UIStates/LoadingState';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { login } from '../../redux/slices/authSlice';
@@ -19,7 +18,7 @@ function Login() {
    const navigate = useNavigate();
    const dispatch = useDispatch();
    const { fields, handleChange } = useFormFields(initialValues);
-   const { validationErrors, isAuthenticated, loading } = useSelector((state) => state.auth);
+   const { validationErrors, isAuthenticated } = useSelector((state) => state.auth);
 
    const handleSubmission = async (e) => {
       e.preventDefault();
@@ -41,8 +40,6 @@ function Login() {
 
    return (
       <div className='container'>
-         {loading && <LoadingState />}
-
          <div className={styles.content_wrap}>
 
             {/* ------------- Left Section ------------- */}

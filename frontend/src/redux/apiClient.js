@@ -12,10 +12,10 @@ const apiClient = axios.create({
 // Fetch CSRF token and set it in the headers
 const fetchCsrfToken = async () => {
    try {
-       const response = await apiClient.get('/csrf-token');
-       apiClient.defaults.headers.common['X-CSRF-TOKEN'] = response.data.csrf_token;
+      const response = await apiClient.get('/csrf-token');
+      apiClient.defaults.headers.common['X-CSRF-TOKEN'] = response.data.csrf_token;
    } catch (error) {
-       console.error('Failed to fetch CSRF token:', error);
+      console.error('Failed to fetch CSRF token:', error);
    }
 };
 

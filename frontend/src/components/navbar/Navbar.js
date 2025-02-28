@@ -181,7 +181,7 @@ function Navbar() {
       try {
          await dispatch(logout()).unwrap();
          persistor.purge(); // Clear persisted data
-         navigate("/");
+         window.location.href = "/";
       } catch (error) {
          toast.error(error?.error);
       }
@@ -412,7 +412,7 @@ function Navbar() {
                            { label: 'Chats', link: '', icon: 'fa-solid fa-comment-dots' },
                            { label: 'Requests', link: '/partners-requests', icon: 'fa-solid fa-user-group' },
                            { label: 'Settings', link: '/edit-account?tab=settings', icon: 'fa-solid fa-gear' },
-                           { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket' },
+                           { label: 'Log Out', link: '', icon: 'fa-solid fa-arrow-right-from-bracket', action: handleLogout },
                         ]}
                         onClose={() => { setIsProfileMbDropOpened(false); setIsMenuOpened(false) }}
                      />

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import './assets/styles/global.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import Navbar from './components/navbar/Navbar.js';
@@ -9,6 +9,11 @@ import * as brandIcons from '@fortawesome/free-brands-svg-icons';
 import * as regularIcons from '@fortawesome/free-regular-svg-icons';
 import ScrollToTop from './utils/ScrollToTop.js';
 import PageWrapper from './utils/PageWrapper.js';
+import { ToastContainer } from 'react-toastify';
+import LoadingState from './components/UIStates/LoadingState.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearAllErrors } from './redux/globalActions.js';
+import { useEffect } from 'react';
 
 library.add(
   ...Object.values(solidIcons).filter(icon => icon.iconName),
@@ -17,11 +22,26 @@ library.add(
 );
 
 function App() {
+
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) =>
+    Object.values(state).some(slice => slice.loading) // Check if any slice has loading = true
+  );
+
+  // Clear errors on route change
+  useEffect(() => {
+    dispatch(clearAllErrors());
+  }, [location.pathname, dispatch]);
+
   return (
     <>
       <Navbar />
       <ScrollToTop />
       <PageWrapper>
+        {isLoading && <LoadingState />}
+        <ToastContainer />
+
         <Routes>
           {routes.map((route, index) => (
             <Route key={index} path={route.path} element={route.element} />

@@ -6,9 +6,8 @@ import MainButton from '../../components/button/MainButton';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { register } from '../../redux/slices/authSlice';
-import LoadingState from '../../components/UIStates/LoadingState';
 import { useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const textFields = ['Username', 'Email', 'Password', 'Password Confirmation'];
 
@@ -23,7 +22,7 @@ function Signup() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
    const { fields, handleChange } = useFormFields(initialValues);
-   const { validationErrors, isAuthenticated, loading } = useSelector((state) => state.auth);
+   const { validationErrors, isAuthenticated } = useSelector((state) => state.auth);
 
    // --------------- Handle submit register form ---------------
    const handleSubmission = async (e) => {
@@ -40,16 +39,16 @@ function Signup() {
    // --------- Redirect to homepage after registration ---------
    useEffect(() => {
       if (isAuthenticated) {
-         localStorage.setItem('signup_success', true);
-         navigate('/');
+         toast.success("Successful Registration!");
+         setTimeout(() => {
+            navigate('/');
+         }, 2000);
       }
    }, [isAuthenticated, navigate]);
 
 
    return (
       <div className='container'>
-         {loading && <LoadingState />}
-
          <div className={styles.content_wrap}>
 
             {/* ------------- Left Section ------------- */}
@@ -78,7 +77,6 @@ function Signup() {
                      label="Sign up"
                      onClick={handleSubmission}
                   />
-                  <ToastContainer />
                </div>
 
                {/* Log in link */}
