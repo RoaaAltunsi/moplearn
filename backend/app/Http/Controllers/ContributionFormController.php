@@ -64,7 +64,7 @@ class ContributionFormController extends Controller
     {
         // Update contribution form status >> by the admin
         $request->validate([
-            'status' => 'required|in:pending,approved,rejected'
+            'status' => 'required|in:pending,accepted,rejected'
         ]);
 
         $form = ContributionForm::findOrFail($id);
@@ -72,7 +72,7 @@ class ContributionFormController extends Controller
         $form->save();
 
         // If form is approved >> create a contributor
-        if ($request->status === 'approved') {
+        if ($request->status === 'accepted') {
             Contributor::create([
                 'form_id' => $form->id
             ]);

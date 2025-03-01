@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ContributorResource;
 use App\Models\Contributor;
 
 class ContributorController extends Controller
@@ -11,11 +12,9 @@ class ContributorController extends Controller
      */
     public function index()
     {
-        $contributors = Contributor::with(['contributionForm' => function($query) {
-            $query->select('id', 'platform_name', 'logo', 'email', 'phone_number');
-        }])->get();
-
-        return response()->json($contributors);
+        return ContributorResource::collection(
+            Contributor::with('contributionForm')->get()
+        );
     }
 
     /**
@@ -23,10 +22,8 @@ class ContributorController extends Controller
      */
     public function show(string $id)
     {
-        $contributor = Contributor::with(['contributionForm' => function ($query) {
-            $query->select('id', 'platform_name', 'logo', 'phone_number', 'email');
-        }])->findOrFail($id);
-
-        return response()->json($contributor);
+        return new ContributorResource(
+            Contributor::with('contributionForm')->findOrFail($id)
+        );
     }
 }

@@ -3,14 +3,31 @@ import { ReactComponent as ContributorsSVG } from '../../assets/images/contribut
 import MainButton from '../../components/button/MainButton';
 import CurvedLine from '../../components/curvedLine/CurvedLine';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getContributors } from '../../redux/slices/contributorSlice';
+import { toast } from 'react-toastify';
 
-// Get all platforms' logos
-const images = require.context('../../assets/images/platforms', false, /\.(png|jpe?g|svg)$/);
 
 function Contributors() {
 
+   const dispatch = useDispatch();
    const navigate = useNavigate();
-   const imagePaths = images.keys().map(image => images(image));
+   const { contributors } = useSelector((state) => state.contributor);
+
+
+   // -------------- Fetch contributors from DB --------------
+   useEffect(() => {
+      if (contributors.length === 0) {
+         try {
+            dispatch(getContributors());
+            
+         } catch(err) {
+            toast.error(err.error);
+         }
+      }
+   }, [dispatch, contributors]);
+
 
    return (
       <div className='container'>
@@ -41,10 +58,10 @@ function Contributors() {
 
             {/* ----------- Contributors Platforms ---------- */}
             <div className={styles.platforms_grid}>
-               {imagePaths.map((src, index) => (
+               {contributors.length > 0 && contributors.map((contributor, index) => (
                   <img
                      key={index}
-                     src={src}
+                     src={contributor['contribution_form'].logo}
                      alt={`Platform ${index}`}
                      className={styles.platform}
                   />
