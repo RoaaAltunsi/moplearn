@@ -73,7 +73,7 @@ export const validateEmail = createAsyncThunk('auth/validate-email', async (emai
       }
       // General errors
       return thunkAPI.rejectWithValue({
-         error: error.response?.data?.message || 'Validation Fails'
+         error: error.response?.data?.message || 'Validation Failed'
       })
    }
 });
@@ -91,7 +91,7 @@ export const resetPassword = createAsyncThunk('auth/reset-password', async (data
       }
       // General errors
       return thunkAPI.rejectWithValue({
-         error: error.response?.data?.message || 'Reset Password Fails'
+         error: error.response?.data?.message || 'Reset Password Failed'
       })
    }
 })

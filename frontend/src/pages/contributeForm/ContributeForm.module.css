@@ -12,6 +12,32 @@
     margin-top: 5vh;
 }
 
+.upload_container {
+    margin-bottom: 1rem;
+}
+
+.upload_box {
+    width: 100%;
+    height: 5vh;
+    min-height: 50px;
+    border: 2px dashed var(--light-grey-color);
+    background-color: var(--light-secondary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--light-grey-color);
+    transition: color 0.3s ease, border-color 0.3s ease;
+    gap: 10px;
+}
+
+.upload_box:hover,
+.upload_box.filled {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
 .input_form {
     flex: 2;
     display: flex;

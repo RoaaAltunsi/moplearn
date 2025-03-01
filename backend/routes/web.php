@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContributionFormController;
+use App\Http\Controllers\ContributorController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -17,3 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::get('user', [AuthController::class, 'getUser']);
     Route::post('logout', [AuthController::class, 'logout']);
 });
+
+Route::apiResource('contribution-forms', ContributionFormController::class)->only(['store', 'update']);
+Route::apiResource('contributors',ContributorController::class)->only(['index', 'show']);

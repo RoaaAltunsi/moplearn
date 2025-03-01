@@ -1,13 +1,18 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import authSlice from "./slices/authSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import authSlice from "./slices/authSlice";
+import contributionFormSlice from "./slices/contributionFormSlice";
+
 
 // -------------------- Root Persist Config --------------------
 const rootPersistConfig = {
    key: 'root',
    storage,
-   blacklist: ['auth'] // Prevent entire auth slice from being persisted globally
+   blacklist: [ // Prevent entire auth slice from being persisted globally
+      'auth',
+      'contributionForm'
+   ]
 };
 
 // ----- Auth Persist Config (Persist only necessary data) -----
@@ -20,6 +25,7 @@ const authPersistConfig = {
 // ------------- Wrap Reducers with PersistReducer -------------
 const rootReducer = combineReducers({
    auth: persistReducer(authPersistConfig, authSlice),
+   contributionForm: contributionFormSlice
 });
 
 // ----------------- Apply Persisted Reducer -------------------
