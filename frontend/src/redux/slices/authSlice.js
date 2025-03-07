@@ -49,7 +49,17 @@ export const login = createAsyncThunk('auth/login', async (credentials, thunkAPI
          error: error.response?.data?.message || 'Log in Failed'
       })
    }
-})
+});
+
+// CHECK-AUTH-STATUS: Restore session on page reload
+export const checkAuthStatus = createAsyncThunk('auth/checkAuthStatus', async (_, thunkAPI) => {
+   try {
+      const response = await apiClient.get('/user');
+      return response.data;
+   } catch (error) {
+      return thunkAPI.rejectWithValue('User is not authenticated');
+   }
+});
 
 // LOGOUT: logout user from the system
 export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
@@ -142,6 +152,22 @@ const authSlice = createSlice({
             state.error = action.payload?.error || '';
          })
 
+         // --------------- check auth status ----------------
+         .addCase(checkAuthStatus.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(checkAuthStatus.fulfilled, (state, action) => {
+            state.loading = false;
+            state.user = action.payload?.user;
+            state.isAuthenticated = true;
+            state.validationErrors = {};
+            state.error = '';
+         })
+         .addCase(checkAuthStatus.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload?.error || '';
+         })
+
          // --------------------- logout ---------------------
          .addCase(logout.pending, (state) => {
             state.loading = true;
@@ -190,5 +216,5 @@ const authSlice = createSlice({
    }
 });
 
-export const { clearErrors } = authSlice.actions;
+export const { clearErrors, forceLogout } = authSlice.actions;
 export default authSlice.reducer;

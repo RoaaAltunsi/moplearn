@@ -189,7 +189,8 @@ function Navbar() {
 
    // ------------- Update courses list only in custom routes ------------
    useEffect(() => {
-      const isCourseCategoryPage = /^\/courses\/[^/]+$/.test(location.pathname);
+      const isCourseCategoryPage = /^\/courses(\/[^/]*)?$/.test(location.pathname);
+
       if (isCourseCategoryPage) {
          // Wait for the browser to update the layout and then update the visible courses
          requestAnimationFrame(() => {

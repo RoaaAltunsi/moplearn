@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { checkAuthStatus } from './slices/authSlice';
 
 const apiClient = axios.create({
-   baseURL: "/",
+   baseURL: "/api",
    withCredentials: true, // Include cookies in requests
    headers: {
       'Accept': 'application/json',
@@ -20,5 +21,22 @@ const fetchCsrfToken = async () => {
 
 // Fetch CSRF token on initial load
 fetchCsrfToken();
+
+// Intercept failed requests to refresh CSRF token if expired
+apiClient.interceptors.response.use(
+   response => response,
+   async (error) => {
+      if (error.response?.status === 419) { // CSRF Token Mismatch
+         await fetchCsrfToken(); // Get a new token
+         return apiClient.request(error.config); // Retry the failed request
+      }
+
+      if (error.response?.status === 401) { // Session Expired
+         import('../redux/store').dispatch(checkAuthStatus());
+      }
+
+      return Promise.reject(error);
+   }
+);
 
 export default apiClient;

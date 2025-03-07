@@ -60,7 +60,7 @@ class AuthController extends Controller
         ]);
 
         // Unautharized login attempt
-        if (!Auth::attempt($credentials)) {
+        if (!Auth::attempt($credentials, true)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Invalid email or password'
@@ -75,6 +75,26 @@ class AuthController extends Controller
             'message' => 'Successful Login',
             'user' => new UserResource($user),
         ], 200);
+    }
+
+    /**
+     * Get authenticated user
+     */
+    public function getUser()
+    {
+        if (!Auth::check()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User is not authenticated'
+            ], 401);
+        }
+
+        $user = Auth::user();
+
+        return response()->json([
+            'status' => 'success',
+            'user' => new UserResource($user)
+        ]);
     }
 
     /**
