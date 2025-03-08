@@ -13,7 +13,7 @@ function CourseCard({
    title,
    platformName,
    rating,
-   ratingNum,
+   totalReviews,
    isChecked, // For partner list checkbox
    handleCheckboxChange
 }) {
@@ -67,7 +67,7 @@ function CourseCard({
             <div className={styles.card_content}>
                <div className={styles.price_section}>
                   <h3 className={styles.price}>
-                     {price === 0 ? 'Free' : `$ ${price}`}
+                     {price > 0 ? `$ ${price}` : 'Free'}
                   </h3>
                   {oldPrice && (
                      <span className={styles.old_price}>
@@ -80,14 +80,14 @@ function CourseCard({
 
                <div className={styles.course_meta_section}>
                   <span className='small_font'> {platformName} </span>
-                  {(rating || ratingNum) && (
+                  {(rating || totalReviews) && (
                      <div className={styles.rating_subsection}>
                         <h3> {rating} </h3>
                         <FontAwesomeIcon
                            icon="fa-solid fa-star"
                            style={{ color: 'var(--yellow-color)' }}
                         />
-                        <span className='small_font'> ({ratingNum}) </span>
+                        <span className='small_font'> ({totalReviews}) </span>
                      </div>
                   )}
                </div>

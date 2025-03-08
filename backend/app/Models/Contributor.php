@@ -18,4 +18,9 @@ class Contributor extends Model
     {
         return $this->belongsTo(ContributionForm::class, 'form_id');
     }
+
+    public function getPlatformNameAttribute()
+    {
+        return $this->contributionForm ? $this->contributionForm->platform_name : null;
+    }
 }

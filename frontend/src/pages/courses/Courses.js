@@ -7,60 +7,28 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import CurvedLine from '../../components/curvedLine/CurvedLine';
 import CourseCard from '../../components/courseCard/CourseCard';
-import CourseImage from '../../assets/images/course-img-test.png';
-import { useState } from 'react';
-
-const courses = [
-   {
-      id: 1,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 2,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 0,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch From Scratch From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 3,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 4,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-]
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getNewestCourses, getCheapestCourses } from '../../redux/slices/courseSlice';
 
 
 function Courses() {
 
+   const dispatch = useDispatch();
    const [partnerChecked, setPartnerChecked] = useState({}); // For partner list checkbox
+   const { newCourses, cheapestCourses } = useSelector((state) => state.course);
+
+
+   // -------------- Fetch courses from DB --------------
+   useEffect(() => {
+      if (newCourses?.length === 0) {
+         dispatch(getNewestCourses());
+      }
+      if (cheapestCourses?.length === 0) {
+         dispatch(getCheapestCourses());
+      }
+   }, [dispatch, newCourses, cheapestCourses]);
+
 
    // ----------- Add/Remove user from partner list -----------
    const handlePartnerCheckboxChange = (courseId, isChecked) => {
@@ -68,13 +36,14 @@ function Courses() {
          ...prevState,
          [courseId]: isChecked
       }));
-      
+
       if (isChecked) {
          console.log("POST user to partner list");
       } else {
          console.log("DELETE user from partner list");
       }
    };
+
 
    // ----------------- Render Courses section ----------------
    const Section = ({ title, courses }) => {
@@ -116,11 +85,11 @@ function Courses() {
                               link={course.link}
                               image={course.image}
                               price={course.price}
-                              oldPrice={course.oldPrice}
+                              oldPrice={course.old_price}
                               title={course.title}
-                              platformName={course.platformName}
+                              platformName={course.platform}
                               rating={course.rating}
-                              ratingNum={course.ratingNum}
+                              totalReviews={course.total_reviews}
                               isChecked={!!partnerChecked[course.id]}
                               handleCheckboxChange={isChecked => handlePartnerCheckboxChange(course.id, isChecked)}
                            />
@@ -147,9 +116,9 @@ function Courses() {
 
    return (
       <div className='container'>
-         <Section title="Newly Courses" courses={courses} />
+         <Section title="Newly Courses" courses={newCourses} />
          <CurvedLine />
-         <Section title="Exclusive Discount" courses={courses} />
+         <Section title="Exclusive Discount" courses={cheapestCourses} />
       </div>
    );
 }

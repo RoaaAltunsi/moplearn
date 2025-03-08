@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import authSlice from "./slices/authSlice";
 import contributionFormSlice from "./slices/contributionFormSlice";
 import contributorSlice from "./slices/contributorSlice";
+import courseSlice from "./slices/courseSlice";
 
 
 // -------------------- Root Persist Config --------------------
@@ -13,7 +14,8 @@ const rootPersistConfig = {
    blacklist: [ // Prevent entire auth slice from being persisted globally
       'auth',
       'contributionForm',
-      'contributor'
+      'contributor',
+      'course'
    ]
 };
 
@@ -28,7 +30,8 @@ const authPersistConfig = {
 const rootReducer = combineReducers({
    auth: persistReducer(authPersistConfig, authSlice),
    contributionForm: contributionFormSlice,
-   contributor: contributorSlice
+   contributor: contributorSlice,
+   course: courseSlice
 });
 
 // ----------------- Apply Persisted Reducer -------------------

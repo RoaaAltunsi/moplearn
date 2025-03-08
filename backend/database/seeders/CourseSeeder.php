@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Course;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -27,6 +28,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 1,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'AWS Certified Cloud Practitioner (CLF-C02)',
@@ -41,6 +44,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 1,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Google Cloud Cybersecurity Professional Certificate',
@@ -55,6 +60,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 1,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Bulut Bilişim Temelleri ve AWS Çözüm Mimarlığına Giriş',
@@ -69,6 +76,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 1,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Cloud Developer',
@@ -83,6 +92,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 1,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -98,6 +109,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 2,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Site Reliability Engineer',
@@ -112,6 +125,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 2,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'IT Security: Defense against the digital dark arts',
@@ -126,6 +141,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 2,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'JavaScript Security Specialization',
@@ -140,6 +157,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 2,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'تعلم القرصنه واختبار الاختراق بشكل صحيح من الصفر (كورس كامل)',
@@ -154,6 +173,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 2,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -169,6 +190,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 3,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Deploy Infrastructure as Code (IAC)',
@@ -183,6 +206,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 3,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Advanced Network Security Specialization',
@@ -197,6 +222,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 3,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Network Security',
@@ -211,6 +238,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 3,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -226,6 +255,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 4,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Operating Systems and You: Becoming a Power User',
@@ -240,6 +271,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 4,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Ultimate Design Patterns',
@@ -254,6 +287,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 4,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Computer Security and Systems Management Specialization',
@@ -268,6 +303,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 1,
                 'topic_id' => 4,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -283,6 +320,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 5,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Python Komplet: Dari Nol Sampai Bisa!',
@@ -297,6 +336,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 5,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Data Science dalam Satu Minggu',
@@ -311,6 +352,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 5,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'تحليل البيانات باستخدام باور بي اي -- Data Analysis Power BI',
@@ -325,6 +368,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 5,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Introduction to Data Analysis using Microsoft Excel',
@@ -339,6 +384,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 5,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -354,6 +401,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 6,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => '(40+ Saat) Python | Sıfırdan İleri Seviye Programlama (2020)',
@@ -368,6 +417,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 6,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Hadoop Big Data desde cero',
@@ -382,6 +433,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 6,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => '(CDAP) أخصائي تحليل البيانات المعتمد',
@@ -396,6 +449,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 6,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -411,6 +466,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 7,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Introduction to Artificial Intelligence (AI)',
@@ -425,6 +482,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 7,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Intelligence Artificielle de A à Z',
@@ -439,6 +498,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 7,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'L’intelligence Artificielle générative pour débutants',
@@ -453,6 +514,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 7,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -468,6 +531,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 8,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Sales data analysis in python, Urdu/Hindi',
@@ -482,6 +547,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 8,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Machine Learning Specialization',
@@ -496,6 +563,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 8,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Data for Machine Learning',
@@ -510,6 +579,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 8,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -525,6 +596,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 9,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Ciencia de Datos y Analítica de Negocio con Python y ChatGPT',
@@ -539,6 +612,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 9,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Aprende Business Intelligence con Qliksense desde cero',
@@ -553,6 +628,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 2,
                 'topic_id' => 9,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -568,6 +645,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 11,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Angular - The Complete Guide (2025 Edition)',
@@ -582,6 +661,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 11,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'The PHP 8 Learning Guide',
@@ -596,6 +677,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 11,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Desarrollo Web con Spring 4',
@@ -610,6 +693,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 11,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -625,6 +710,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 12,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Meta iOS Developer Professional Certificate',
@@ -639,6 +726,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 12,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Advanced App Development in Android Specialization',
@@ -653,6 +742,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 12,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -668,6 +759,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 14,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -683,6 +776,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 15,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => '100 Days of Code: The Complete Python Pro Bootcamp',
@@ -697,6 +792,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 15,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -712,6 +809,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 16,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Advanced Database Design Patterns in Action',
@@ -726,6 +825,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 16,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Introduction to Database Migration',
@@ -740,6 +841,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 16,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'SQL',
@@ -754,6 +857,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 3,
                 'topic_id' => 16,
                 'platform_id' => 4,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -769,6 +874,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 4,
                 'topic_id' => 17,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -784,6 +891,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 4,
                 'topic_id' => 18,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -799,6 +908,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 4,
                 'topic_id' => 19,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Curso Completo de Violão + 3 Revistas Digitais Grátis',
@@ -813,6 +924,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 4,
                 'topic_id' => 19,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -828,6 +941,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 4,
                 'topic_id' => 20,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => '로봇으로 기사를 작성해보자:로봇 저널리즘 입문(Introduction to Robot Journalism)',
@@ -842,6 +957,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 4,
                 'topic_id' => 20,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -857,6 +974,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 5,
                 'topic_id' => 21,
                 'platform_id' => 2,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Credential of Leadership, Impact, and Management in Business (CLIMB)',
@@ -871,6 +990,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 5,
                 'topic_id' => 21,
                 'platform_id' => 2,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Organizational Leadership',
@@ -885,6 +1006,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 5,
                 'topic_id' => 21,
                 'platform_id' => 2,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -900,6 +1023,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 5,
                 'topic_id' => 23,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Google Project Management: Professional Certificate',
@@ -914,6 +1039,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 5,
                 'topic_id' => 23,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -929,6 +1056,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 5,
                 'topic_id' => 25,
                 'platform_id' => 2,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -944,6 +1073,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 6,
                 'topic_id' => 26,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Magnétisme et Pendule',
@@ -958,6 +1089,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 6,
                 'topic_id' => 26,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Understanding Modern Physics I: Relativity and Cosmology',
@@ -972,6 +1105,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 6,
                 'topic_id' => 26,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -987,6 +1122,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 6,
                 'topic_id' => 27,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Chemistry + Python: Solve chemistry problems with Python',
@@ -1001,6 +1138,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 6,
                 'topic_id' => 27,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1016,6 +1155,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 7,
                 'topic_id' => 30,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Vital Signs: Understanding What the Body Is Telling Us',
@@ -1030,6 +1171,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 7,
                 'topic_id' => 30,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1045,6 +1188,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 7,
                 'topic_id' => 32,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1060,6 +1205,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 7,
                 'topic_id' => 33,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Nutrition for Inflammation - The Anti-inflammatory Diet',
@@ -1074,6 +1221,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 7,
                 'topic_id' => 33,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Personal trainer de sucesso',
@@ -1088,6 +1237,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 7,
                 'topic_id' => 33,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1103,6 +1254,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 8,
                 'topic_id' => 35,
                 'platform_id' => 2,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Credential of Digital Innovation and Strategy',
@@ -1117,6 +1270,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 8,
                 'topic_id' => 35,
                 'platform_id' => 2,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Winning with Digital Platforms',
@@ -1131,6 +1286,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 8,
                 'topic_id' => 35,
                 'platform_id' => 2,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1146,6 +1303,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 37,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'English for Interactions in the Workplace Intermediate Level',
@@ -1160,6 +1319,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 37,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Learn English: Advanced Grammar and Punctuation Specialization',
@@ -1174,6 +1335,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 37,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1189,6 +1352,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 38,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Learn Chinese Language: Everyday & Business Chinese BEGINNER',
@@ -1203,6 +1368,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 38,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1218,6 +1385,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 39,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Korean Pronunciation Masterclass',
@@ -1232,6 +1401,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 39,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'First Step Korean',
@@ -1246,6 +1417,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 39,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1261,6 +1434,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 9,
                 'topic_id' => 40,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1276,6 +1451,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 10,
                 'topic_id' => 41,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Machine Design Part I',
@@ -1290,6 +1467,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 10,
                 'topic_id' => 41,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
 
             [
@@ -1305,6 +1484,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 10,
                 'topic_id' => 43,
                 'platform_id' => 5,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
             [
                 'title' => 'Introduction to User Experience Design',
@@ -1319,6 +1500,8 @@ class CourseSeeder extends Seeder
                 'category_id' => 10,
                 'topic_id' => 43,
                 'platform_id' => 1,
+                'created_at' => Carbon::now()->subDays(rand(1,30)),
+                'updated_at' => Carbon::now()->subDays(rand(1, 30)),
             ],
         ];
 
