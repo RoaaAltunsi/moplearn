@@ -38,7 +38,6 @@ function App() {
 
   // Fetch categories once when app loads >> brcause it is static categories
   useEffect(() => {
-    console.log('rendered');
     dispatch(getCategories());
   }, [dispatch]);
   

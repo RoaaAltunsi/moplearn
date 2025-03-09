@@ -1,5 +1,4 @@
 import styles from './CourseCategory.module.css';
-import CourseImage from '../../assets/images/course-img-test.png';
 import Filter from '../../components/filter/Filter';
 import CourseCard from '../../components/courseCard/CourseCard';
 import SelectInput from '../../components/inputFields/SelectInput';
@@ -7,92 +6,18 @@ import Pagination from '../../components/pagination/Pagination';
 import EmptyState from '../../components/UIStates/EmptyState';
 import { useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-
-const courses = [
-   {
-      id: 1,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 2,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 0,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch From Scratch From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 3,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 4,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 5,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 6,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-   {
-      id: 7,
-      link: "https://www.udemy.com/course/php-mvc-from-scratch/",
-      image: CourseImage,
-      price: 14.99,
-      oldPrice: 54.99,
-      title: 'Write PHP Like a Pro: Build a PHP MVC Framework From Scratch',
-      platformName: 'Udemy',
-      rating: 4.8,
-      ratingNum: 3093
-   },
-];
+import { useDispatch, useSelector } from 'react-redux';
+import { getCoursesByCategory } from '../../redux/slices/courseSlice';
+import { toast } from 'react-toastify';
 
 
 function CourseCategory() {
 
    const location = useLocation();
+   const dispatch = useDispatch();
    const { courseCategory } = useParams();
+   const categoryId = courseCategory?.split("-")[0];
+   const { coursesByCategory } = useSelector((state) => state.course);
    const [partnerChecked, setPartnerChecked] = useState({}); // For partner list checkbox
    const [filters, setFilters] = useState({
       price: { free: false, discounted: false },
@@ -102,14 +27,25 @@ function CourseCategory() {
       language: {}
    });
    const [sortFilter, setSortFilter] = useState('');
+
+   // ---------- Fetch courses when category changes -----------
+   useEffect(() => {
+      try {
+         dispatch(getCoursesByCategory(categoryId)).unwrap();
+      } catch (err) {
+         toast.error(err.error);
+      }
+   }, [dispatch, categoryId]);
+
    const itemsPerPage = 9;
-   const [currentItems, setCurrentItems] = useState(courses.slice(0, itemsPerPage));
+   const [currentItems, setCurrentItems] = useState(coursesByCategory.slice(0, itemsPerPage));
 
 
    // ----------- Format extracted category from URL -----------
    const formCourseCategory = (category) => {
       return category
          .split('-')
+         .slice(1) // remove category id
          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
          .join(' ');
    }
@@ -153,7 +89,6 @@ function CourseCategory() {
       }
    };
 
-
    // ------- Initialize some filters state dynamically --------
    useEffect(() => {
       // Replace it later with actual API call to fetch data
@@ -191,14 +126,14 @@ function CourseCategory() {
          return page ? parseInt(page, 10) : 1; // Return 1 as the default page
       };
       const handlePageClick = (startOffset) => {
-         const newSlice = courses.slice(startOffset, startOffset + itemsPerPage);
+         const newSlice = coursesByCategory.slice(startOffset, startOffset + itemsPerPage);
          setCurrentItems(newSlice);
       };
 
       const page = getPageFromURL();
       const startOffset = (page - 1) * itemsPerPage;
       handlePageClick(startOffset);
-   }, [location.search])
+   }, [location.search, coursesByCategory])
 
 
    return (
@@ -224,7 +159,7 @@ function CourseCategory() {
             <div className={styles.courses_section}>
                {/* Results && Sort filter */}
                <div className={styles.courses_header}>
-                  <span className='small_font'> 5,370 results </span>
+                  <span className='small_font'> {coursesByCategory.length} results </span>
                   <div>
                      <SelectInput
                         label="Sort by"
@@ -236,7 +171,7 @@ function CourseCategory() {
                </div>
 
                {/* Courses cards */}
-               {courses.length > 0 ? (
+               {coursesByCategory.length > 0 ? (
                   <>
                      <div className={styles.courses_grid}>
                         {currentItems.map(course => (
@@ -246,11 +181,11 @@ function CourseCategory() {
                               link={course.link}
                               image={course.image}
                               price={course.price}
-                              oldPrice={course.oldPrice}
+                              oldPrice={course.old_price}
                               title={course.title}
-                              platformName={course.platformName}
+                              platformName={course.platform.platform_name}
                               rating={course.rating}
-                              ratingNum={course.ratingNum}
+                              totalReviews={course.total_reviews}
                               isChecked={!!partnerChecked[course.id]}
                               handleCheckboxChange={isChecked => handlePartnerCheckboxChange(course.id, isChecked)}
                            />
@@ -258,9 +193,9 @@ function CourseCategory() {
                      </div>
 
                      {/* Pagination section */}
-                     {courses.length > itemsPerPage && (
+                     {coursesByCategory.length > itemsPerPage && (
                         <Pagination
-                           itemsLength={courses.length}
+                           itemsLength={coursesByCategory.length}
                            itemsPerPage={itemsPerPage}
                         />
                      )}

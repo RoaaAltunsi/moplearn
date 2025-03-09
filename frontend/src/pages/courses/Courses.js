@@ -92,7 +92,7 @@ function Courses() {
                               price={course.price}
                               oldPrice={course.old_price}
                               title={course.title}
-                              platformName={course.platform}
+                              platformName={course.platform.platform_name}
                               rating={course.rating}
                               totalReviews={course.total_reviews}
                               isChecked={!!partnerChecked[course.id]}

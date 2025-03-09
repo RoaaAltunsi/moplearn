@@ -24,10 +24,30 @@ class CourseResource extends JsonResource
             'total_reviews' => $this->total_reviews,
             'price' => $this->price,
             'old_price' => $this->old_price,
-            'language' => $this->language->language ?? null,
-            'category' => $this->category->title ?? null,
-            'topic' => $this->topic->title ?? null,
-            'platform' => $this->contributor->platform_name ?? null
+            'language' => $this->language 
+            ?   [
+                'id' => $this->language->id ,
+                'language' => $this->language->language
+                ] 
+            : null,
+            'category' => $this->category 
+            ?   [
+                'id' => $this->category->id ,
+                'title' => $this->category->title
+                ] 
+            : null,
+            'topic' => $this->topic
+            ?   [
+                'id' => $this->topic->id ,
+                'title' => $this->topic->title
+                ] 
+            : null,
+            'platform' => $this->contributor
+            ?   [
+                'id' => $this->contributor->id ,
+                'platform_name' => $this->contributor->platformName
+                ] 
+            : null
         ];
     }
 }

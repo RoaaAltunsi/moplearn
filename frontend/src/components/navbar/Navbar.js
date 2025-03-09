@@ -116,7 +116,7 @@ function Navbar() {
                key={item.id}
                item={{
                   label: item.title,
-                  link: `/courses/${slugify(item.title, { lower: true })}` // Dynamically generate the link
+                  link: `/courses/${item.id}-${slugify(item.title, { lower: true })}` // Dynamically generate the link
                }}
                onClick={onClick}
             />

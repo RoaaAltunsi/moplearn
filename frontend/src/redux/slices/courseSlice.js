@@ -4,6 +4,7 @@ import apiClient from "../apiClient";
 const initialState = {
    newCourses: [],
    cheapestCourses: [],
+   coursesByCategory: [],
    loading: false,
    error: ''
 };
@@ -32,6 +33,16 @@ export const getCheapestCourses = createAsyncThunk('course/getCheapest', async (
    }
 });
 
+// GET-COURSES-BY-CATEGORY: Fetch all courses under specific category
+export const getCoursesByCategory = createAsyncThunk('course/getCoursesByCategory', async (categoryId, thunkAPI) => {
+   try {
+      const response = await apiClient.get(`categories/${categoryId}/courses`);
+      return response.data;
+
+   } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch courses for this category");
+   }
+});
 
 const courseSlice = createSlice({
    name: 'course',
@@ -67,6 +78,20 @@ const courseSlice = createSlice({
             state.error = '';
          })
          .addCase(getCheapestCourses.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // ----------------- get courses by category ------------------
+         .addCase(getCoursesByCategory.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(getCoursesByCategory.fulfilled, (state, action) => {
+            state.loading = false;
+            state.coursesByCategory = action.payload;
+            state.error = '';
+         })
+         .addCase(getCoursesByCategory.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
          })

@@ -31,4 +31,13 @@ class CourseController extends Controller
         
         return response()->json(CourseResource::collection($cheapestCourses));
     }
+
+    /**
+     * Display all courses under specific category
+     */
+    public function getCoursesByCategory($categoryId)
+    {
+        $courses = Course::where('category_id', $categoryId)->get();
+        return response()->json(CourseResource::collection($courses));
+    }
 }
