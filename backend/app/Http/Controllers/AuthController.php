@@ -78,26 +78,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Get authenticated user
-     */
-    public function getUser()
-    {
-        if (!Auth::check()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'User is not authenticated'
-            ], 401);
-        }
-
-        $user = Auth::user();
-
-        return response()->json([
-            'status' => 'success',
-            'user' => new UserResource($user)
-        ]);
-    }
-
-    /**
      * Logout user
     */
     public function logout(Request $request)

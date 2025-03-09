@@ -18,7 +18,6 @@ Route::post('validate-email', [AuthController::class, 'validateEmail']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth')->group(function () {
-    Route::get('user', [AuthController::class, 'getUser']);
     Route::post('logout', [AuthController::class, 'logout']);
 });
 

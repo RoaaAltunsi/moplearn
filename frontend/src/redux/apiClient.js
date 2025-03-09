@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { checkAuthStatus } from './slices/authSlice';
 
 const apiClient = axios.create({
    baseURL: "/api",
@@ -30,11 +29,7 @@ apiClient.interceptors.response.use(
          await fetchCsrfToken(); // Get a new token
          return apiClient.request(error.config); // Retry the failed request
       }
-
-      if (error.response?.status === 401) { // Session Expired
-         import('../redux/store').dispatch(checkAuthStatus());
-      }
-
+      
       return Promise.reject(error);
    }
 );

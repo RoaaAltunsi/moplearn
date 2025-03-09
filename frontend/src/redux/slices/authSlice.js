@@ -51,16 +51,6 @@ export const login = createAsyncThunk('auth/login', async (credentials, thunkAPI
    }
 });
 
-// CHECK-AUTH-STATUS: Restore session on page reload
-export const checkAuthStatus = createAsyncThunk('auth/checkAuthStatus', async (_, thunkAPI) => {
-   try {
-      const response = await apiClient.get('/user');
-      return response.data;
-   } catch (error) {
-      return thunkAPI.rejectWithValue('User is not authenticated');
-   }
-});
-
 // LOGOUT: logout user from the system
 export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
    try {
@@ -71,7 +61,7 @@ export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
 });
 
 // VALIDATE-EMAIL: validate user's email
-export const validateEmail = createAsyncThunk('auth/validate-email', async (email, thunkAPI) => {
+export const validateEmail = createAsyncThunk('auth/validateEmail', async (email, thunkAPI) => {
    try {
       await apiClient.post('validate-email', email);
    } catch (error) {
@@ -89,7 +79,7 @@ export const validateEmail = createAsyncThunk('auth/validate-email', async (emai
 });
 
 // RESET-PASSWORD: reset user's password
-export const resetPassword = createAsyncThunk('auth/reset-password', async (data, thunkAPI) => {
+export const resetPassword = createAsyncThunk('auth/resetPassword', async (data, thunkAPI) => {
    try {
       await apiClient.post('reset-password', data);
    } catch (error) {
@@ -149,22 +139,6 @@ const authSlice = createSlice({
          .addCase(login.rejected, (state, action) => {
             state.loading = false;
             state.validationErrors = action.payload?.validationErrors || {};
-            state.error = action.payload?.error || '';
-         })
-
-         // --------------- check auth status ----------------
-         .addCase(checkAuthStatus.pending, (state) => {
-            state.loading = true;
-         })
-         .addCase(checkAuthStatus.fulfilled, (state, action) => {
-            state.loading = false;
-            state.user = action.payload?.user;
-            state.isAuthenticated = true;
-            state.validationErrors = {};
-            state.error = '';
-         })
-         .addCase(checkAuthStatus.rejected, (state, action) => {
-            state.loading = false;
             state.error = action.payload?.error || '';
          })
 

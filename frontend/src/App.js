@@ -9,7 +9,7 @@ import * as brandIcons from '@fortawesome/free-brands-svg-icons';
 import * as regularIcons from '@fortawesome/free-regular-svg-icons';
 import ScrollToTop from './utils/ScrollToTop.js';
 import PageWrapper from './utils/PageWrapper.js';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import LoadingState from './components/UIStates/LoadingState.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearAllErrors } from './redux/globalActions.js';
@@ -25,27 +25,10 @@ function App() {
 
   const location = useLocation();
   const dispatch = useDispatch();
-
-  // Track loading state from all slices
   const isLoading = useSelector((state) =>
     Object.values(state).some(slice => slice.loading) // Check if any slice has loading = true
   );
 
-  // Track error state from all slices
-  const errors = useSelector((state) =>
-    Object.entries(state)
-      .map(([_, slice]) => slice.error) // Extract error messages
-      .filter(error => error) // Remove null/undefined errors
-  );
-  
-
-  // Show toast notifications for errors
-  useEffect(() => {
-    errors.forEach((error) => {
-      toast.error(error);
-    });
-
-  }, [errors, dispatch]);
 
   // Clear errors on route change
   useEffect(() => {

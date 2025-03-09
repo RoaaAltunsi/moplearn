@@ -20,7 +20,7 @@ function Contributors() {
    useEffect(() => {
       if (contributors.length === 0) {
          try {
-            dispatch(getContributors());
+            dispatch(getContributors()).unwrap();
             
          } catch(err) {
             toast.error(err.error);

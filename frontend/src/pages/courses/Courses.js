@@ -10,6 +10,7 @@ import CourseCard from '../../components/courseCard/CourseCard';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getNewestCourses, getCheapestCourses } from '../../redux/slices/courseSlice';
+import { toast } from 'react-toastify';
 
 
 function Courses() {
@@ -21,11 +22,15 @@ function Courses() {
 
    // -------------- Fetch courses from DB --------------
    useEffect(() => {
-      if (newCourses?.length === 0) {
-         dispatch(getNewestCourses());
-      }
-      if (cheapestCourses?.length === 0) {
-         dispatch(getCheapestCourses());
+      try {
+         if (newCourses?.length === 0) {
+            dispatch(getNewestCourses()).unwrap();
+         }
+         if (cheapestCourses?.length === 0) {
+            dispatch(getCheapestCourses()).unwrap();
+         }
+      } catch (err) {
+         toast.error(err.error);
       }
    }, [dispatch, newCourses, cheapestCourses]);
 
