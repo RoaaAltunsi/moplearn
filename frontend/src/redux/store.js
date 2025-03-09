@@ -5,6 +5,7 @@ import authSlice from "./slices/authSlice";
 import contributionFormSlice from "./slices/contributionFormSlice";
 import contributorSlice from "./slices/contributorSlice";
 import courseSlice from "./slices/courseSlice";
+import categorySlice from "./slices/categorySlice";
 
 
 // -------------------- Root Persist Config --------------------
@@ -15,15 +16,21 @@ const rootPersistConfig = {
       'auth',
       'contributionForm',
       'contributor',
-      'course'
+      'course',
+      'category'
    ]
 };
 
-// ----- Auth Persist Config (Persist only necessary data) -----
+// ------- Persist Config (Persist only necessary data) --------
 const authPersistConfig = {
    key: 'auth',
    storage,
    whitelist: ['user', 'isAuthenticated'] // Persist only user data
+};
+const categoryPersistConfig = {
+   key: 'category',
+   storage,
+   whitelist: ['categories']
 };
 
 // ------------- Wrap Reducers with PersistReducer -------------
@@ -31,7 +38,8 @@ const rootReducer = combineReducers({
    auth: persistReducer(authPersistConfig, authSlice),
    contributionForm: contributionFormSlice,
    contributor: contributorSlice,
-   course: courseSlice
+   course: courseSlice,
+   category: persistReducer(categoryPersistConfig, categorySlice)
 });
 
 // ----------------- Apply Persisted Reducer -------------------

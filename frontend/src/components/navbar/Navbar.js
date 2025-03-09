@@ -7,7 +7,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import slugify from "slugify";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
-import { persistor } from "../../redux/store"; 
+import { persistor } from "../../redux/store";
 import { toast, ToastContainer } from "react-toastify";
 import LoadingState from "../UIStates/LoadingState";
 
@@ -16,18 +16,6 @@ const navSections = [
    { label: "Courses", link: "/courses" },
    { label: "Find Partner", link: "/find-partner" },
    { label: 'Contributors', link: "/contributors" }
-];
-
-const coursesCategories = [
-   "IT & Software",
-   "Computer Science",
-   "Business & Management",
-   "Engineering",
-   "Arts & Humanities",
-   "Science",
-   "Health & Medicine",
-   "Web Development",
-   "App Development",
 ];
 
 // ---------- Reusable NavItem component ----------
@@ -55,21 +43,6 @@ const MainNavList = ({ onClick = () => { } }) => (
    </ul>
 );
 
-// ---------- List of Courses Categories ----------
-const CoursesList = forwardRef(({ onClick = () => { } }, ref) => (
-   <ul ref={ref || null} className={styles.courses_list}>
-      {coursesCategories.map((item, index) => (
-         <NavItem
-            key={index}
-            item={{
-               label: item,
-               link: `/courses/${slugify(item, { lower: true })}` // Dynamically generate the link
-            }}
-            onClick={onClick}
-         />
-      ))}
-   </ul>
-));
 
 // ------- Signup/Login container component -------
 const AuthButtons = ({
@@ -133,6 +106,23 @@ function Navbar() {
    const [isProfileDtDropOpened, setIsProfileDtDropOpened] = useState(false);
    const [isProfileMbDropOpened, setIsProfileMbDropOpened] = useState(false);
    const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
+   const { categories } = useSelector((state) => state.category);
+
+   // ---------- List of Courses Categories ----------
+   const CoursesList = forwardRef(({ onClick = () => { } }, ref) => (
+      <ul ref={ref || null} className={styles.courses_list}>
+         {categories.map((item) => (
+            <NavItem
+               key={item.id}
+               item={{
+                  label: item.title,
+                  link: `/courses/${slugify(item.title, { lower: true })}` // Dynamically generate the link
+               }}
+               onClick={onClick}
+            />
+         ))}
+      </ul>
+   ));
 
 
    // ---------- Close menu when clicking outside the component ----------
@@ -159,7 +149,7 @@ function Navbar() {
    }, [isCoursesDropMenuOpened, isProfileDtDropOpened, isMenuOpened, isProfileMbDropOpened]);
 
    // ---------- Update hidden courses based on container width ----------
-   const updateHiddenCourses = () => {
+   const updateHiddenCourses = useCallback(() => {
       if (!coursesListRef?.current) return;
 
       const coursesUlWidth = coursesListRef.current.getBoundingClientRect().width;
@@ -170,14 +160,14 @@ function Navbar() {
       Array.from(coursesLiElements).forEach((item, index) => {
          totalWidth += item.getBoundingClientRect().width;
          if (parseInt(totalWidth) > coursesUlWidth) {
-            newHiddenCourses.push(coursesCategories[index]);
+            newHiddenCourses.push(categories[index].title);
          }
       });
       setHiddenCourses(newHiddenCourses);
-   };
+   }, [coursesListRef, categories]);
 
    // ---------------- Logout user and clear global state ----------------
-   const handleLogout = async() => {
+   const handleLogout = async () => {
       try {
          await dispatch(logout()).unwrap();
          persistor.purge(); // Clear persisted data
@@ -201,7 +191,7 @@ function Navbar() {
       return () => {
          window.removeEventListener('resize', updateHiddenCourses);
       };
-   }, [location.pathname]);
+   }, [location.pathname, updateHiddenCourses]);
 
    // -------------- Handle clicking outside the opened menu --------------
    useEffect(() => {

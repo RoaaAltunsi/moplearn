@@ -5,12 +5,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContributionFormController;
 use App\Http\Controllers\ContributorController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CategoryController;
+
 
 Route::get('csrf-token', function() {
     return response()->json(['csrf_token' => csrf_token()]);
 });
 Route::get('new-courses', [CourseController::class, 'getNewCourses']);
 Route::get('cheapest-courses', [CourseController::class, 'getCheapestCourses']);
+Route::get('categories', [CategoryController::class, 'index']);
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);

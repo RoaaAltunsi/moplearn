@@ -14,6 +14,7 @@ import LoadingState from './components/UIStates/LoadingState.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearAllErrors } from './redux/globalActions.js';
 import { useEffect } from 'react';
+import { getCategories } from './redux/slices/categorySlice.js';
 
 library.add(
   ...Object.values(solidIcons).filter(icon => icon.iconName),
@@ -34,6 +35,12 @@ function App() {
   useEffect(() => {
     dispatch(clearAllErrors());
   }, [location.pathname, dispatch]);
+
+  // Fetch categories once when app loads >> brcause it is static categories
+  useEffect(() => {
+    console.log('rendered');
+    dispatch(getCategories());
+  }, [dispatch]);
   
 
   return (
