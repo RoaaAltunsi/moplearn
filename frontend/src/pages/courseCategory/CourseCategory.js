@@ -31,6 +31,7 @@ function CourseCategory() {
    const { languages } = useSelector((state) => state.language);
    const { contributors } = useSelector((state) => state.contributor);
    const { topics } = useSelector((state) => state.topic);
+   const [filteredCourses, setFilteredCourses] = useState([]);
 
 
    // ----------- Format extracted category from URL -----------
@@ -124,7 +125,7 @@ function CourseCategory() {
       }
    }, [dispatch, categoryId]);
    const itemsPerPage = 9;
-   const [currentItems, setCurrentItems] = useState(coursesByCategory.slice(0, itemsPerPage));
+   const [currentItems, setCurrentItems] = useState(filteredCourses.slice(0, itemsPerPage));
 
    // ------------- Change content on page change --------------
    useEffect(() => {
@@ -134,14 +135,54 @@ function CourseCategory() {
          return page ? parseInt(page, 10) : 1; // Return 1 as the default page
       };
       const handlePageClick = (startOffset) => {
-         const newSlice = coursesByCategory.slice(startOffset, startOffset + itemsPerPage);
+         const newSlice = filteredCourses.slice(startOffset, startOffset + itemsPerPage);
          setCurrentItems(newSlice);
       };
 
       const page = getPageFromURL();
       const startOffset = (page - 1) * itemsPerPage;
       handlePageClick(startOffset);
-   }, [location.search, coursesByCategory])
+   }, [location.search, filteredCourses]);
+
+   // --------------------- Filter courses ---------------------
+   useEffect(() => {
+      const filtering = coursesByCategory
+      .filter(course => {
+         // Filter by Price
+         if (filters.price.free && !filters.price.discounted && course.price > 0) return false;
+         if (filters.price.discounted && !filters.price.free && course.old_price <= course.price) return false;
+
+         // Filter by Topic
+         const selectedTopics = Object.keys(filters.topic).filter(topic => filters.topic[topic]);
+         if (selectedTopics.length > 0 && !selectedTopics.includes(course.topic.title)) return false;
+
+         // Filter by Level
+         const selectedLevels = Object.keys(filters.level).filter(level => filters.level[level]);
+         if (selectedLevels.length > 0 && !selectedLevels.includes(course.level)) return false;
+
+         // Filter by Language
+         const selectedLangs = Object.keys(filters.language).filter(lang => filters.language[lang]);
+         if (selectedLangs.length > 0 && !selectedLangs.includes(course.language.language)) return false;
+
+         // Filter by Platform
+         const selectedPlat = Object.keys(filters.platform).filter(plat => filters.platform[plat]);
+         if (selectedPlat.length > 0 && !selectedPlat.includes(course.platform.platform_name)) return false;
+
+         return true;
+      })
+      .sort((a,b) => {
+         if (sortFilter === 'highest-rated') {
+            return b.rating - a.rating;
+         } else if (sortFilter === 'newest') {
+            return new Date(b.created_at) - new Date(a.created_at);
+         } else if (sortFilter === 'cheapest') {
+            return a.price - b.price;
+         }
+         return 0; // Default: No sorting
+      });
+      
+      setFilteredCourses(filtering);
+   }, [coursesByCategory, filters, sortFilter]);
 
 
    return (
@@ -167,7 +208,7 @@ function CourseCategory() {
             <div className={styles.courses_section}>
                {/* Results && Sort filter */}
                <div className={styles.courses_header}>
-                  <span className='small_font'> {coursesByCategory.length} results </span>
+                  <span className='small_font'> {filteredCourses.length} results </span>
                   <div>
                      <SelectInput
                         label="Sort by"
@@ -179,7 +220,7 @@ function CourseCategory() {
                </div>
 
                {/* Courses cards */}
-               {coursesByCategory.length > 0 ? (
+               {filteredCourses.length > 0 ? (
                   <>
                      <div className={styles.courses_grid}>
                         {currentItems.map(course => (
@@ -201,9 +242,9 @@ function CourseCategory() {
                      </div>
 
                      {/* Pagination section */}
-                     {coursesByCategory.length > itemsPerPage && (
+                     {filteredCourses.length > itemsPerPage && (
                         <Pagination
-                           itemsLength={coursesByCategory.length}
+                           itemsLength={filteredCourses.length}
                            itemsPerPage={itemsPerPage}
                         />
                      )}

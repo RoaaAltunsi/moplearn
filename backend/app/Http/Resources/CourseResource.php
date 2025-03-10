@@ -47,7 +47,8 @@ class CourseResource extends JsonResource
                 'id' => $this->contributor->id ,
                 'platform_name' => $this->contributor->platformName
                 ] 
-            : null
+            : null,
+            'created_at' => $this->created_at
         ];
     }
 }
