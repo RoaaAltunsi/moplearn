@@ -6,7 +6,8 @@ use App\Http\Controllers\ContributionFormController;
 use App\Http\Controllers\ContributorController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CategoryController;
-
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\TopicController;
 
 Route::get('csrf-token', function() {
     return response()->json(['csrf_token' => csrf_token()]);
@@ -15,6 +16,8 @@ Route::get('categories', [CategoryController::class, 'index']);
 Route::get('new-courses', [CourseController::class, 'getNewCourses']);
 Route::get('cheapest-courses', [CourseController::class, 'getCheapestCourses']);
 Route::get('categories/{categoryId}/courses', [CourseController::class, 'getCoursesByCategory']);
+Route::get('languages', [LanguageController::class, 'index']);
+Route::get('categories/{categoryId}/topics', [TopicController::class, 'getTopicsByCategory']);
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);

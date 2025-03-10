@@ -3,30 +3,13 @@ import { ReactComponent as ContributorsSVG } from '../../assets/images/contribut
 import MainButton from '../../components/button/MainButton';
 import CurvedLine from '../../components/curvedLine/CurvedLine';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getContributors } from '../../redux/slices/contributorSlice';
-import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 
 function Contributors() {
 
-   const dispatch = useDispatch();
    const navigate = useNavigate();
    const { contributors } = useSelector((state) => state.contributor);
-
-
-   // -------------- Fetch contributors from DB --------------
-   useEffect(() => {
-      if (contributors.length === 0) {
-         try {
-            dispatch(getContributors()).unwrap();
-            
-         } catch(err) {
-            toast.error(err.error);
-         }
-      }
-   }, [dispatch, contributors]);
 
 
    return (

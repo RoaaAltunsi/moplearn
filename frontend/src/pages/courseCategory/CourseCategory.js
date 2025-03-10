@@ -8,6 +8,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCoursesByCategory } from '../../redux/slices/courseSlice';
+import { getTopics } from '../../redux/slices/topicSlice';
 import { toast } from 'react-toastify';
 
 
@@ -17,7 +18,6 @@ function CourseCategory() {
    const dispatch = useDispatch();
    const { courseCategory } = useParams();
    const categoryId = courseCategory?.split("-")[0];
-   const { coursesByCategory } = useSelector((state) => state.course);
    const [partnerChecked, setPartnerChecked] = useState({}); // For partner list checkbox
    const [filters, setFilters] = useState({
       price: { free: false, discounted: false },
@@ -27,18 +27,10 @@ function CourseCategory() {
       language: {}
    });
    const [sortFilter, setSortFilter] = useState('');
-
-   // ---------- Fetch courses when category changes -----------
-   useEffect(() => {
-      try {
-         dispatch(getCoursesByCategory(categoryId)).unwrap();
-      } catch (err) {
-         toast.error(err.error);
-      }
-   }, [dispatch, categoryId]);
-
-   const itemsPerPage = 9;
-   const [currentItems, setCurrentItems] = useState(coursesByCategory.slice(0, itemsPerPage));
+   const { coursesByCategory } = useSelector((state) => state.course);
+   const { languages } = useSelector((state) => state.language);
+   const { contributors } = useSelector((state) => state.contributor);
+   const { topics } = useSelector((state) => state.topic);
 
 
    // ----------- Format extracted category from URL -----------
@@ -89,24 +81,29 @@ function CourseCategory() {
       }
    };
 
+
+   // ------------- Fetch course category topics ---------------
+   useEffect(() => {
+      try {
+         dispatch(getTopics(categoryId)).unwrap();
+      } catch (err) {
+         toast.error(err?.error);
+      }
+   }, [dispatch, categoryId]);
+
    // ------- Initialize some filters state dynamically --------
    useEffect(() => {
-      // Replace it later with actual API call to fetch data
-      const fetchedTopics = ['Web Development', 'App Development', 'Cybersecurity', 'AI'];
-      const fetchedPlatforms = ['Udemy', 'Coursera', 'Harvard'];
-      const fetchedLanguages = ['English', 'Spanish', 'French', 'German', 'Chinese', 'Korean', 'Arabic'];
-
       const initialTopicFilters = {};
-      fetchedTopics.forEach(topic => {
-         initialTopicFilters[topic] = false;
+      topics.forEach(topic => {
+         initialTopicFilters[topic.title] = false;
       });
       const initialPlatformFilters = {};
-      fetchedPlatforms.forEach(platform => {
-         initialPlatformFilters[platform] = false;
+      contributors.forEach(platform => {
+         initialPlatformFilters[platform['contribution_form'].platform_name] = false;
       });
       const initialLanguageFilters = {};
-      fetchedLanguages.forEach(language => {
-         initialLanguageFilters[language] = false;
+      languages.forEach(language => {
+         initialLanguageFilters[language.language] = false;
       });
 
       // Set the filters state
@@ -116,7 +113,18 @@ function CourseCategory() {
          platform: initialPlatformFilters,
          language: initialLanguageFilters,
       }));
-   }, []);
+   }, [topics, contributors, languages]);
+
+   // ---------- Fetch courses when category changes -----------
+   useEffect(() => {
+      try {
+         dispatch(getCoursesByCategory(categoryId)).unwrap();
+      } catch (err) {
+         toast.error(err.error);
+      }
+   }, [dispatch, categoryId]);
+   const itemsPerPage = 9;
+   const [currentItems, setCurrentItems] = useState(coursesByCategory.slice(0, itemsPerPage));
 
    // ------------- Change content on page change --------------
    useEffect(() => {

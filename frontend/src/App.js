@@ -9,12 +9,14 @@ import * as brandIcons from '@fortawesome/free-brands-svg-icons';
 import * as regularIcons from '@fortawesome/free-regular-svg-icons';
 import ScrollToTop from './utils/ScrollToTop.js';
 import PageWrapper from './utils/PageWrapper.js';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import LoadingState from './components/UIStates/LoadingState.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearAllErrors } from './redux/globalActions.js';
 import { useEffect } from 'react';
 import { getCategories } from './redux/slices/categorySlice.js';
+import { getContributors } from './redux/slices/contributorSlice.js';
+import { getLanguages } from './redux/slices/languageSlice.js';
 
 library.add(
   ...Object.values(solidIcons).filter(icon => icon.iconName),
@@ -36,9 +38,16 @@ function App() {
     dispatch(clearAllErrors());
   }, [location.pathname, dispatch]);
 
-  // Fetch categories once when app loads >> brcause it is static categories
+  // Fetch once when app loads >> static data
   useEffect(() => {
-    dispatch(getCategories());
+    try {
+      dispatch(getCategories());
+      dispatch(getContributors());
+      dispatch(getLanguages());
+
+    } catch (err) {
+      toast.error(err.error);
+    }
   }, [dispatch]);
   
 
