@@ -314,37 +314,42 @@ function Navbar() {
          </div>
 
          {/* --------------------- Courses Nav Section -------------------- */}
-         <div className={`
+         {categories.length > 0 && (
+            <>
+               <div className={`
                   ${styles.courses_section}
                   ${location.pathname.startsWith('/courses') ? styles.visible : ''}
                `}
-         >
-            <div className={styles.nav_links_container}>
-               <CoursesList ref={coursesListRef} />
+               >
+                  <div className={styles.nav_links_container}>
+                     <CoursesList ref={coursesListRef} />
 
-               <FontAwesomeIcon
-                  ref={coursesIconRef}
-                  icon="fa-solid fa-ellipsis-vertical"
-                  onClick={() => setIsCoursesDropMenuOpened(!isCoursesDropMenuOpened)}
-                  className={`
+                     <FontAwesomeIcon
+                        ref={coursesIconRef}
+                        icon="fa-solid fa-ellipsis-vertical"
+                        onClick={() => setIsCoursesDropMenuOpened(!isCoursesDropMenuOpened)}
+                        className={`
                      ${styles.icon}
                      ${hiddenCourses.length > 0 ? styles.visible : ''}
                   `}
-               />
-            </div>
-         </div>
+                     />
+                  </div>
+               </div>
 
-         {/* -- Drop down menu if courses exceed the available nav width -- */}
-         <PopUpList
-            ref={coursesDropMenu}
-            isVisible={hiddenCourses.length > 0 && isCoursesDropMenuOpened}
-            width='20vw'
-            items={hiddenCourses.map(course => ({
-               label: course,
-               link: `/courses/${slugify(course, { lower: true })}` // Dynamically generate the link
-            }))}
-            onClose={() => setIsCoursesDropMenuOpened(false)}
-         />
+               {/* -- Drop down menu if courses exceed the available nav width -- */}
+               <PopUpList
+                  ref={coursesDropMenu}
+                  isVisible={hiddenCourses.length > 0 && isCoursesDropMenuOpened}
+                  width='20vw'
+                  items={hiddenCourses.map(course => ({
+                     label: course,
+                     link: `/courses/${slugify(course, { lower: true })}` // Dynamically generate the link
+                  }))}
+                  onClose={() => setIsCoursesDropMenuOpened(false)}
+               />
+            </>
+         )}
+
 
          {/* ----------- Hamburger's Menu for Tablet/Mobile Mode ---------- */}
          <div>
@@ -373,9 +378,12 @@ function Navbar() {
                {/* Main nav list items */}
                <MainNavList onClick={() => setIsMenuOpened(false)} />
 
-               {location.pathname.startsWith('/courses') && (
-                  <CoursesList onClick={() => setIsMenuOpened(false)} />
-               )}
+               {location.pathname.startsWith('/courses')
+                  && categories.length > 0 &&
+                  (
+                     <CoursesList onClick={() => setIsMenuOpened(false)} />
+                  )
+               }
 
                {isAuthenticated ? (
                   <>

@@ -68,7 +68,7 @@ function PartnerCard({
             </div>
 
             {/* ----------------- Interests Tags ----------------- */}
-            {interests && (
+            {interests.length > 0 && (
                <div className={styles.interests}>
                   <div className={styles.header}>
                      <FontAwesomeIcon icon="fa-regular fa-heart" />

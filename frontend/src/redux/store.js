@@ -8,6 +8,7 @@ import courseSlice from "./slices/courseSlice";
 import categorySlice from "./slices/categorySlice";
 import languageSlice from "./slices/languageSlice";
 import topicSlice from "./slices/topicSlice";
+import userSlice from "./slices/userSlice";
 
 
 // -------------------- Root Persist Config --------------------
@@ -21,7 +22,8 @@ const rootPersistConfig = {
       'course',
       'category',
       'language',
-      'topic'
+      'topic',
+      'user'
    ]
 };
 
@@ -55,7 +57,8 @@ const rootReducer = combineReducers({
    course: courseSlice,
    category: persistReducer(categoryPersistConfig, categorySlice),
    language: persistReducer(languagePersistConfig, languageSlice),
-   topic: topicSlice
+   topic: topicSlice,
+   user: userSlice
 });
 
 // ----------------- Apply Persisted Reducer -------------------

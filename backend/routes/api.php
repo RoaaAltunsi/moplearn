@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContributionFormController;
 use App\Http\Controllers\ContributorController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\TopicController;
+
 
 Route::get('csrf-token', function() {
     return response()->json(['csrf_token' => csrf_token()]);
@@ -26,6 +28,7 @@ Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('users', [UserController::class, 'index']);
 });
 
 Route::apiResource('contribution-forms', ContributionFormController::class)->only(['store', 'update']);

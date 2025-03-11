@@ -16,8 +16,16 @@ class UserResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'username' => $this->username,
             'email' => $this->email,
+            'username' => $this->username,
+            'full_name' => $this->profile?->full_name,
+            'specialization' => $this->profile?->specialization,
+            'image' => $this->profile?->image? asset('storage/', $this->profile?->image) : null,
+            'profile_background' => $this->profile?->profile_background? asset('storage/', $this->profile?->profile_background) : null,
+            'location' => $this->profile?->location,
+            'bio' => $this->profile?->bio,
+            'languages' => $this->languages?->pluck('language'),
+            'interests' => $this->interests?->pluck('title')
         ];
     }
 }

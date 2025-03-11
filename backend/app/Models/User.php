@@ -52,7 +52,18 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function profile() {
+    public function profile() 
+    {
         return $this -> hasOne(UserProfile::class);
+    }
+
+    public function languages()
+    {
+        return $this->belongsToMany(Language::class, 'user_languages', 'user_id', 'language_id');
+    }
+
+    public function interests()
+    {
+        return $this->belongsToMany(Topic::class, 'user_interests', 'user_id', 'topic_id');
     }
 }

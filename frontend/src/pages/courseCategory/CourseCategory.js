@@ -32,6 +32,8 @@ function CourseCategory() {
    const { contributors } = useSelector((state) => state.contributor);
    const { topics } = useSelector((state) => state.topic);
    const [filteredCourses, setFilteredCourses] = useState([]);
+   const itemsPerPage = 9;
+   const [currentItems, setCurrentItems] = useState(filteredCourses.slice(0, itemsPerPage));
 
 
    // ----------- Format extracted category from URL -----------
@@ -83,9 +85,10 @@ function CourseCategory() {
    };
 
 
-   // ------------- Fetch course category topics ---------------
+   // ---------- Fetch topics and courses for category ----------
    useEffect(() => {
       try {
+         dispatch(getCoursesByCategory(categoryId)).unwrap();
          dispatch(getTopics(categoryId)).unwrap();
       } catch (err) {
          toast.error(err?.error);
@@ -115,17 +118,6 @@ function CourseCategory() {
          language: initialLanguageFilters,
       }));
    }, [topics, contributors, languages]);
-
-   // ---------- Fetch courses when category changes -----------
-   useEffect(() => {
-      try {
-         dispatch(getCoursesByCategory(categoryId)).unwrap();
-      } catch (err) {
-         toast.error(err.error);
-      }
-   }, [dispatch, categoryId]);
-   const itemsPerPage = 9;
-   const [currentItems, setCurrentItems] = useState(filteredCourses.slice(0, itemsPerPage));
 
    // ------------- Change content on page change --------------
    useEffect(() => {

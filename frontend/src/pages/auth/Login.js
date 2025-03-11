@@ -2,7 +2,7 @@ import styles from './Auth.module.css';
 import { ReactComponent as LoginSVG } from '../../assets/images/login.svg';
 import TextInput from '../../components/inputFields/TextInput';
 import MainButton from '../../components/button/MainButton';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useFormFields from '../../hooks/useFormFields';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
@@ -15,6 +15,7 @@ function Login() {
       email: '',
       password: ''
    };
+   const location = useLocation();
    const navigate = useNavigate();
    const dispatch = useDispatch();
    const { fields, handleChange } = useFormFields(initialValues);
@@ -33,7 +34,7 @@ function Login() {
    // --------- Redirect to homepage after login ---------
    useEffect(() => {
       if (isAuthenticated) {
-         navigate('/');
+         navigate(location.state?.from || '/', { replace: true });
       }
    }, [isAuthenticated, navigate]);
 
