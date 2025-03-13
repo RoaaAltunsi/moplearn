@@ -5,6 +5,7 @@ const initialState = {
    newCourses: [],
    cheapestCourses: [],
    coursesByCategory: [],
+   pagination: {},
    loading: false,
    error: ''
 };
@@ -34,9 +35,12 @@ export const getCheapestCourses = createAsyncThunk('course/getCheapest', async (
 });
 
 // GET-COURSES-BY-CATEGORY: Fetch all courses under specific category
-export const getCoursesByCategory = createAsyncThunk('course/getCoursesByCategory', async (categoryId, thunkAPI) => {
+export const getCoursesByCategory = createAsyncThunk('course/getCoursesByCategory', 
+   async ({ categoryId, params }, thunkAPI) => {
    try {
-      const response = await apiClient.get(`categories/${categoryId}/courses`);
+      const response = await apiClient.get(`categories/${categoryId}/courses`, {
+         params
+      });
       return response.data;
 
    } catch (error) {
@@ -88,7 +92,8 @@ const courseSlice = createSlice({
          })
          .addCase(getCoursesByCategory.fulfilled, (state, action) => {
             state.loading = false;
-            state.coursesByCategory = action.payload;
+            state.coursesByCategory = action.payload?.courses;
+            state.pagination = action.payload?.pagination;
             state.error = '';
          })
          .addCase(getCoursesByCategory.rejected, (state, action) => {

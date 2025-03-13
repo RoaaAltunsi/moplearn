@@ -9,7 +9,7 @@ import * as brandIcons from '@fortawesome/free-brands-svg-icons';
 import * as regularIcons from '@fortawesome/free-regular-svg-icons';
 import ScrollToTop from './utils/ScrollToTop.js';
 import PageWrapper from './utils/PageWrapper.js';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import LoadingState from './components/UIStates/LoadingState.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearAllErrors } from './redux/globalActions.js';
@@ -28,6 +28,9 @@ function App() {
 
   const location = useLocation();
   const dispatch = useDispatch();
+  const { categories } = useSelector((state) => state.category);
+  const { languages } = useSelector((state) => state.language);
+  const { contributors } = useSelector((state) => state.contributor);
   const isLoading = useSelector((state) =>
     Object.values(state).some(slice => slice.loading) // Check if any slice has loading = true
   );
@@ -40,16 +43,17 @@ function App() {
 
   // Fetch once when app loads >> static data
   useEffect(() => {
-    try {
+    if (categories.length === 0) {
       dispatch(getCategories());
-      dispatch(getContributors());
-      dispatch(getLanguages());
-
-    } catch (err) {
-      toast.error(err.error);
     }
-  }, [dispatch]);
-  
+    if (languages.length === 0) {
+      dispatch(getLanguages());
+    }
+    if (contributors.length === 0) {
+      dispatch(getContributors());
+    }
+  }, [dispatch, contributors.length, categories.length, languages.length]);
+
 
   return (
     <>

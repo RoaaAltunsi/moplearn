@@ -44,7 +44,7 @@ function Contributors() {
                {contributors.length > 0 && contributors.map((contributor, index) => (
                   <img
                      key={index}
-                     src={contributor['contribution_form'].logo}
+                     src={contributor.logo}
                      alt={`Platform ${index}`}
                      className={styles.platform}
                   />

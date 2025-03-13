@@ -15,7 +15,7 @@ export const getCategories = createAsyncThunk('category/get', async (_, thunkAPI
       return response.data;
 
    } catch (error) {
-      thunkAPI.rejectWithValue("Failed to fetch categories");
+      return thunkAPI.rejectWithValue("Failed to fetch categories");
    }
 });
 
@@ -31,16 +31,11 @@ export const categorySlice = createSlice({
    extraReducers: (builder) => {
       builder
          // --------------------- get categories ---------------------
-         .addCase(getCategories.pending, (state) => {
-            state.loading = true;
-         })
          .addCase(getCategories.fulfilled, (state, action) => {
-            state.loading = false;
             state.categories = action.payload;
             state.error = '';
          })
          .addCase(getCategories.rejected, (state, action) => {
-            state.loading = false;
             state.error = action.payload;
          })
    }

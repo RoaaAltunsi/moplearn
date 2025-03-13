@@ -314,7 +314,7 @@ function Navbar() {
          </div>
 
          {/* --------------------- Courses Nav Section -------------------- */}
-         {categories.length > 0 && (
+         {categories?.length > 0 && (
             <>
                <div className={`
                   ${styles.courses_section}
@@ -330,7 +330,7 @@ function Navbar() {
                         onClick={() => setIsCoursesDropMenuOpened(!isCoursesDropMenuOpened)}
                         className={`
                      ${styles.icon}
-                     ${hiddenCourses.length > 0 ? styles.visible : ''}
+                     ${hiddenCourses?.length > 0 ? styles.visible : ''}
                   `}
                      />
                   </div>
@@ -339,7 +339,7 @@ function Navbar() {
                {/* -- Drop down menu if courses exceed the available nav width -- */}
                <PopUpList
                   ref={coursesDropMenu}
-                  isVisible={hiddenCourses.length > 0 && isCoursesDropMenuOpened}
+                  isVisible={hiddenCourses?.length > 0 && isCoursesDropMenuOpened}
                   width='20vw'
                   items={hiddenCourses.map(course => ({
                      label: course,
@@ -379,7 +379,7 @@ function Navbar() {
                <MainNavList onClick={() => setIsMenuOpened(false)} />
 
                {location.pathname.startsWith('/courses')
-                  && categories.length > 0 &&
+                  && categories?.length > 0 &&
                   (
                      <CoursesList onClick={() => setIsMenuOpened(false)} />
                   )

@@ -4,8 +4,8 @@ import CourseCard from '../../components/courseCard/CourseCard';
 import SelectInput from '../../components/inputFields/SelectInput';
 import Pagination from '../../components/pagination/Pagination';
 import EmptyState from '../../components/UIStates/EmptyState';
-import { useLocation, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCoursesByCategory } from '../../redux/slices/courseSlice';
 import { getTopics } from '../../redux/slices/topicSlice';
@@ -14,26 +14,26 @@ import { toast } from 'react-toastify';
 
 function CourseCategory() {
 
-   const location = useLocation();
    const dispatch = useDispatch();
+   const navigate = useNavigate();
+   const location = useLocation();
    const { courseCategory } = useParams();
    const categoryId = courseCategory?.split("-")[0];
    const [partnerChecked, setPartnerChecked] = useState({}); // For partner list checkbox
    const [filters, setFilters] = useState({
       price: { free: false, discounted: false },
-      topic: {},
-      level: { beginner: false, intermediate: false, expert: false },
-      platform: {},
-      language: {}
+      topics: {},
+      levels: { beginner: false, intermediate: false, expert: false },
+      platforms: {},
+      languages: {},
    });
    const [sortFilter, setSortFilter] = useState('');
-   const { coursesByCategory } = useSelector((state) => state.course);
+   const { coursesByCategory, pagination } = useSelector((state) => state.course);
    const { languages } = useSelector((state) => state.language);
    const { contributors } = useSelector((state) => state.contributor);
    const { topics } = useSelector((state) => state.topic);
-   const [filteredCourses, setFilteredCourses] = useState([]);
-   const itemsPerPage = 9;
-   const [currentItems, setCurrentItems] = useState(filteredCourses.slice(0, itemsPerPage));
+   const searchParams = new URLSearchParams(location.search);
+   const currentPage = parseInt(searchParams.get("page"), 10) || 1;
 
 
    // ----------- Format extracted category from URL -----------
@@ -46,14 +46,18 @@ function CourseCategory() {
    }
 
    // ------------ Update filters' options on change -----------
-   const handleFilterChange = (section, option) => {
+   const handleFilterChange = (filterType, option) => {
       setFilters(prevState => ({
          ...prevState,
-         [section]: {
-            ...prevState[section],
-            [option]: !prevState[section][option]
+         [filterType]: {
+            ...prevState[filterType],
+            [option]: !prevState[filterType][option]
          }
-      }))
+      }));
+
+      // Reset page to 1
+      searchParams.set("page", 1);
+      navigate(`${location.pathname}?${searchParams.toString()}`);
    }
 
    // ------------------- Reset all filters --------------------
@@ -84,16 +88,67 @@ function CourseCategory() {
       }
    };
 
+   // --------------- Update URL on page change ----------------
+   const handlePageChange = (newPage) => {
+      searchParams.set("page", newPage);
+      navigate(`${location.pathname}?${searchParams.toString()}`);
+   };
 
-   // ---------- Fetch topics and courses for category ----------
-   useEffect(() => {
-      try {
-         dispatch(getCoursesByCategory(categoryId)).unwrap();
-         dispatch(getTopics(categoryId)).unwrap();
-      } catch (err) {
-         toast.error(err?.error);
+   // -------------- Map selected filters to IDs ---------------
+   const getFilterIds = useCallback((filterType) => {
+      switch (filterType) {
+         case 'topics':
+            return topics
+               .filter(topic => filters[filterType][topic.title])
+               .map(topic => topic.id);
+         case 'platforms':
+            return contributors
+               .filter(platform => filters[filterType][platform.platform_name])
+               .map(platform => platform.id);
+         case 'languages':
+            return languages
+               .filter(language => filters[filterType][language.language])
+               .map(language => language.id);
+         default:
+            return [];
       }
-   }, [dispatch, categoryId]);
+   }, [topics, contributors, languages, filters]);
+
+   // ---------- Format filters for backend end point -----------
+   const transformFiltersToQueryParams = useCallback(() => {
+      const params = {};
+
+      // Price Filter
+      const selectedPrices = [];
+      if (filters.price.free) selectedPrices.push('free');
+      if (filters.price.discounted) selectedPrices.push('discounted');
+      if (selectedPrices.length > 0) params.price = selectedPrices.join(',');
+
+      // Topic Filter
+      const selectedTopics = getFilterIds('topics');
+      if (selectedTopics.length > 0) params.topics = selectedTopics.join(',');
+
+      // Level Filter
+      const selectedLevels = Object.keys(filters['levels']).filter(option => filters['levels'][option]);
+      if (selectedLevels.length > 0) params.levels = selectedLevels.join(',');
+
+      // Platfrom Filter
+      const selectedPlatforms = getFilterIds('platforms');
+      if (selectedPlatforms.length > 0) params.platforms = selectedPlatforms.join(',');
+
+      // Language Filter
+      const selectedLanguages = getFilterIds('languages');
+      if (selectedLanguages.length > 0) params.languages = selectedLanguages.join(',');
+
+      // Sort Filter
+      if (sortFilter) params.sort = sortFilter;
+
+      // Page Parameter
+      if (currentPage) params.page = currentPage;
+
+      return params;
+   }, [filters, sortFilter, currentPage, getFilterIds]);
+
 
    // ------- Initialize some filters state dynamically --------
    useEffect(() => {
@@ -101,10 +156,12 @@ function CourseCategory() {
       topics.forEach(topic => {
          initialTopicFilters[topic.title] = false;
       });
+
       const initialPlatformFilters = {};
       contributors.forEach(platform => {
-         initialPlatformFilters[platform['contribution_form'].platform_name] = false;
+         initialPlatformFilters[platform.platform_name] = false;
       });
+
       const initialLanguageFilters = {};
       languages.forEach(language => {
          initialLanguageFilters[language.language] = false;
@@ -113,68 +170,24 @@ function CourseCategory() {
       // Set the filters state
       setFilters(prevState => ({
          ...prevState,
-         topic: initialTopicFilters,
-         platform: initialPlatformFilters,
-         language: initialLanguageFilters,
+         topics: initialTopicFilters,
+         platforms: initialPlatformFilters,
+         languages: initialLanguageFilters,
       }));
    }, [topics, contributors, languages]);
 
-   // ------------- Change content on page change --------------
+   // ---------- Fetch topics and courses for category ----------
    useEffect(() => {
-      const getPageFromURL = () => {
-         const searchParams = new URLSearchParams(location.search);
-         const page = searchParams.get('page');
-         return page ? parseInt(page, 10) : 1; // Return 1 as the default page
-      };
-      const handlePageClick = (startOffset) => {
-         const newSlice = filteredCourses.slice(startOffset, startOffset + itemsPerPage);
-         setCurrentItems(newSlice);
-      };
+      dispatch(getTopics(categoryId));
+   }, [dispatch, categoryId]);
 
-      const page = getPageFromURL();
-      const startOffset = (page - 1) * itemsPerPage;
-      handlePageClick(startOffset);
-   }, [location.search, filteredCourses]);
-
-   // --------------------- Filter courses ---------------------
    useEffect(() => {
-      const filtering = coursesByCategory
-      .filter(course => {
-         // Filter by Price
-         if (filters.price.free && !filters.price.discounted && course.price > 0) return false;
-         if (filters.price.discounted && !filters.price.free && course.old_price <= course.price) return false;
-
-         // Filter by Topic
-         const selectedTopics = Object.keys(filters.topic).filter(topic => filters.topic[topic]);
-         if (selectedTopics.length > 0 && !selectedTopics.includes(course.topic.title)) return false;
-
-         // Filter by Level
-         const selectedLevels = Object.keys(filters.level).filter(level => filters.level[level]);
-         if (selectedLevels.length > 0 && !selectedLevels.includes(course.level)) return false;
-
-         // Filter by Language
-         const selectedLangs = Object.keys(filters.language).filter(lang => filters.language[lang]);
-         if (selectedLangs.length > 0 && !selectedLangs.includes(course.language.language)) return false;
-
-         // Filter by Platform
-         const selectedPlat = Object.keys(filters.platform).filter(plat => filters.platform[plat]);
-         if (selectedPlat.length > 0 && !selectedPlat.includes(course.platform.platform_name)) return false;
-
-         return true;
-      })
-      .sort((a,b) => {
-         if (sortFilter === 'highest-rated') {
-            return b.rating - a.rating;
-         } else if (sortFilter === 'newest') {
-            return new Date(b.created_at) - new Date(a.created_at);
-         } else if (sortFilter === 'cheapest') {
-            return a.price - b.price;
-         }
-         return 0; // Default: No sorting
-      });
-      
-      setFilteredCourses(filtering);
-   }, [coursesByCategory, filters, sortFilter]);
+      const params = transformFiltersToQueryParams();
+      dispatch(getCoursesByCategory({
+         categoryId,
+         params
+      }));
+   }, [dispatch, categoryId, transformFiltersToQueryParams]);
 
 
    return (
@@ -200,7 +213,7 @@ function CourseCategory() {
             <div className={styles.courses_section}>
                {/* Results && Sort filter */}
                <div className={styles.courses_header}>
-                  <span className='small_font'> {filteredCourses.length} results </span>
+                  <span className='small_font'> {pagination.total} results </span>
                   <div>
                      <SelectInput
                         label="Sort by"
@@ -212,10 +225,10 @@ function CourseCategory() {
                </div>
 
                {/* Courses cards */}
-               {filteredCourses.length > 0 ? (
+               {coursesByCategory.length > 0 ? (
                   <>
                      <div className={styles.courses_grid}>
-                        {currentItems.map(course => (
+                        {coursesByCategory.map(course => (
                            <CourseCard
                               key={course.id}
                               id={course.id}
@@ -224,7 +237,7 @@ function CourseCategory() {
                               price={course.price}
                               oldPrice={course.old_price}
                               title={course.title}
-                              platformName={course.platform.platform_name}
+                              platformName={course.platform?.platform_name}
                               rating={course.rating}
                               totalReviews={course.total_reviews}
                               isChecked={!!partnerChecked[course.id]}
@@ -234,10 +247,11 @@ function CourseCategory() {
                      </div>
 
                      {/* Pagination section */}
-                     {filteredCourses.length > itemsPerPage && (
+                     {pagination.total > pagination.per_page && (
                         <Pagination
-                           itemsLength={filteredCourses.length}
-                           itemsPerPage={itemsPerPage}
+                           currentPage={pagination.current_page}
+                           lastPage={pagination.last_page}
+                           onPageChange={handlePageChange}
                         />
                      )}
                   </>

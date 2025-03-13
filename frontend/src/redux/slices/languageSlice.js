@@ -32,16 +32,11 @@ export const languageSlice = createSlice({
    extraReducers: (builder) => {
       builder
          // --------------------- get course languages ---------------------
-         .addCase(getLanguages.pending, (state) => {
-            state.loading = true;
-         })
          .addCase(getLanguages.fulfilled, (state, action) => {
-            state.loading = false;
             state.languages = action.payload;
             state.error = '';
          })
          .addCase(getLanguages.rejected, (state, action) => {
-            state.loading = false;
             state.error = action.payload;
          })
    }
