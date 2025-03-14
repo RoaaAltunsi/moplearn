@@ -1,5 +1,5 @@
 import styles from './FindPartner.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import CurvedLine from '../../components/curvedLine/CurvedLine';
 import SelectInput from '../../components/inputFields/SelectInput';
@@ -11,44 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import MainButton from '../../components/button/MainButton';
 import { getUsers } from '../../redux/slices/userSlice';
-import { toast } from 'react-toastify';
+import { getAllTopics } from '../../redux/slices/topicSlice';
 
-
-// const partners = [
-//    {
-//       id: 1,
-//       name: 'Ola Saber',
-//       image: ExampleImage,
-//       specialization: 'Dentist',
-//       interests: ['Astronomy', 'Writing']
-//    },
-//    {
-//       id: 2,
-//       name: 'Rana Hafez',
-//       specialization: 'Programmer',
-//       interests: ['App Development', 'Web Development', 'Anime', 'Design']
-//    },
-//    {
-//       id: 3,
-//       name: 'Sabooh',
-//       interests: ['AI', 'Playing', 'Data Science', 'Design']
-//    },
-//    {
-//       id: 4,
-//       name: 'Doha Mohammed',
-//    },
-//    {
-//       id: 5,
-//       name: 'Rana Hafez',
-//       specialization: 'Programmer',
-//       interests: ['App Development', 'Web Development', 'Anime', 'Design']
-//    },
-//    {
-//       id: 6,
-//       name: 'Alzahraa Alaumri',
-//       interests: ['AI', 'Playing', 'Data Science', 'Design']
-//    },
-// ]
 
 function FindPartner() {
 
@@ -57,15 +21,16 @@ function FindPartner() {
    const dispatch = useDispatch();
    const courseId = location.state?.id;
    const { isAuthenticated } = useSelector((state) => state.auth);
-   const { users } = useSelector((state) => state.user);
+   const { users, pagination } = useSelector((state) => state.user);
    const { languages } = useSelector((state) => state.language);
+   const { topics } = useSelector((state) => state.topic);
    const { courseTitle } = useParams();
-   const [gender, setGender] = useState('');
-   const [language, setLanguage] = useState('');
+   const [selectedLang, setSelectedLang] = useState('');
+   const [selectedTopic, setSelectedTopic] = useState('');
    const [partnerChecked, setPartnerChecked] = useState(false); // For partner list checkbox
    const [friendList, setFriendList] = useState([]); // LATER: Fetch user's friend list from DB
-   const itemsPerPage = 9;
-   const [currentItems, setCurrentItems] = useState([]);
+   const searchParams = new URLSearchParams(location.search);
+   const currentPage = parseInt(searchParams.get("page"), 10) || 1;
 
 
    // ----------- Add/Remove user from partner list -----------
@@ -79,36 +44,59 @@ function FindPartner() {
       }
    };
 
+   // --------------- Update URL on page change ----------------
+   const handlePageChange = (newPage) => {
+      searchParams.set("page", newPage);
+      navigate(`${location.pathname}?${searchParams.toString()}`);
+   };
+
+   // -------- Update content on language filter change ---------
+   const handleLanguageChange = (value) => {
+      setSelectedLang(value);
+      handlePageChange(1); // reset page
+   };
+
+   // -------- Update content on language filter change ---------
+   const handleTopicChange = (value) => {
+      setSelectedTopic(value);
+      handlePageChange(1); // reset page
+   };
+
+   // ---------- Format filters for backend end point -----------
+   const transformFiltersToQueryParams = useCallback(() => {
+      const params = {};
+
+      // Language Filter
+      if (languages.length > 0 && selectedLang) {
+         const langId = languages.find(lang => lang.language.toLowerCase() === selectedLang)?.id;
+         if (langId) params.language = langId;
+      }
+
+      // Topic Filter
+      if (selectedTopic) {
+         const topicId = topics.find(topic => topic.title.toLowerCase().replaceAll(' ', '-') === selectedTopic)?.id;
+         if (topicId) params.topic = topicId;
+      }
+
+      // Page Parameter
+      if (currentPage) params.page = currentPage;
+
+      return params;
+   }, [currentPage, languages, selectedLang, topics, selectedTopic]);
+
 
    // -------------- Fetch partnets on page load --------------
    useEffect(() => {
-      try {
-         if (users.length === 0) {
-            dispatch(getUsers()).unwrap();
-         }
-         setCurrentItems(users.slice(0, itemsPerPage));
-      } catch (err) {
-         toast.error(err?.error);
-      }
-   }, [dispatch, users]);
+      const params = transformFiltersToQueryParams();
+      dispatch(getUsers(params));
+   }, [dispatch, transformFiltersToQueryParams]);
 
-
-   // ------------- Change content on page change --------------
+   // --------------- Fetch topics on page load ---------------
    useEffect(() => {
-      const getPageFromURL = () => {
-         const searchParams = new URLSearchParams(location.search);
-         const page = searchParams.get('page');
-         return page ? parseInt(page, 10) : 1; // Return 1 as the default page
-      };
-      const handlePageClick = (startOffset) => {
-         const newSlice = users.slice(startOffset, startOffset + itemsPerPage);
-         setCurrentItems(newSlice);
-      };
-
-      const page = getPageFromURL();
-      const startOffset = (page - 1) * itemsPerPage;
-      handlePageClick(startOffset);
-   }, [location.search, users])
+      if (topics.length === 0 && isAuthenticated) {
+         dispatch(getAllTopics());
+      }
+   }, [dispatch, topics.length, isAuthenticated]);
 
 
    return (
@@ -131,7 +119,7 @@ function FindPartner() {
                   {/* ----------- Resutls / Filters Header ---------- */}
                   <div className={styles.header}>
                      {/* Left sub-section */}
-                     <span className='small_font'> {users.length} results </span>
+                     <span className='small_font'> {pagination.total} results </span>
 
                      {/* Right sub-section */}
                      <div className={styles.inputs}>
@@ -143,16 +131,16 @@ function FindPartner() {
                            />
                         )}
                         <SelectInput
-                           label="Gender"
-                           value={gender}
-                           options={['Male', 'Female']}
-                           onChange={(value) => setGender(value)}
+                           label="Interests"
+                           value={selectedTopic}
+                           options={topics.map(topic => topic.title)}
+                           onChange={handleTopicChange}
                         />
                         <SelectInput
                            label="Language"
-                           value={language}
+                           value={selectedLang}
                            options={languages.map(language => language.language)}
-                           onChange={(value) => setLanguage(value)}
+                           onChange={handleLanguageChange}
                         />
                      </div>
                   </div>
@@ -161,7 +149,7 @@ function FindPartner() {
                   {users.length > 0 ? (
                      <>
                         <div className={styles.partners_grid}>
-                           {currentItems.map(partner => (
+                           {users.map(partner => (
                               <PartnerCard
                                  key={partner.id}
                                  id={partner.id}
@@ -175,10 +163,11 @@ function FindPartner() {
                         </div>
 
                         {/* Pagination section */}
-                        {users.length > itemsPerPage && (
+                        {pagination.total > pagination.per_page && (
                            <Pagination
-                              itemsLength={users.length}
-                              itemsPerPage={itemsPerPage}
+                              currentPage={pagination.current_page}
+                              lastPage={pagination.last_page}
+                              onPageChange={handlePageChange}
                            />
                         )}
                      </>

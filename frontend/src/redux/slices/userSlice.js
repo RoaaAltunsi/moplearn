@@ -4,6 +4,7 @@ import apiClient from "../apiClient";
 
 const initialState = {
    users: [],
+   pagination: {},
    loading: false,
    error: ''
 };
@@ -11,9 +12,11 @@ const initialState = {
 
 // --------------------- Async Reducer Functions ---------------------
 // GET-USERS: Fetch all users
-export const getUsers = createAsyncThunk('user/get', async (_, thunkAPI) => {
+export const getUsers = createAsyncThunk('user/get', async (params, thunkAPI) => {
    try {
-      const response = await apiClient.get('users');
+      const response = await apiClient.get('users', {
+         params
+      });
       return response.data;
 
    } catch (error) {
@@ -38,7 +41,8 @@ export const userSlice = createSlice({
          })
          .addCase(getUsers.fulfilled, (state, action) => {
             state.loading = false;
-            state.users = action.payload;
+            state.users = action.payload?.users;
+            state.pagination = action.payload?.pagination;
             state.error = '';
          })
          .addCase(getUsers.rejected, (state, action) => {

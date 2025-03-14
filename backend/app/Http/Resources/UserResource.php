@@ -24,8 +24,14 @@ class UserResource extends JsonResource
             'profile_background' => $this->profile?->profile_background? asset('storage/', $this->profile?->profile_background) : null,
             'location' => $this->profile?->location,
             'bio' => $this->profile?->bio,
-            'languages' => $this->languages?->pluck('language'),
-            'interests' => $this->interests?->pluck('title')
+            'languages' => $this->languages->pluck('language', 'id')->map(fn ($name, $id) => [
+                'id' => $id,
+                'name' => $name,
+            ])->values(),
+            'interests' => $this->interests->pluck('title', 'id')->map(fn ($title, $id) => [
+                'id' => $id,
+                'title' => $title,
+            ])->values(),
         ];
     }
 }

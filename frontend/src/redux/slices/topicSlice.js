@@ -1,21 +1,34 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../apiClient";
 
+
 const initialState = {
+   categoryTopics: [],
    topics: [],
    loading: false,
    error: ''
 };
 
 // --------------------- Async Reducer Functions ---------------------
-// GET-TOPICS: Fetch all topics under specific category
-export const getTopics = createAsyncThunk('topic/get', async (categoryId, thinkAPI) => {
+// GET-TOPICS-BY-CATEGORY: Fetch all topics under specific category
+export const getTopicsByCategory = createAsyncThunk('topic/getByCategory', async (categoryId, thinkAPI) => {
    try {
       const response = await apiClient.get(`categories/${categoryId}/topics`);
       return response.data;
 
    } catch (error) {
-      return thinkAPI.rejectWithValue("Failed to fetch topics");
+      return thinkAPI.rejectWithValue("Failed to fetch topics under this category");
+   }
+});
+
+// GET-ALL-TOPICS: Fetch all topics
+export const getAllTopics = createAsyncThunk('topic/getAll', async (_, thunkAPI) => {
+   try {
+      const response = await apiClient.get('topics');
+      return response.data;
+
+   } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch topics");
    }
 });
 
@@ -31,15 +44,29 @@ export const topicSlice = createSlice({
    extraReducers: (builder) => {
       builder
          // --------------------- get category topics ---------------------
-         .addCase(getTopics.pending, (state) => {
+         .addCase(getTopicsByCategory.pending, (state) => {
             state.loading = true;
          })
-         .addCase(getTopics.fulfilled, (state, action) => {
+         .addCase(getTopicsByCategory.fulfilled, (state, action) => {
+            state.loading = false;
+            state.categoryTopics = action.payload;
+            state.error = '';
+         })
+         .addCase(getTopicsByCategory.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // ----------------------- get all topics -----------------------
+         .addCase(getAllTopics.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(getAllTopics.fulfilled, (state, action) => {
             state.loading = false;
             state.topics = action.payload;
             state.error = '';
          })
-         .addCase(getTopics.rejected, (state, action) => {
+         .addCase(getAllTopics.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
          })

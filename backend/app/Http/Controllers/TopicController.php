@@ -9,6 +9,15 @@ use Illuminate\Http\Request;
 class TopicController extends Controller
 {
     /**
+     * Display all topics
+     */
+    public function index()
+    {
+        $topics = Topic::all();
+        return response()->json(TopicResource::collection($topics));
+    }
+
+    /**
      * Display all topics under specific category
      */
     public function getTopicsByCategory($categoryId)
@@ -16,4 +25,5 @@ class TopicController extends Controller
         $topics = Topic::where('category_id', $categoryId)->get();
         return response()->json(TopicResource::collection($topics));
     }
+
 }

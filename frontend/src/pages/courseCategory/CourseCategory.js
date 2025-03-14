@@ -8,8 +8,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCoursesByCategory } from '../../redux/slices/courseSlice';
-import { getTopics } from '../../redux/slices/topicSlice';
-import { toast } from 'react-toastify';
+import { getTopicsByCategory } from '../../redux/slices/topicSlice';
 
 
 function CourseCategory() {
@@ -178,7 +177,7 @@ function CourseCategory() {
 
    // ---------- Fetch topics and courses for category ----------
    useEffect(() => {
-      dispatch(getTopics(categoryId));
+      dispatch(getTopicsByCategory(categoryId));
    }, [dispatch, categoryId]);
 
    useEffect(() => {

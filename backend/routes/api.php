@@ -20,6 +20,7 @@ Route::get('cheapest-courses', [CourseController::class, 'getCheapestCourses']);
 Route::get('categories/{categoryId}/courses', [CourseController::class, 'getCoursesByCategory']);
 Route::get('languages', [LanguageController::class, 'index']);
 Route::get('categories/{categoryId}/topics', [TopicController::class, 'getTopicsByCategory']);
+Route::get('topics', [TopicController::class, 'index']);
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
@@ -28,7 +29,7 @@ Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('users', [UserController::class, 'index']);
+    Route::get('users', [UserController::class, 'getUsers']);
 });
 
 Route::apiResource('contribution-forms', ContributionFormController::class)->only(['store', 'update']);

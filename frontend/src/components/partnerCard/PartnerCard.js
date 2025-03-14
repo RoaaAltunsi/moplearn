@@ -68,7 +68,7 @@ function PartnerCard({
             </div>
 
             {/* ----------------- Interests Tags ----------------- */}
-            {interests.length > 0 && (
+            {interests?.length > 0 && (
                <div className={styles.interests}>
                   <div className={styles.header}>
                      <FontAwesomeIcon icon="fa-regular fa-heart" />
@@ -78,9 +78,9 @@ function PartnerCard({
                      ref={tagsContainerRef}
                      className={`${styles.tags_container} ${isTagsOverflowed ? styles.overflowed : ''}`}
                   >
-                     {interests.map((interest, index) => (
-                        <div key={index} className={styles.tag}>
-                           <span className='small_font'> {interest} </span>
+                     {interests.map((interest) => (
+                        <div key={interest.id} className={styles.tag}>
+                           <span className='small_font'> {interest.title} </span>
                         </div>
                      ))}
                   </div>
