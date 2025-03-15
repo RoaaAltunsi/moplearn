@@ -45,4 +45,9 @@ class Course extends Model
     {
         return $this->belongsTo(Language::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'partners_list', 'course_id', 'user_id');
+    }
 }

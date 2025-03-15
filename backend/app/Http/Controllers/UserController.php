@@ -25,6 +25,14 @@ class UserController extends Controller
         $itemsPerPaage = 9;
         $query = User::query();
 
+        // Course Filter
+        if ($request->has('course')) {
+            $courseId = $request->input('course');
+            $query->whereHas('courses', function ($q) use ($courseId) {
+                $q->where('courses.id', $courseId);
+            });
+        }
+
         // Language Filter
         if ($request->has('language')) {
             $languageId = $request->input('language');

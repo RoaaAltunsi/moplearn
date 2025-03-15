@@ -34,7 +34,7 @@ function CourseCard({
    // ------- Find Partners to Specific Course by Passing ID -------
    const handleFindPartnerClick = () => {
       const formatedTitle = formatTitleForURL(title);
-      navigate(`/find-partner/${formatedTitle}`, { state: { id } });
+      navigate(`/find-partner/${formatedTitle}?courseId=${id}`);
    };
 
 

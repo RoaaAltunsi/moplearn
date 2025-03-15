@@ -19,7 +19,6 @@ function FindPartner() {
    const location = useLocation();
    const navigate = useNavigate();
    const dispatch = useDispatch();
-   const courseId = location.state?.id;
    const { isAuthenticated } = useSelector((state) => state.auth);
    const { users, pagination } = useSelector((state) => state.user);
    const { languages } = useSelector((state) => state.language);
@@ -31,6 +30,7 @@ function FindPartner() {
    const [friendList, setFriendList] = useState([]); // LATER: Fetch user's friend list from DB
    const searchParams = new URLSearchParams(location.search);
    const currentPage = parseInt(searchParams.get("page"), 10) || 1;
+   const courseId = searchParams.get("courseId");
 
 
    // ----------- Add/Remove user from partner list -----------
@@ -66,8 +66,11 @@ function FindPartner() {
    const transformFiltersToQueryParams = useCallback(() => {
       const params = {};
 
+      // Course Filter
+      if (courseId) params.course = courseId;
+      
       // Language Filter
-      if (languages.length > 0 && selectedLang) {
+      if (selectedLang) {
          const langId = languages.find(lang => lang.language.toLowerCase() === selectedLang)?.id;
          if (langId) params.language = langId;
       }
@@ -82,7 +85,7 @@ function FindPartner() {
       if (currentPage) params.page = currentPage;
 
       return params;
-   }, [currentPage, languages, selectedLang, topics, selectedTopic]);
+   }, [currentPage, languages, selectedLang, topics, selectedTopic, courseId]);
 
 
    // -------------- Fetch partnets on page load --------------
