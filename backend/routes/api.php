@@ -27,9 +27,10 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('validate-email', [AuthController::class, 'validateEmail']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('users', [UserController::class, 'getUsers']);
+    Route::post('update-profile', [UserController::class, 'updateProfile']);
 });
 
 Route::apiResource('contribution-forms', ContributionFormController::class)->only(['store', 'update']);

@@ -20,13 +20,13 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'full_name' => $this->profile?->full_name,
             'specialization' => $this->profile?->specialization,
-            'image' => $this->profile?->image? asset('storage/', $this->profile?->image) : null,
-            'profile_background' => $this->profile?->profile_background? asset('storage/', $this->profile?->profile_background) : null,
+            'image' => $this->profile?->image? asset('storage/'. $this->profile?->image) : null,
+            'profile_background' => $this->profile?->profile_background? asset('storage/'. $this->profile?->profile_background) : null,
             'location' => $this->profile?->location,
             'bio' => $this->profile?->bio,
             'languages' => $this->languages->pluck('language', 'id')->map(fn ($name, $id) => [
                 'id' => $id,
-                'name' => $name,
+                'language' => $name,
             ])->values(),
             'interests' => $this->interests->pluck('title', 'id')->map(fn ($title, $id) => [
                 'id' => $id,

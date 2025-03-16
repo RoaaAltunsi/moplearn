@@ -71,13 +71,13 @@ function FindPartner() {
       
       // Language Filter
       if (selectedLang) {
-         const langId = languages.find(lang => lang.language.toLowerCase() === selectedLang)?.id;
+         const langId = languages.find(lang => lang.language === selectedLang)?.id;
          if (langId) params.language = langId;
       }
 
       // Topic Filter
       if (selectedTopic) {
-         const topicId = topics.find(topic => topic.title.toLowerCase().replaceAll(' ', '-') === selectedTopic)?.id;
+         const topicId = topics.find(topic => topic.title === selectedTopic)?.id;
          if (topicId) params.topic = topicId;
       }
 
@@ -184,8 +184,8 @@ function FindPartner() {
 
             ) : (
                // ----------- Ask user to login -----------
-               <div className={styles.login_container}>
-                  <FontAwesomeIcon icon="fa-solid fa-users" className={styles.icon} />
+               <div className={'login_ask_container'}>
+                  <FontAwesomeIcon icon="fa-solid fa-users" className={'icon'} />
                   <p>Please log in to browse partners</p>
                   <MainButton
                      label="Log in"

@@ -1,6 +1,7 @@
 .content_wrap {
     width: 90%;
     justify-self: center;
+    justify-content: center;
     display: flex;
     flex-direction: column;
     padding: 5vw;

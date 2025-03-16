@@ -1,51 +1,55 @@
 import styles from './EditAccount.module.css';
 import Tabs from '../../components/tabs/Tabs';
 import DefaultImg from '../../assets/images/default-profile.png';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import MainButton from '../../components/button/MainButton';
 import TextInput from '../../components/inputFields/TextInput';
 import SelectInput from '../../components/inputFields/SelectInput';
 import Modal from '../../components/modal/Modal';
 import useFormFields from '../../hooks/useFormFields';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-const languages = [
-   'English', 'Arabic', 'Chinese', 'Italian', 'French', 'Korean', 'Japanese', 'Russian', 'Turkish',
-   'Spanish', 'German', 'Hindi', 'Portuguese', 'Swedish', 'Ukranian', 'Greek', 'Dutch', 'Tahi'
-];
-
-const interests = [
-   'Design', 'Programming', 'Gaming', 'Writing', 'Physics', 'Game Development'
-];
+import { useDispatch, useSelector } from 'react-redux';
+import countryList from "react-select-country-list";
+import { getAllTopics } from '../../redux/slices/topicSlice';
+import { toast } from 'react-toastify';
+import { updateProfile } from "../../redux/slices/userSlice";
 
 
 function EditAccount() {
 
-   const initialValues = {
-      profile_img: null,
-      first_name: '',
-      last_name: '',
-      specialization: '',
-      location: '',
-      bio: '',
-      languages: [],
-      interests: [],
-      username: '',
-      email: '',
-   };
    const navigate = useNavigate();
+   const dispatch = useDispatch();
+   const location = useLocation();
    const imageInputRef = useRef(null);
    const editBtnRef = useRef(null);
    const profileImgDropMenuRef = useRef(null);
-   const { fields, handleChange } = useFormFields(initialValues);
    const tabs = ['Profile Info', 'Settings'];
+   const locations = useMemo(() => countryList().getData(), []);
    const [searchParams] = useSearchParams();
    const activeTabFromURL = searchParams.get('tab') || 'profile-info';
    const [activeTab, setActiveTab] = useState(activeTabFromURL);
-   const [tempProfileImg, setTempProfileImg] = useState(null);
    const [isDropMenuOpened, setIsDropMenuOpened] = useState(false); // Edit profile img drop menu
    const [isModalOpened, setIsModalOpened] = useState(false);
+   const { user, isAuthenticated } = useSelector((state) => state.auth);
+   const { languages } = useSelector((state) => state.language);
+   const { topics } = useSelector((state) => state.topic);
+   const { validationErrors } = useSelector((state) => state.user);
+   const initialValues = {
+      profile_img: user?.image,
+      first_name: user?.full_name?.split(' ')[0] || '',
+      last_name: user?.full_name?.split(' ')[1] || '',
+      specialization: user?.specialization || '',
+      image: user?.image || null,
+      location: user?.location || '',
+      bio: user?.bio || '',
+      languages: user?.languages?.map(lang => lang.language) || [],
+      interests: user?.interests?.map(topic => topic.title) || [],
+      username: user?.username || '',
+      email: user?.email || '',
+   };
+   const { fields, handleChange } = useFormFields(initialValues);
+   const [modifiedFields, setModifiedFields] = useState({}); // track only the updated fields
 
 
    // ------- Handle clicking Upload Photo in edit profile img --------
@@ -56,16 +60,82 @@ function EditAccount() {
 
    // --------------- Handle uploading new Profile Image --------------
    const handleUploadImage = (e) => {
-      if (e.target.files && e.target.files[0]) {
-         const imgURL = URL.createObjectURL(e.target.files[0]);
-         setTempProfileImg(imgURL);
+      const file = e.target.files[0];
+      if (file) {
+         handleChange('image', file);
+         setModifiedFields(prev => ({
+            ...prev,
+            image: file
+         }));
       }
+   };
+
+   // ---------------- Track updates in profile fields ----------------
+   const trackFieldsChange = (field, value) => {
+      handleChange(field, value);
+
+      setModifiedFields(prev => {
+         const updatedFields = { ...prev, [field]: value };
+         if (field === 'first_name' || field === 'last_name') {
+            updatedFields.full_name = `${fields.first_name} ${fields.last_name}`.trim();
+         }
+
+         return updatedFields;
+      });
    };
 
    // ------------------- Handle Remove Profile Image -----------------
    const handleRemoveProfileImg = () => {
       setIsDropMenuOpened(false);
-      setTempProfileImg(null);
+      handleChange('image', null);
+      setModifiedFields(prev => ({
+         ...prev,
+         image: null
+      }));
+   };
+
+   // ------------------- Handle Update Profile Info ------------------
+   const handleUpdateProfile = async () => {
+      if (Object.keys(modifiedFields).length === 0) {
+         toast.error("No changes detected");
+         return;
+      }
+
+      const formData = new FormData();
+
+      // Append modified text fields
+      Object.keys(modifiedFields).forEach((key) => {
+         if (key === "image" && modifiedFields.image instanceof File) {
+            formData.append("image", modifiedFields.image);
+         } else if (Array.isArray(modifiedFields[key])) {
+            formData.append(key, modifiedFields[key].join(","));
+         } else {
+            formData.append(key, modifiedFields[key]);
+         }
+      });
+
+      // Convert languages & interests to IDs before sending
+      if (modifiedFields.languages) {
+         const languageIds = fields.languages
+            .map((lang) => languages.find((l) => l.language === lang)?.id)
+            .filter((id) => id !== undefined);
+         formData.append("languages", languageIds.join(","));
+      }
+
+      if (modifiedFields.interests) {
+         const interestIds = fields.interests
+            .map((topic) => topics.find((t) => t.title === topic)?.id)
+            .filter((id) => id !== undefined);
+         formData.append("interests", interestIds.join(","));
+      }
+
+      // Dispatch profile update
+      try {
+         await dispatch(updateProfile(formData)).unwrap();
+         toast.success("Your info has been updated successfully!");
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
    // ------------------- Handle Remove user account ------------------
@@ -93,6 +163,7 @@ function EditAccount() {
       if (formattedTab !== searchParams.get('tab')) {
          navigate(`?tab=${formattedTab}`, { replace: true }); // Use replace to avoid unnecessary history entries
       }
+      setModifiedFields({}); // reset modification on tab change
    }, [activeTab, navigate, searchParams]);
 
    // ----------- Handle clicking outside the opened menu -----------
@@ -103,163 +174,200 @@ function EditAccount() {
       }
    }, [handleClickOutside]);
 
+   // ------------------ Fetch topics on page load ------------------
+   useEffect(() => {
+      if (topics?.length === 0 && isAuthenticated) {
+         dispatch(getAllTopics());
+      }
+   }, [dispatch, topics?.length, isAuthenticated]);
+
 
    return (
       <div className='container'>
          <div className={styles.content_wrap}>
-            {/* ---------------- Tabs Switch ----------------- */}
-            <Tabs
-               tabs={tabs}
-               activeTab={activeTab}
-               onTabChange={setActiveTab}
-            />
+            {isAuthenticated ? (
+               <>
+                  {/* ---------------- Tabs Switch ----------------- */}
+                  <Tabs
+                     tabs={tabs}
+                     activeTab={activeTab}
+                     onTabChange={setActiveTab}
+                  />
 
-            <div className={styles.info_container}>
-               {activeTab === 'profile-info' ? (
-                  <>
-                     {/* ------------ Edit Profile Image ----------- */}
-                     <div className={styles.section}>
-                        <div className={styles.profile_img}>
-                           <img src={tempProfileImg ? tempProfileImg : DefaultImg} alt="" />
-                           {/* Edit button */}
-                           <div ref={editBtnRef} className={styles.edit_img_btn}>
+                  <div className={styles.info_container}>
+                     {activeTab === 'profile-info' ? (
+                        <>
+                           {/* ------------ Edit Profile Image ----------- */}
+                           <div className={styles.section}>
+                              <div className={styles.profile_img}>
+                                 <img
+                                    src={fields['image'] instanceof File ? URL.createObjectURL(fields['image']) : fields['image'] || DefaultImg}
+                                    alt="Profile"
+                                 />
+                                 {/* Edit button */}
+                                 <div ref={editBtnRef} className={styles.edit_img_btn}>
+                                    <MainButton
+                                       isCircular={true}
+                                       iconName="fa-solid fa-pen"
+                                       onClick={() => setIsDropMenuOpened(!isDropMenuOpened)}
+                                    />
+                                 </div>
+
+                                 {/* Edit dropdown menu */}
+                                 <ul
+                                    ref={profileImgDropMenuRef}
+                                    className={`${styles.edit_menu} ${isDropMenuOpened ? styles.visible : ''}`}
+                                 >
+                                    <li onClick={handleUploadClick}>
+                                       <FontAwesomeIcon icon="fa-solid fa-arrow-up-from-bracket" />
+                                       <span className='small_font'> Upload Photo </span>
+                                       <input
+                                          type="file"
+                                          ref={imageInputRef}
+                                          style={{ display: 'none' }}
+                                          accept=".jpg, .jpeg, .png"
+                                          onChange={handleUploadImage}
+                                       />
+                                    </li>
+
+                                    {fields['image'] && (
+                                       <li onClick={handleRemoveProfileImg}>
+                                          <FontAwesomeIcon icon="fa-regular fa-trash-can" />
+                                          <span className='small_font'> Remove </span>
+                                       </li>
+                                    )}
+                                 </ul>
+                              </div>
+
+                              {validationErrors['image'] && (
+                                 <span className='error' style={{ alignSelf: 'center' }}> {validationErrors['image'][0]} </span>
+                              )}
+                           </div>
+
+                           {/* -------- Profile Info Input Fields -------- */}
+                           <div className={styles.section}>
+                              <h4> Personal Information </h4>
+                              <div className={styles.flex_row}>
+                                 <TextInput
+                                    label="First Name"
+                                    value={fields['first_name']}
+                                    error={validationErrors['first_name'] ? validationErrors['first_name'][0] : ""}
+                                    onChange={trackFieldsChange}
+                                 />
+                                 <TextInput
+                                    label="Last Name"
+                                    value={fields['last_name']}
+                                    error={validationErrors['last_name'] ? validationErrors['last_name'][0] : ""}
+                                    onChange={(value) => trackFieldsChange('last_name', value)}
+                                 />
+                              </div>
+
+                              <div className={styles.flex_row}>
+                                 <TextInput
+                                    label="Specialization"
+                                    value={fields['specialization']}
+                                    error={validationErrors['specialization'] ? validationErrors['specialization'][0] : ""}
+                                    onChange={(value) => trackFieldsChange('specialization', value)}
+                                 />
+                                 <SelectInput
+                                    label="Location"
+                                    value={fields['location']}
+                                    options={locations.map(location => location.label)}
+                                    error={validationErrors['location'] ? validationErrors['location'][0] : ""}
+                                    onChange={(value) => trackFieldsChange('location', value)}
+                                 />
+                              </div>
+
+                              <div className={styles.flex_row}>
+                                 <TextInput
+                                    isMulitLine={true}
+                                    label="Bio"
+                                    value={fields['bio']}
+                                    error={validationErrors['bio'] ? validationErrors['bio'][0] : ""}
+                                    onChange={(value) => trackFieldsChange('bio', value)}
+                                 />
+                              </div>
+                           </div>
+
+                           <div className={styles.section}>
+                              <h4> Preference </h4>
+                              <div>
+                                 <SelectInput
+                                    isMultiOptions={true}
+                                    label="Languages"
+                                    value={fields['languages']}
+                                    options={languages.map(lang => lang.language)}
+                                    onChange={(value) => trackFieldsChange('languages', value)}
+                                 />
+                              </div>
+
+                              <div>
+                                 <SelectInput
+                                    isMultiOptions={true}
+                                    label="Interests"
+                                    value={fields['interests']}
+                                    options={topics.map(topic => topic.title)}
+                                    onChange={(value) => trackFieldsChange('interests', value)}
+                                 />
+                              </div>
+                           </div>
+
+                           <div className={styles.section}>
                               <MainButton
-                                 isCircular={true}
-                                 iconName="fa-solid fa-pen"
-                                 onClick={() => setIsDropMenuOpened(!isDropMenuOpened)}
+                                 label="Save Changes"
+                                 onClick={handleUpdateProfile}
+                                 customStyles={{ alignSelf: 'flex-start' }}
+                              />
+                           </div>
+                        </>
+
+                     ) : (
+                        <>
+                           <div className={styles.section}>
+                              <div className={styles.flex_row}>
+                                 <TextInput
+                                    label="Username"
+                                    value={fields['username']}
+                                    onChange={(value) => trackFieldsChange('username', value)}
+                                 />
+                                 <TextInput
+                                    label="Email"
+                                    value={fields['email']}
+                                    onChange={(value) => trackFieldsChange('email', value)}
+                                 />
+                              </div>
+
+                              <MainButton
+                                 label="Save Changes"
+                                 customStyles={{ alignSelf: 'flex-start', margin: '3vh 0' }}
                               />
                            </div>
 
-                           {/* Edit dropdown menu */}
-                           <ul
-                              ref={profileImgDropMenuRef}
-                              className={`${styles.edit_menu} ${isDropMenuOpened ? styles.visible : ''}`}
-                           >
-                              <li onClick={handleUploadClick}>
-                                 <FontAwesomeIcon icon="fa-solid fa-arrow-up-from-bracket" />
-                                 <span className='small_font'> Upload Photo </span>
-                                 <input
-                                    type="file"
-                                    ref={imageInputRef}
-                                    style={{ display: 'none' }}
-                                    accept=".jpg, .jpeg, .png"
-                                    onChange={handleUploadImage}
-                                 />
-                              </li>
-
-                              <li onClick={handleRemoveProfileImg}>
-                                 <FontAwesomeIcon icon="fa-regular fa-trash-can" />
-                                 <span className='small_font'> Remove </span>
-                              </li>
-                           </ul>
-                        </div>
-                     </div>
-
-                     {/* -------- Profile Info Input Fields -------- */}
-                     <div className={styles.section}>
-                        <h4> Personal Information </h4>
-                        <div className={styles.flex_row}>
-                           <TextInput
-                              label="First Name"
-                              value={fields['first_name']}
-                              onChange={(value) => handleChange('first_name', value)}
-                           />
-                           <TextInput
-                              label="Last Name"
-                              value={fields['last_name']}
-                              onChange={(value) => handleChange('last_name', value)}
-                           />
-                        </div>
-
-                        <div className={styles.flex_row}>
-                           <TextInput
-                              label="Specialization"
-                              value={fields['specialization']}
-                              onChange={(value) => handleChange('specialization', value)}
-                           />
-                           <TextInput
-                              label="Location"
-                              value={fields['locatione']}
-                              onChange={(value) => handleChange('location', value)}
-                           />
-                        </div>
-
-                        <div className={styles.flex_row}>
-                           <TextInput
-                              isMulitLine={true}
-                              label="Bio"
-                              value={fields['bio']}
-                              onChange={(value) => handleChange('bio', value)}
-                           />
-                        </div>
-                     </div>
-
-                     <div className={styles.section}>
-                        <h4> Preference </h4>
-                        <div>
-                           <SelectInput
-                              isMultiOptions={true}
-                              label="Languages"
-                              value={fields['languages']}
-                              options={languages}
-                              onChange={(value) => handleChange('languages', value)}
-                           />
-                        </div>
-
-                        <div>
-                           <SelectInput
-                              isMultiOptions={true}
-                              label="Interests"
-                              value={fields['interests']}
-                              options={interests}
-                              onChange={(value) => handleChange('interests', value)}
-                           />
-                        </div>
-                     </div>
-
-                     <div className={styles.section}>
-                        <MainButton
-                           label="Save Changes"
-                           customStyles={{ alignSelf: 'flex-start' }}
-                        />
-                     </div>
-                  </>
-
-               ) : (
-                  <>
-                     <div className={styles.section}>
-                        <div className={styles.flex_row}>
-                           <TextInput
-                              label="Username"
-                              value={fields['username']}
-                              onChange={(value) => handleChange('username', value)}
-                           />
-                           <TextInput
-                              label="Email"
-                              value={fields['email']}
-                              onChange={(value) => handleChange('email', value)}
-                           />
-                        </div>
-
-                        <MainButton
-                           label="Save Changes"
-                           customStyles={{ alignSelf: 'flex-start', margin: '3vh 0' }}
-                        />
-                     </div>
-
-                     <div className={`${styles.section} ${styles.delete_sec}`}>
-                        <h3> Delete Account </h3>
-                        <span className='small_font'> Once you delete your account, there is no going back. Please be certain </span>
-                        <MainButton
-                           isDestructive={true}
-                           label="Delete My Account"
-                           customStyles={{ alignSelf: 'flex-start', margin: '3vh 0' }}
-                           onClick={() => setIsModalOpened(true)}
-                        />
-                     </div>
-                  </>
-               )}
-            </div>
+                           <div className={`${styles.section} ${styles.delete_sec}`}>
+                              <h3> Delete Account </h3>
+                              <span className='small_font'> Once you delete your account, there is no going back. Please be certain </span>
+                              <MainButton
+                                 isDestructive={true}
+                                 label="Delete My Account"
+                                 customStyles={{ alignSelf: 'flex-start', margin: '3vh 0' }}
+                                 onClick={() => setIsModalOpened(true)}
+                              />
+                           </div>
+                        </>
+                     )}
+                  </div>
+               </>
+            ) : (
+               // ----------- Ask user to login -----------
+               <div className={'login_ask_container'}>
+                  <FontAwesomeIcon icon="fa-solid fa-circle-exclamation" className={'icon'} />
+                  <p>Please log in to continue</p>
+                  <MainButton
+                     label="Log in"
+                     onClick={() => navigate('/login', { state: { from: location.pathname } })}
+                  />
+               </div>
+            )}
          </div>
 
          {/* ---------------- Confirmation Modal ----------------- */}

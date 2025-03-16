@@ -14,7 +14,7 @@ function SelectInput({
    const selectRef = useRef(null);
    const listItemRefs = useRef([]);
    const [searchTerm, setSearchTerm] = useState('');
-   const [selectedValue, setSelectedValue] = useState('');
+   const [selectedValue, setSelectedValue] = useState(value);
    const [selectedTags, setSelectedTags] = useState(value); // For multi-options
    const [highlightedIndex, setHighlightedIndex] = useState(-1);
    const [isOpen, setIsOpen] = useState(false);
@@ -27,12 +27,6 @@ function SelectInput({
       ? options.filter(option => option.toLowerCase().startsWith(searchTerm.toLowerCase()))
       : updatedOptions;
 
-
-   // ------------------- Format selected option -------------------
-   const formatSelectedOption = (option) => {
-      return option.toLowerCase().replaceAll(' ', '-');
-   };
-
    // ----------------- Handle selecting an option -----------------
    const handleOptionClick = useCallback((option, index) => {
       if (option === 'No selection') {
@@ -42,17 +36,16 @@ function SelectInput({
 
       } else {
          setHighlightedIndex(index);
-         const formatedOption = formatSelectedOption(option);
          if (isMultiOptions) {
-            if (!selectedTags.includes(formatedOption)) { // Prevents option redundancy
-               const updatedTags = [...selectedTags, formatedOption];
+            if (!selectedTags.includes(option)) { // Prevents option redundancy
+               const updatedTags = [...selectedTags, option];
                setSelectedTags(updatedTags);
                onChange(updatedTags);
             }
 
          } else {
             setSelectedValue(option);
-            onChange(formatedOption); // Pass the selected value to the parent via onChange
+            onChange(option); // Pass the selected value to the parent via onChange
          }
       }
       setSearchTerm('');
@@ -139,7 +132,7 @@ function SelectInput({
    return (
       <div className={styles.container} ref={selectRef}>
          <label
-            className={`${(isMultiOptions? selectedTags.length > 0 : value) ? styles.filled : ''} ${error? 'error' : ''}`}>
+            className={`${(isMultiOptions? selectedTags?.length > 0 : value) ? styles.filled : ''} ${error? 'error' : ''}`}>
             {label}
          </label>
 
@@ -147,7 +140,7 @@ function SelectInput({
          <div
             className={`
                ${styles.input_box}
-               ${selectedValue || selectedTags.length > 0 || searchTerm ? styles.filled : ''}
+               ${selectedValue || (Array.isArray(selectedTags) && selectedTags?.length > 0) || searchTerm ? styles.filled : ''}
                ${error? 'error' : ''}
             `}
          >

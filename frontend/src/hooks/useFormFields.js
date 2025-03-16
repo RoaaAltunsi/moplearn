@@ -3,7 +3,7 @@ import { useState } from "react";
 const useFormFields = (initialValues) => {
     const [fields, setFields] = useState(initialValues);
     const handleChange = (label, value) => {
-        setFields({ ...fields, [label]: value instanceof File ? value : value.toString() });
+        setFields({ ...fields, [label]: value });
     }
 
     // Function to reset fields
