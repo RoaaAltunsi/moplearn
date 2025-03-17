@@ -18,4 +18,9 @@ class Language extends Model
     {
         return $this->hasMany(Course::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_languages', 'language_id', 'user_id');
+    }
 }

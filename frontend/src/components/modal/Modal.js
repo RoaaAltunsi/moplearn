@@ -12,7 +12,7 @@ function Modal({
    return (
       <div className={styles.overlay} onClick={onClose}>
 
-         <div className={styles.modal_content}>
+         <div className={styles.modal_content} onClick={(e) => e.stopPropagation()}>
             {/* Close Icon */}
             <FontAwesomeIcon
                icon="fa-solid fa-xmark"

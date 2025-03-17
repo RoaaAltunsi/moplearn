@@ -63,7 +63,7 @@ export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
 // VALIDATE-EMAIL: validate user's email
 export const validateEmail = createAsyncThunk('auth/validateEmail', async (email, thunkAPI) => {
    try {
-      await apiClient.post('validate-email', email);
+      await apiClient.post('email/validation', email);
    } catch (error) {
       if (error.response?.status === 422) {
          // Validation errors returned with status = 422
@@ -81,7 +81,7 @@ export const validateEmail = createAsyncThunk('auth/validateEmail', async (email
 // RESET-PASSWORD: reset user's password
 export const resetPassword = createAsyncThunk('auth/resetPassword', async (data, thunkAPI) => {
    try {
-      await apiClient.post('reset-password', data);
+      await apiClient.post('password/reset', data);
    } catch (error) {
       if (error.response?.status === 422) {
          // Validation errors returned with status = 422

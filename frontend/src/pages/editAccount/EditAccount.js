@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import countryList from "react-select-country-list";
 import { getAllTopics } from '../../redux/slices/topicSlice';
 import { toast } from 'react-toastify';
-import { updateProfile } from "../../redux/slices/userSlice";
+import { deleteAccount, updateAccount, updateProfile } from "../../redux/slices/userSlice";
 
 
 function EditAccount() {
@@ -47,6 +47,7 @@ function EditAccount() {
       interests: user?.interests?.map(topic => topic.title) || [],
       username: user?.username || '',
       email: user?.email || '',
+      password: ''
    };
    const { fields, handleChange } = useFormFields(initialValues);
    const [modifiedFields, setModifiedFields] = useState({}); // track only the updated fields
@@ -138,9 +139,34 @@ function EditAccount() {
       }
    };
 
-   // ------------------- Handle Remove user account ------------------
-   const handleRemoveAccount = () => {
+   // ------------------- Handle Update Account Info ------------------
+   const handleUpdateAccount = async () => {
+      if (Object.keys(modifiedFields).length === 0) {
+         toast.error("No changes detected");
+         return;
+      }
 
+      // Dispatch account update
+      try {
+         await dispatch(updateAccount(modifiedFields)).unwrap();
+         toast.success("Your info has been updated successfully!");
+      } catch (err) {
+         toast.error(err.error);
+      }
+   };
+
+   // ------------------- Handle Remove user account ------------------
+   const handleRemoveAccount = async () => {
+      try {
+         await dispatch(deleteAccount(fields['password'])).unwrap();
+         setIsModalOpened(false);
+         toast.success("Your account has beed deleted successfully");
+         setTimeout(() => {
+            window.location.href = "/";
+         }, 2000);
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
    // --------- Close menu when clicking outside the component --------
@@ -328,17 +354,20 @@ function EditAccount() {
                                  <TextInput
                                     label="Username"
                                     value={fields['username']}
+                                    error={validationErrors['username'] ? validationErrors['username'][0] : ""}
                                     onChange={(value) => trackFieldsChange('username', value)}
                                  />
                                  <TextInput
                                     label="Email"
                                     value={fields['email']}
+                                    error={validationErrors['email'] ? validationErrors['email'][0] : ""}
                                     onChange={(value) => trackFieldsChange('email', value)}
                                  />
                               </div>
 
                               <MainButton
                                  label="Save Changes"
+                                 onClick={handleUpdateAccount}
                                  customStyles={{ alignSelf: 'flex-start', margin: '3vh 0' }}
                               />
                            </div>
@@ -377,7 +406,12 @@ function EditAccount() {
             onClose={() => setIsModalOpened(false)}
             children={
                <>
-                  <span> Are you sure you want to delete your account? </span>
+                  <span> Enter your password to confirm deleting your account </span>
+                  <TextInput
+                     isPassword={true}
+                     value={fields['password']}
+                     onChange={(value) => handleChange('password', value)}
+                  />
                   <div className={styles.modal_btns}>
                      <MainButton
                         label="Cancel"

@@ -15,7 +15,7 @@ const initialState = {
 // GET-NEW-COURSES: Fetch the latest new courses
 export const getNewestCourses = createAsyncThunk('course/getNewest', async (_, thunkAPI) => {
    try {
-      const response = await apiClient.get('new-courses');
+      const response = await apiClient.get('courses/new');
       return response.data;
 
    } catch (error) {
@@ -26,7 +26,7 @@ export const getNewestCourses = createAsyncThunk('course/getNewest', async (_, t
 // GET-CHEAPEST-COURSES: Fetch the cheapest courses
 export const getCheapestCourses = createAsyncThunk('course/getCheapest', async (_, thunkAPI) => {
    try {
-      const response = await apiClient.get('cheapest-courses');
+      const response = await apiClient.get('courses/cheapest');
       return response.data;
 
    } catch (error) {
@@ -38,7 +38,7 @@ export const getCheapestCourses = createAsyncThunk('course/getCheapest', async (
 export const getCoursesByCategory = createAsyncThunk('course/getCoursesByCategory', 
    async ({ categoryId, params }, thunkAPI) => {
    try {
-      const response = await apiClient.get(`categories/${categoryId}/courses`, {
+      const response = await apiClient.get(`courses/categories/${categoryId}`, {
          params
       });
       return response.data;

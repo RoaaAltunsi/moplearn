@@ -13,7 +13,7 @@ const initialState = {
 // GET-TOPICS-BY-CATEGORY: Fetch all topics under specific category
 export const getTopicsByCategory = createAsyncThunk('topic/getByCategory', async (categoryId, thinkAPI) => {
    try {
-      const response = await apiClient.get(`categories/${categoryId}/topics`);
+      const response = await apiClient.get(`topics/categories/${categoryId}`);
       return response.data;
 
    } catch (error) {

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserProfileRequest;
+use App\Http\Requests\UpdateUserAccountRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -65,7 +68,7 @@ class UserController extends Controller
     /**
      * Update user profile
      */
-    public function updateProfile(StoreUserProfileRequest $request)
+    public function storeOrUpdateProfile(StoreUserProfileRequest $request)
     {
         $user = $request->user();
 
@@ -107,6 +110,67 @@ class UserController extends Controller
             'status' => 'success',
             'message' => 'Profile updated successfully!',
             'user' => new UserResource($user)
+        ]);
+    }
+
+    /**
+     * Update user account
+     */
+    public function updateAccount(UpdateUserAccountRequest $request)
+    {
+        $user = $request->user();
+
+        $dataToUpdate = array_filter($request->only(['username', 'email']),
+        fn($value) => !is_null($value)
+        );
+
+        $user->update($dataToUpdate);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Account updated successfully!',
+            'user' => new UserResource($user),
+        ]);
+    }
+
+    /**
+     * Delete user account
+     */
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+
+        // Validate password confirmation
+        $request->validate([
+            'password' => 'required|string'
+        ]);
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Incorrect password'
+            ], 403);
+        }
+
+        // Delete associated images if exist
+        if ($user->profile && $user->profile->image) {
+            Storage::disk('public')->delete($user->profile->image);
+        }
+
+        // Delete user relationships
+        $user->courses()->detach();
+        $user->languages()->detach();
+        $user->interests()->detach();
+        $user->profile()->delete();
+
+        // Logout user before deletion
+        Auth::logout();
+
+        // Delete user account
+        $user->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Your account has been deleted successfully'
         ]);
     }
 

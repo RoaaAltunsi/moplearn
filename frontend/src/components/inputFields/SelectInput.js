@@ -140,7 +140,7 @@ function SelectInput({
          <div
             className={`
                ${styles.input_box}
-               ${selectedValue || (Array.isArray(selectedTags) && selectedTags?.length > 0) || searchTerm ? styles.filled : ''}
+               ${`${(isMultiOptions? selectedTags?.length > 0 : value) ? styles.filled : ''} ${error? 'error' : ''}`}
                ${error? 'error' : ''}
             `}
          >
