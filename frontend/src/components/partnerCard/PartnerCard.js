@@ -8,7 +8,8 @@ import { Link } from 'react-router-dom';
 function PartnerCard({
    id,
    image,
-   name,
+   fullName,
+   username,
    specialization,
    interests,
    isFriend,
@@ -29,7 +30,7 @@ function PartnerCard({
 
    // ------------------ Format Username for URL ------------------
    const formatNameForURL = () => {
-      return name
+      return username
          .toLowerCase()
          .replaceAll(' ', '-');
    };
@@ -49,7 +50,7 @@ function PartnerCard({
 
          <Link
             to={{
-               pathname: `/profile/${formatNameForURL(name)}`,
+               pathname: `/profile/${formatNameForURL()}`,
                state: { id }
             }}
             className={styles.link}
@@ -60,7 +61,7 @@ function PartnerCard({
                   <img src={image ? image : DefaultImg} alt="partner" />
                </div>
 
-               <h3> {name} </h3>
+               <h3> {fullName ?? username} </h3>
 
                {specialization && (
                   <span className='small_font'> {specialization} </span>

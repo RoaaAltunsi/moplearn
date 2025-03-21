@@ -13,7 +13,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import countryList from "react-select-country-list";
 import { getAllTopics } from '../../redux/slices/topicSlice';
 import { toast } from 'react-toastify';
-import { deleteAccount, updateAccount, updateProfile } from "../../redux/slices/userSlice";
+import { deleteAccount, updateAccount } from "../../redux/slices/userSlice";
+import { updateProfile } from '../../redux/slices/userProfileSlice';
 
 
 function EditAccount() {
@@ -91,7 +92,7 @@ function EditAccount() {
       handleChange('image', null);
       setModifiedFields(prev => ({
          ...prev,
-         image: null
+         remove_image: 1,
       }));
    };
 

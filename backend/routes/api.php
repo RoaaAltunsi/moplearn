@@ -9,7 +9,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\TopicController;
-
+use App\Http\Controllers\UserProfileController;
 
 Route::get('csrf-token', function() {
     return response()->json(['csrf_token' => csrf_token()]);
@@ -27,7 +27,7 @@ Route::post('password/reset', [AuthController::class, 'resetPassword']);
 Route::middleware(['auth'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('users', [UserController::class, 'getUsers']);
-    Route::post('profile', [UserController::class, 'storeOrUpdateProfile']);
+    Route::post('profile', [UserProfileController::class, 'storeOrUpdateProfile']);
     Route::put('account', [UserController::class, 'updateAccount']);
     Route::delete('account', [UserController::class, 'deleteAccount']);
 });
@@ -39,5 +39,5 @@ Route::prefix('courses')->group(function () {
 });
 
 
-Route::apiResource('contribution-forms', ContributionFormController::class)->only(['store', 'update']);
+Route::apiResource('contribution-forms', controller: ContributionFormController::class)->only(['store', 'update']);
 Route::apiResource('contributors',ContributorController::class)->only(['index', 'show']);

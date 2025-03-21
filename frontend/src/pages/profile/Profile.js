@@ -8,7 +8,11 @@ import EmptyState from '../../components/UIStates/EmptyState';
 import Pagination from '../../components/pagination/Pagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUsers } from '../../redux/slices/userSlice';
+import { updateProfile } from '../../redux/slices/userProfileSlice';
+import { toast } from 'react-toastify';
 
 
 // ------------ Account section component ------------
@@ -42,6 +46,7 @@ function Profile() {
       partners: []
    });
    const navigate = useNavigate();
+   const dispatch = useDispatch();
    const location = useLocation();
    const headerDropMenuRef = useRef(null);
    const imageInputRef = useRef(null);
@@ -52,15 +57,18 @@ function Profile() {
    const [activeTab, setActiveTab] = useState(activeTabFromURL);
    const [tempHeader, setTempHeader] = useState(null);
    const [isDropMenuOpened, setIsDropMenuOpened] = useState(false); // Edit header drop menu
-   const [dragging, setDragging] = useState(false);
-   const [bgPosition, setBgPosition] = useState({ x: 50, y: 50 }); // Center by default
-   const [startDragPosition, setStartDragPosition] = useState({ x: 0, y: 0 });
-   const [initialPosition, setInitialPosition] = useState({ x: 50, y: 50 });
    const [isModalOpened, setIsModalOpened] = useState(false);
    const [modalAction, setModalAction] = useState(null);
    const [searchTerm, setSearchTerm] = useState('');
    const itemsPerPage = 9;
    const [currentItems, setCurrentItems] = useState(profileData.partners?.slice(0, itemsPerPage));
+   const { username } = useParams(); // Get username from URL
+   const { user, isAuthenticated } = useSelector((state) => state.auth);
+   const { users } = useSelector((state) => state.user);
+   const isOwnProfile = isAuthenticated && user?.username === username;
+   const [profileUser, setProfileUser] = useState(isOwnProfile
+      ? user
+      : users.find(u => u.username === username));
 
 
    // ----------- Handle clicking Upload Photo in Header ------------
@@ -71,47 +79,42 @@ function Profile() {
 
    // -------------- Handle uploading new Header Image --------------
    const handleUploadImage = (e) => {
-      if (e.target.files && e.target.files[0]) {
-         const imgURL = URL.createObjectURL(e.target.files[0]);
-         setTempHeader(imgURL);
-         setBgPosition({ x: 50, y: 50 }); // Reset to center position on new upload
+      const file = e.target.files[0];
+      if (file) {
+         setTempHeader(file);
       }
-   };
-
-   // ------------ Control repositioning uploaded Header ------------
-   const handleMouseDown = (e) => {
-      if (tempHeader) { // Enable dragging only is image is not saved yet
-         setDragging(true);
-         setStartDragPosition({ x: e.clientX, y: e.clientY });
-         setInitialPosition(bgPosition);
-      }
-   };
-   const handleMouseMove = (e) => {
-      if (!dragging || !tempHeader) return; // Only allow dragging if tempHeader exists
-      const newX = e.clientX - startDragPosition.x;
-      const newY = e.clientY - startDragPosition.y;
-      setBgPosition({
-         x: Math.max(0, Math.min(100, initialPosition.x + newX / 5)), // Dividing by 5 for smoother movement
-         y: Math.max(0, Math.min(100, initialPosition.y + newY / 5))
-      });
    };
 
    // ----------------- Setting a new Header Image ------------------
-   const handleSaveHeaderBg = () => {
-      setProfileData((prevState) => ({
-         ...prevState,
-         headerBg: tempHeader
-      }));
-      setTempHeader(null);
+   const handleSaveHeaderBg = async () => {
+      try {
+         const formData = new FormData();
+         formData.append('profile_background', tempHeader);
+         const updatedUser = await dispatch(updateProfile(formData)).unwrap();
+         // Update user object to reflect the change immediately
+         setTempHeader(null);
+         setProfileUser((prev) => ({
+            ...prev,
+            profile_background: updatedUser?.user?.profile_background
+         }));
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
    // --------------- Remove the current Header Image ---------------
-   const handleRemoveHeaderBg = () => {
+   const handleRemoveHeaderBg = async () => {
       setIsDropMenuOpened(false);
-      setProfileData((prevState) => ({
-         ...prevState,
-         headerBg: null
-      }))
+      try {
+         await dispatch(updateProfile({ 'remove_background': 1 })).unwrap();
+         setIsModalOpened(false);
+         setProfileUser((prev) => ({
+            ...prev,
+            profile_background: null
+         }));
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
    // -------------- Control Opening Confirmation Modal -------------
@@ -130,11 +133,13 @@ function Profile() {
 
    // -------- Close menu when clicking outside the component -------
    const handleClickOutside = useCallback((e) => {
-      if (editBtnRef && editBtnRef.current.contains(e.target)) return; // Ignore clicks on the edit button
-      if (isDropMenuOpened && headerDropMenuRef && !headerDropMenuRef.current.contains(e.target)) {
-         setIsDropMenuOpened(false);
+      if (isOwnProfile) {
+         if (editBtnRef && editBtnRef?.current.contains(e.target)) return; // Ignore clicks on the edit button
+         if (isDropMenuOpened && headerDropMenuRef && !headerDropMenuRef.current.contains(e.target)) {
+            setIsDropMenuOpened(false);
+         }
       }
-   }, [isDropMenuOpened]);
+   }, [isDropMenuOpened, isOwnProfile]);
 
 
    // Synchronize state with URL query parameters on mount and back/forward navigation
@@ -149,27 +154,6 @@ function Profile() {
          navigate(`?tab=${formattedTab}`, { replace: true }); // Use replace to avoid unnecessary history entries
       }
    }, [activeTab, navigate, searchParams]);
-
-   // ------------ Fetch user profile information from DB -----------
-   useEffect(() => {
-      // Modified later with backend logic
-      const fetchedData = {
-         headerBg: null,
-         profileImg: null,
-         username: 'ola99',
-         full_name: 'Ola Saber',
-         specialization: 'Dentist',
-         bio: 'I am interested in software and game development and constantly seek new knowledge and opportunities in different technical fields. I am dedicated to do my best work and bringing innovative ideas to life.',
-         location: 'Saudi Arabia, Jeddah',
-         languages: ['Arabic', 'English'],
-         interests: ['Astronomy', 'Writing'],
-         partners: [
-            { full_name: 'Rana Hafez', username: 'ran87', specialization: 'Programmer' },
-            { full_name: 'Doha Mohammed', username: 'dohamm', specialization: 'Writer' },
-         ]
-      }
-      setProfileData(fetchedData);
-   }, []);
 
    // ----------- Handle clicking outside the opened menu -----------
    useEffect(() => {
@@ -196,9 +180,27 @@ function Profile() {
       handlePageClick(startOffset);
    }, [location.search, profileData.partners]);
 
+   // ------- Fetch users when viewing someone else's profil --------
+   useEffect(() => {
+      if (!isOwnProfile && users.length === 0) {
+         dispatch(getUsers());
+      }
+   }, [dispatch, isOwnProfile, users.length]);
+
+   // ---------------- Set the correct profile user -----------------
+   useEffect(() => {
+      if (!isOwnProfile) {
+         const foundUser = users.find(u => u.username === username);
+         setProfileUser(foundUser || null);
+      }
+   }, [users, isOwnProfile, username]);
+
    // ----------- Track empty state for each tab section ------------
-   const isAccountEmpty = !profileData.bio && !profileData.location && !profileData.languages && !profileData.interests;
-   const isPartnersEmpty = !profileData.partners || profileData.partners.length === 0;
+   const isAccountEmpty = !profileUser?.bio
+      && !profileUser?.location
+      && profileUser?.languages.length === 0
+      && profileUser?.interests.length === 0;
+   const isPartnersEmpty = !profileUser?.partners || profileUser?.partners.length === 0;
 
 
    return (
@@ -226,72 +228,76 @@ function Profile() {
             {/* Header background image */}
             <div
                className={styles.header_bg}
-               onMouseDown={handleMouseDown}
-               onMouseMove={handleMouseMove}
-               onMouseUp={() => setDragging(false)}
                style={{
                   backgroundImage: tempHeader
-                     ? `url(${tempHeader})`
-                     : profileData.headerBg
-                        ? `url(${profileData.headerBg})`
+                     ? `url(${URL.createObjectURL(tempHeader)})`
+                     : profileUser?.profile_background
+                        ? `url(${profileUser?.profile_background})`
                         : 'none',
-                  backgroundColor: profileData.headerBg
+                  backgroundColor: profileUser?.profile_background
                      ? 'transparent'
                      : 'var(--dark-grey-color)',
-                  backgroundPosition: `${bgPosition.x}% ${bgPosition.y}%`,
-                  cursor: tempHeader ? 'grabbing' : 'default'
                }}
             />
 
             {/* Edit header button and drop menu optinos */}
-            <div
-               ref={editBtnRef}
-               className={`${styles.edit_btn} ${tempHeader ? '' : styles.visible}`}
-               onClick={() => setIsDropMenuOpened(!isDropMenuOpened)}
-            >
-               <FontAwesomeIcon icon="fa-solid fa-pen" />
-               <span> Edit Header </span>
-            </div>
+            {isOwnProfile && (
+               <>
+                  <div
+                     ref={editBtnRef}
+                     className={`${styles.edit_btn} ${tempHeader ? '' : styles.visible}`}
+                     onClick={() => setIsDropMenuOpened(!isDropMenuOpened)}
+                  >
+                     <FontAwesomeIcon icon="fa-solid fa-pen" />
+                     <span> Edit Header </span>
+                  </div>
 
-            <ul
-               ref={headerDropMenuRef}
-               className={`${styles.edit_menu} ${isDropMenuOpened ? styles.visible : ''}`}
-            >
-               <li onClick={handleUploadClick}>
-                  <FontAwesomeIcon icon="fa-solid fa-arrow-up-from-bracket" />
-                  <span className='small_font'> Upload Photo </span>
-                  <input
-                     type="file"
-                     ref={imageInputRef}
-                     style={{ display: 'none' }}
-                     accept=".jpg, .jpeg, .png"
-                     onChange={handleUploadImage}
-                  />
-               </li>
+                  <ul
+                     ref={headerDropMenuRef}
+                     className={`${styles.edit_menu} ${isDropMenuOpened ? styles.visible : ''}`}
+                  >
+                     <li onClick={handleUploadClick}>
+                        <FontAwesomeIcon icon="fa-solid fa-arrow-up-from-bracket" />
+                        <span className='small_font'> Upload Photo </span>
+                        <input
+                           type="file"
+                           ref={imageInputRef}
+                           style={{ display: 'none' }}
+                           accept=".jpg, .jpeg, .png"
+                           onChange={handleUploadImage}
+                        />
+                     </li>
 
-               <li onClick={() => OpenModal('removeHeader')}>
-                  <FontAwesomeIcon icon="fa-regular fa-trash-can" />
-                  <span className='small_font'> Remove </span>
-               </li>
-            </ul>
+                     {profileUser?.profile_background && (
+                        <li onClick={() => OpenModal('removeHeader')}>
+                           <FontAwesomeIcon icon="fa-regular fa-trash-can" />
+                           <span className='small_font'> Remove </span>
+                        </li>
+                     )}
+                  </ul>
+               </>
+            )}
+
          </div>
 
          {/* --------------- Profile Body Content ---------------- */}
          <div className={styles.content_wrap}>
             {/* Profile image */}
             <div className={styles.profile_img}>
-               <img src={profileData.profileImg ? profileData.profileImg : DefaultImg} alt="" />
+               <img src={profileUser?.image ? profileUser.image : DefaultImg} alt="" />
             </div>
 
             {/* Username and specialization */}
             <div className={styles.desc_container}>
-               <h3> {profileData.full_name ? profileData.full_name : profileData.username} </h3>
-               <span> {profileData.specialization} </span>
-               <FontAwesomeIcon
-                  icon="fa-solid fa-pen"
-                  className={styles.edit_icon}
-                  onClick={() => navigate('/edit-account')}
-               />
+               <h3> {profileUser?.full_name ? profileUser?.full_name : profileUser?.username} </h3>
+               <span> {profileUser?.specialization} </span>
+               {isOwnProfile && (
+                  <FontAwesomeIcon
+                     icon="fa-solid fa-pen"
+                     className={styles.edit_icon}
+                     onClick={() => navigate('/edit-account')}
+                  />
+               )}
             </div>
 
             {/* Tabs switch */}
@@ -308,36 +314,36 @@ function Profile() {
                      <EmptyState />
                   ) : (
                      <>
-                        {profileData.bio && (
+                        {profileUser?.bio && (
                            <AccountSection title="Bio" icon="fa-regular fa-user">
-                              <p> {profileData.bio} </p>
+                              <p> {profileUser?.bio} </p>
                            </AccountSection>
                         )}
 
-                        {profileData.location && (
+                        {profileUser?.location && (
                            <AccountSection title="Location" icon="fa-regular fa-flag">
-                              <p> {profileData.location} </p>
+                              <p> {profileUser?.location} </p>
                            </AccountSection>
                         )}
 
-                        {profileData.languages && (
+                        {profileUser?.languages.length > 0 && (
                            <AccountSection title="Languages" icon="fa-regular fa-comments">
                               <div className={styles.tags_container}>
-                                 {profileData.languages.map((language, index) => (
-                                    <div key={index} className={styles.tag}>
-                                       <span className='small_font'> {language} </span>
+                                 {profileUser?.languages.map((lang) => (
+                                    <div key={lang.id} className={styles.tag}>
+                                       <span className='small_font'> {lang.language} </span>
                                     </div>
                                  ))}
                               </div>
                            </AccountSection>
                         )}
 
-                        {profileData.interests && (
+                        {profileUser?.interests.length > 0 && (
                            <AccountSection title="Interests" icon="fa-regular fa-heart">
                               <div className={styles.tags_container}>
-                                 {profileData.interests.map((interest, index) => (
-                                    <div key={index} className={styles.tag}>
-                                       <span className='small_font'> {interest} </span>
+                                 {profileUser?.interests.map((interest) => (
+                                    <div key={interest.id} className={styles.tag}>
+                                       <span className='small_font'> {interest.title} </span>
                                     </div>
                                  ))}
                               </div>

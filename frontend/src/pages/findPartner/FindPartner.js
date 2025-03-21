@@ -156,7 +156,8 @@ function FindPartner() {
                               <PartnerCard
                                  key={partner.id}
                                  id={partner.id}
-                                 name={partner.full_name ?? partner.username}
+                                 fullName={partner.full_name}
+                                 username={partner.username}
                                  image={partner.image}
                                  specialization={partner.specialization}
                                  interests={partner.interests}
