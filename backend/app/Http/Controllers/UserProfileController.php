@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserProfileRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserFullResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -90,7 +90,7 @@ class UserProfileController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Profile updated successfully!',
-            'user' => new UserResource($user)
+            'user' => new UserFullResource($user)
         ]);
     }
 }

@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateUserAccountRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserFullResource;
+use App\Http\Resources\UserSummaryResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class UserController extends Controller
     public function getUsers(Request $request)
     {
         $itemsPerPaage = 9;
-        $query = User::query();
+        $query = User::with(['interests']);
 
         // Exclude the authenticated user
         $authUserId = $request->user()->id;
@@ -53,7 +54,7 @@ class UserController extends Controller
         $users = $query->paginate($itemsPerPaage, ['*'], 'page', $currentPage);
 
         return response()->json([
-            'users' => UserResource::collection($users->items()), // The actual paginated data
+            'users' => UserSummaryResource::collection($users->items()), // The actual paginated data
             'pagination' => [
                 'current_page' => $users->currentPage(),
                 'last_page' => $users->lastPage(),
@@ -61,6 +62,18 @@ class UserController extends Controller
                 'total' => $users->total(),
             ]
         ]);
+    }
+
+    /**
+     * Display a specific user
+     */
+    public function getUserByUsername($username)
+    {
+        $user = User::where('username', $username)
+            ->with(['profile', 'languages', 'interests'])
+            ->firstOrFail();
+
+        return response()->json(new UserFullResource($user));
     }
 
     /**
@@ -79,7 +92,7 @@ class UserController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Account updated successfully!',
-            'user' => new UserResource($user),
+            'user' => new UserFullResource($user),
         ]);
     }
 

@@ -1,18 +1,19 @@
 import styles from './Profile.module.css';
 import DefaultImg from '../../assets/images/default-profile.png';
 import MainButton from '../../components/button/MainButton';
-import TextInput from '../../components/inputFields/TextInput';
+// import TextInput from '../../components/inputFields/TextInput';
 import Modal from '../../components/modal/Modal';
 import Tabs from '../../components/tabs/Tabs';
 import EmptyState from '../../components/UIStates/EmptyState';
 import Pagination from '../../components/pagination/Pagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUsers } from '../../redux/slices/userSlice';
+import { getUserByUsername } from '../../redux/slices/userSlice';
 import { updateProfile } from '../../redux/slices/userProfileSlice';
 import { toast } from 'react-toastify';
+import { getFriends, getUserFriends } from '../../redux/slices/friendshipSlice';
 
 
 // ------------ Account section component ------------
@@ -33,18 +34,7 @@ const AccountSection = ({ title, icon, children }) => {
 
 function Profile() {
 
-   const [profileData, setProfileData] = useState({
-      headerBg: null,
-      profileImg: null,
-      username: '',
-      full_name: '',
-      specialization: '',
-      bio: '',
-      location: '',
-      languages: [],
-      interests: [],
-      partners: []
-   });
+   const itemsPerPage = 9;
    const navigate = useNavigate();
    const dispatch = useDispatch();
    const location = useLocation();
@@ -52,23 +42,22 @@ function Profile() {
    const imageInputRef = useRef(null);
    const editBtnRef = useRef(null);
    const tabs = ['Account', 'Partners'];
-   const [searchParams] = useSearchParams();
+   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
    const activeTabFromURL = searchParams.get('tab') || 'account';
+   const currentPage = parseInt(searchParams.get("page"), 10) || 1;
    const [activeTab, setActiveTab] = useState(activeTabFromURL);
    const [tempHeader, setTempHeader] = useState(null);
    const [isDropMenuOpened, setIsDropMenuOpened] = useState(false); // Edit header drop menu
    const [isModalOpened, setIsModalOpened] = useState(false);
    const [modalAction, setModalAction] = useState(null);
-   const [searchTerm, setSearchTerm] = useState('');
-   const itemsPerPage = 9;
-   const [currentItems, setCurrentItems] = useState(profileData.partners?.slice(0, itemsPerPage));
+   // const [searchTerm, setSearchTerm] = useState('');
    const { username } = useParams(); // Get username from URL
    const { user, isAuthenticated } = useSelector((state) => state.auth);
-   const { users } = useSelector((state) => state.user);
+   const { fullUsers } = useSelector((state) => state.user);
+   const { myFriends, myPagination, userPagination } = useSelector((state) => state.friendship);
    const isOwnProfile = isAuthenticated && user?.username === username;
-   const [profileUser, setProfileUser] = useState(isOwnProfile
-      ? user
-      : users.find(u => u.username === username));
+   const pagination = isOwnProfile ? myPagination : userPagination;
+   const [profileUser, setProfileUser] = useState(null);
 
 
    // ----------- Handle clicking Upload Photo in Header ------------
@@ -83,6 +72,12 @@ function Profile() {
       if (file) {
          setTempHeader(file);
       }
+   };
+
+   // --------------- Update URL on page change ----------------
+   const handlePageChange = (newPage) => {
+      searchParams.set("page", newPage);
+      navigate(`${location.pathname}?${searchParams.toString()}`);
    };
 
    // ----------------- Setting a new Header Image ------------------
@@ -163,43 +158,62 @@ function Profile() {
       }
    }, [handleClickOutside]);
 
-   // --------------- Change content on page change -----------------
+   // ------------ Fetch user object to display profile -------------
+   const hasFetched = useRef(false);
    useEffect(() => {
-      const getPageFromURL = () => {
-         const searchParams = new URLSearchParams(location.search);
-         const page = searchParams.get('page');
-         return page ? parseInt(page, 10) : 1; // Return 1 as the default page
-      };
-      const handlePageClick = (startOffset) => {
-         const newSlice = profileData.partners?.slice(startOffset, startOffset + itemsPerPage);
-         setCurrentItems(newSlice);
-      };
-
-      const page = getPageFromURL();
-      const startOffset = (page - 1) * itemsPerPage;
-      handlePageClick(startOffset);
-   }, [location.search, profileData.partners]);
-
-   // ------- Fetch users when viewing someone else's profil --------
-   useEffect(() => {
-      if (!isOwnProfile && users.length === 0) {
-         dispatch(getUsers());
+      // User onw profile
+      if (isOwnProfile) {
+         setProfileUser(user);
+         return;
       }
-   }, [dispatch, isOwnProfile, users.length]);
 
-   // ---------------- Set the correct profile user -----------------
-   useEffect(() => {
-      if (!isOwnProfile) {
-         const foundUser = users.find(u => u.username === username);
-         setProfileUser(foundUser || null);
+      // Other users profile
+      const fullUserObj = fullUsers?.[username];
+      if (fullUserObj) {
+         setProfileUser(fullUserObj);
+         return;
       }
-   }, [users, isOwnProfile, username]);
+
+      if (!hasFetched.current) {
+         hasFetched.current = true;
+         dispatch(getUserByUsername(username)).then((response) => {
+            setProfileUser(response?.payload);
+         });
+      }
+   }, [dispatch, username, isOwnProfile, user, fullUsers]);
+
+   // ---------------- Fetch partner list for user ------------------
+   useEffect(() => {
+      if (activeTab !== 'partners' || profileUser?.partners) return;
+
+      const fetchFriends = () => {
+         let friends = [];
+         // User own friends
+         if (isOwnProfile) {
+            if (myFriends.length === 0) {
+               dispatch(getFriends({ page: currentPage, size: itemsPerPage }))
+                  .then((response) => { friends = response.friends });
+            } else {
+               friends = myFriends;
+            }
+
+         } else {
+            // Other users friends
+            dispatch(getUserFriends({ user_id: profileUser.id, page: currentPage, size: itemsPerPage }))
+               .then((response) => { friends = response.friends });
+         }
+         setProfileUser((prev) => ({ ...prev, partners: friends }));
+      };
+
+      fetchFriends();
+   }, [dispatch, activeTab, isOwnProfile, myFriends, currentPage, profileUser?.partners, profileUser?.id]);
+
 
    // ----------- Track empty state for each tab section ------------
    const isAccountEmpty = !profileUser?.bio
       && !profileUser?.location
-      && profileUser?.languages.length === 0
-      && profileUser?.interests.length === 0;
+      && (profileUser?.languages?.length || 0) === 0
+      && (profileUser?.interests?.length || 0) === 0;
    const isPartnersEmpty = !profileUser?.partners || profileUser?.partners.length === 0;
 
 
@@ -360,24 +374,24 @@ function Profile() {
                      <>
                         {/* Results number && Search input field */}
                         <div className={styles.partners_header}>
-                           <span className='small_font'> 24 results </span>
-                           <TextInput
+                           <span className='small_font'> {pagination?.total} results </span>
+                           {/* <TextInput
                               placeholder="Search by Name"
                               value={searchTerm}
                               icon="fa-solid fa-search"
                               onChange={(value) => setSearchTerm(value)}
-                           />
+                           /> */}
                         </div>
 
                         {/* Partners list */}
-                        {currentItems.map((partner, index) => (
+                        {profileUser?.partners?.map((partner, index) => (
                            <div key={index} className={`${styles.section} ${styles.partners}`}>
                               <div className={styles.left_subsection}>
                                  <div
                                     className={styles.partnet_img}
                                     onClick={() => navigate(`/profile/${partner.username}`)}
                                  >
-                                    <img src={partner.profileImg ? partner.profileImg : DefaultImg} alt="" />
+                                    <img src={partner?.image ? partner?.image : DefaultImg} alt="" />
                                  </div>
                                  <div>
                                     <h4> {partner.full_name ? partner.full_name : partner.username} </h4>
@@ -385,17 +399,19 @@ function Profile() {
                                  </div>
                               </div>
 
-                              <div className={styles.right_subsection}>
-                                 <MainButton
-                                    label="Message"
-                                    customStyles={{ minWidth: 'auto' }}
-                                 />
-                                 <FontAwesomeIcon
-                                    icon="fa-solid fa-xmark"
-                                    className={styles.remove_icon}
-                                    onClick={() => OpenModal('removePartner')}
-                                 />
-                              </div>
+                              {isOwnProfile && (
+                                 <div className={styles.right_subsection}>
+                                    <MainButton
+                                       label="Message"
+                                       customStyles={{ minWidth: 'auto' }}
+                                    />
+                                    <FontAwesomeIcon
+                                       icon="fa-solid fa-xmark"
+                                       className={styles.remove_icon}
+                                       onClick={() => OpenModal('removePartner')}
+                                    />
+                                 </div>
+                              )}
                            </div>
                         ))}
                      </>
@@ -404,10 +420,11 @@ function Profile() {
             </div>
 
             {/* Pagination section */}
-            {(activeTab === 'partners' && profileData.partners?.length > itemsPerPage) && (
+            {(activeTab === 'partners' && pagination.total > pagination.per_page) && (
                <Pagination
-                  itemsLength={profileData.partners?.length}
-                  itemsPerPage={itemsPerPage}
+                  currentPage={pagination.current_page}
+                  lastPage={pagination.last_page}
+                  onPageChange={handlePageChange}
                />
             )}
          </div>

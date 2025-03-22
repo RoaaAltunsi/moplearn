@@ -71,4 +71,36 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Course::class, 'partners_list', 'user_id', 'course_id');
     }
+
+    public function sentFriendships()
+    {
+        return $this->hasMany(Friendship::class, 'sender_id');
+    }
+
+    public function receivedFriendships()
+    {
+        return $this->hasMany(Friendship::class, 'receiver_id');
+    }
+
+    // friendship that I started
+    public function friendsOfMine()
+    {
+        return $this->belongsToMany(User::class, 'friendship', 'sender_id', 'receiver_id')
+            ->wherePivot('status', 'accepted')
+            ->withPivot('status');
+    }
+
+    // friendship that I was invited to 
+    public function friendsOf()
+    {
+        return $this->belongsToMany(User::class, 'friendship', 'receiver_id', 'sender_id')
+            ->wherePivot('status', 'accepted')
+            ->withPivot('status');
+    }
+
+    // Accessor: use $user->friends to get all accepted friends
+    public function getFriendsAttribute()
+    {
+        return $this->friendsOfMine->merge($this->friendsOf);
+    }
 }

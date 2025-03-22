@@ -7,6 +7,7 @@ use App\Http\Controllers\ContributionFormController;
 use App\Http\Controllers\ContributorController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FriendshipController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserProfileController;
@@ -27,9 +28,11 @@ Route::post('password/reset', [AuthController::class, 'resetPassword']);
 Route::middleware(['auth'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('users', [UserController::class, 'getUsers']);
-    Route::post('profile', [UserProfileController::class, 'storeOrUpdateProfile']);
+    Route::get('users/username/{username}', [UserController::class, 'getUserByUsername']);
     Route::put('account', [UserController::class, 'updateAccount']);
     Route::delete('account', [UserController::class, 'deleteAccount']);
+    Route::post('profile', [UserProfileController::class, 'storeOrUpdateProfile']);
+    Route::get('friends', [FriendshipController::class, 'getFriends']);
 });
 
 Route::prefix('courses')->group(function () {

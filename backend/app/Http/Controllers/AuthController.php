@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserFullResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +36,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Successful Registration',
-                'user' => new UserResource($user),
+                'user' => new UserFullResource($user),
             ], 201);
 
         } catch (Throwable $e) {
@@ -73,7 +73,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Successful Login',
-            'user' => new UserResource($user),
+            'user' => new UserFullResource($user),
         ], 200);
     }
 

@@ -10,7 +10,7 @@ import EmptyState from '../../components/UIStates/EmptyState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import MainButton from '../../components/button/MainButton';
-import { getUsers } from '../../redux/slices/userSlice';
+import { getUsers, resetUsers } from '../../redux/slices/userSlice';
 import { getAllTopics } from '../../redux/slices/topicSlice';
 
 
@@ -24,11 +24,11 @@ function FindPartner() {
    const { languages } = useSelector((state) => state.language);
    const { topics } = useSelector((state) => state.topic);
    const { courseTitle } = useParams();
-   const [selectedLang, setSelectedLang] = useState('');
-   const [selectedTopic, setSelectedTopic] = useState('');
+   const searchParams = new URLSearchParams(location.search);
+   const selectedLang = searchParams.get('language') || '';
+   const selectedTopic = searchParams.get('topic') || '';
    const [partnerChecked, setPartnerChecked] = useState(false); // For partner list checkbox
    const [friendList, setFriendList] = useState([]); // LATER: Fetch user's friend list from DB
-   const searchParams = new URLSearchParams(location.search);
    const currentPage = parseInt(searchParams.get("page"), 10) || 1;
    const courseId = searchParams.get("courseId");
 
@@ -52,13 +52,13 @@ function FindPartner() {
 
    // -------- Update content on language filter change ---------
    const handleLanguageChange = (value) => {
-      setSelectedLang(value);
+      searchParams.set('language', value);
       handlePageChange(1); // reset page
    };
 
    // -------- Update content on language filter change ---------
    const handleTopicChange = (value) => {
-      setSelectedTopic(value);
+      searchParams.set('topic', value);
       handlePageChange(1); // reset page
    };
 
@@ -68,7 +68,7 @@ function FindPartner() {
 
       // Course Filter
       if (courseId) params.course = courseId;
-      
+
       // Language Filter
       if (selectedLang) {
          const langId = languages.find(lang => lang.language === selectedLang)?.id;
@@ -88,12 +88,17 @@ function FindPartner() {
    }, [currentPage, languages, selectedLang, topics, selectedTopic, courseId]);
 
 
-   // -------------- Fetch partnets on page load --------------
+   // ---------- Fetch partners when filters change -----------
    useEffect(() => {
-      const params = transformFiltersToQueryParams();
-      dispatch(getUsers(params));
-   }, [dispatch, transformFiltersToQueryParams]);
+      const shouldFetchUsers = () => {
+         return users.length === 0 || selectedLang || selectedTopic || courseId || currentPage > 1;
+      };
 
+      if (shouldFetchUsers()) {
+         dispatch(getUsers(transformFiltersToQueryParams()));
+      }
+   }, [dispatch, transformFiltersToQueryParams, selectedLang, selectedTopic, courseId, currentPage, users.length]);
+   
    // --------------- Fetch topics on page load ---------------
    useEffect(() => {
       if (topics.length === 0 && isAuthenticated) {
@@ -101,6 +106,18 @@ function FindPartner() {
       }
    }, [dispatch, topics.length, isAuthenticated]);
 
+   // - Reset users when leaving the page with active filters -
+   useEffect(() => {
+      return () => {
+         const searchParams = new URLSearchParams(location.search);
+         const hasActiveFilters = searchParams.get('language') || searchParams.get('topic') || searchParams.get('courseId');
+   
+         if (hasActiveFilters) {
+            dispatch(resetUsers());
+         }
+      };
+   }, [dispatch, location.search]);
+   
 
    return (
       <div className='container'>

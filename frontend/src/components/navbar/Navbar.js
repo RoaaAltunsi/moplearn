@@ -275,7 +275,7 @@ function Navbar() {
                            onClick={() => setIsProfileDtDropOpened(!isProfileDtDropOpened)}
                         >
                            <div className={styles.img_container}>
-                              <img src={DefaultImg} alt="" />
+                              <img src={user?.image ? user.image : DefaultImg} alt="" />
                            </div>
                            <FontAwesomeIcon icon="fa-solid fa-caret-down" />
                         </div>
@@ -395,7 +395,7 @@ function Navbar() {
                            onClick={() => setIsProfileMbDropOpened(!isProfileMbDropOpened)}
                         >
                            <div className={styles.img_container}>
-                              <img src={DefaultImg} alt="" />
+                              <img src={user?.image ? user.image : DefaultImg} alt="" />
                            </div>
                            <h3> Ola Saber </h3>
                         </div>

@@ -4,7 +4,8 @@ import { logout, updateAuthUser } from "./authSlice";
 
 
 const initialState = {
-   users: [],
+   users: [], // summary users (used in partner card)
+   fullUsers: {}, // to display complete user info in profile
    pagination: {},
    loading: false,
    validationErrors: {},
@@ -23,6 +24,17 @@ export const getUsers = createAsyncThunk('user/get', async (params, thunkAPI) =>
 
    } catch (error) {
       return thunkAPI.rejectWithValue("Failed to fetch users");
+   }
+});
+
+// GET-USER-BY-USERNAME: Fetch the user object by username
+export const getUserByUsername = createAsyncThunk('user/getByUsername', async (username, thunkAPI) => {
+   try {
+      const response = await apiClient.get(`users/username/${username}`);
+      return response.data;
+
+   } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch user");
    }
 });
 
@@ -77,6 +89,11 @@ export const userSlice = createSlice({
    reducers: {
       clearErrors: (state) => {
          state.error = '';
+         state.validationErrors = {};
+      },
+      resetUsers: (state) => {
+         state.users = [];
+         state.pagination = {};
       }
    },
    extraReducers: (builder) => {
@@ -92,6 +109,21 @@ export const userSlice = createSlice({
             state.error = '';
          })
          .addCase(getUsers.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // ----------------- get user by username ------------------
+         .addCase(getUserByUsername.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(getUserByUsername.fulfilled, (state, action) => {
+            const user = action.payload;
+            state.loading = false;
+            state.fullUsers[user.username] = user;
+            state.error = '';
+         })
+         .addCase(getUserByUsername.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
          })
@@ -128,5 +160,5 @@ export const userSlice = createSlice({
    }
 });
 
-export const { clearErrors } = userSlice.actions;
+export const { clearErrors, resetUsers } = userSlice.actions;
 export default userSlice.reducer;
