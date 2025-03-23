@@ -33,6 +33,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('account', [UserController::class, 'deleteAccount']);
     Route::post('profile', [UserProfileController::class, 'storeOrUpdateProfile']);
     Route::get('friends', [FriendshipController::class, 'getFriends']);
+    Route::get('friends/requests/received', [FriendshipController::class, 'getReceivedRequests']);
+    Route::get('friends/requests/sent', [FriendshipController::class, 'getSentRequests']);
+    Route::patch('friends/{id}/status', [FriendshipController::class, 'updateStatus']);
+    Route::delete('friends/{id}', [FriendshipController::class, 'destroy']);
 });
 
 Route::prefix('courses')->group(function () {

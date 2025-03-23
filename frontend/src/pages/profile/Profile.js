@@ -184,23 +184,27 @@ function Profile() {
 
    // ---------------- Fetch partner list for user ------------------
    useEffect(() => {
-      if (activeTab !== 'partners' || profileUser?.partners) return;
+      if (
+         activeTab !== 'partners' ||
+         !profileUser?.id ||            // Wait until user is ready
+         profileUser?.partners          // Already has partners
+      ) return;
 
-      const fetchFriends = () => {
+      const fetchFriends = async () => {
          let friends = [];
          // User own friends
          if (isOwnProfile) {
             if (myFriends.length === 0) {
-               dispatch(getFriends({ page: currentPage, size: itemsPerPage }))
-                  .then((response) => { friends = response.friends });
+               await dispatch(getFriends({ page: currentPage, size: itemsPerPage }))
+                  .then((response) => { friends = response?.payload?.friends });
             } else {
                friends = myFriends;
             }
 
          } else {
             // Other users friends
-            dispatch(getUserFriends({ user_id: profileUser.id, page: currentPage, size: itemsPerPage }))
-               .then((response) => { friends = response.friends });
+            await dispatch(getUserFriends({ user_id: profileUser?.id, page: currentPage, size: itemsPerPage }))
+               .then((response) => { friends = response?.payload?.friends });
          }
          setProfileUser((prev) => ({ ...prev, partners: friends }));
       };
@@ -384,18 +388,18 @@ function Profile() {
                         </div>
 
                         {/* Partners list */}
-                        {profileUser?.partners?.map((partner, index) => (
-                           <div key={index} className={`${styles.section} ${styles.partners}`}>
+                        {profileUser?.partners?.map((partner) => (
+                           <div key={partner.id} className={`${styles.section} ${styles.partners}`}>
                               <div className={styles.left_subsection}>
                                  <div
                                     className={styles.partnet_img}
-                                    onClick={() => navigate(`/profile/${partner.username}`)}
+                                    onClick={() => navigate(`/profile/${partner.user?.username}`)}
                                  >
-                                    <img src={partner?.image ? partner?.image : DefaultImg} alt="" />
+                                    <img src={partner.user?.image ? partner.user?.image : DefaultImg} alt="" />
                                  </div>
                                  <div>
-                                    <h4> {partner.full_name ? partner.full_name : partner.username} </h4>
-                                    <span className='small_font'> {partner.specialization} </span>
+                                    <h4> {partner.user?.full_name ? partner.user?.full_name : partner.user?.username} </h4>
+                                    <span className='small_font'> {partner.user?.specialization} </span>
                                  </div>
                               </div>
 

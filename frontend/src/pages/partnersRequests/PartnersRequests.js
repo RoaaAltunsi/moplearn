@@ -5,52 +5,60 @@ import Modal from '../../components/modal/Modal';
 import EmptyState from '../../components/UIStates/EmptyState';
 import DefaultImg from '../../assets/images/default-profile.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-
-
-const receivedRequests = [
-   { full_name: 'Rana Hafez', username: 'ran87', specialization: 'Programmer' },
-   { full_name: 'Doha Mohammed', username: 'dohamm', specialization: 'Writer' },
-];
-
-const sentRequests = [
-   { full_name: 'Rana Hafez', username: 'ran87', specialization: 'Programmer' },
-   { full_name: 'Doha Mohammed', username: 'dohamm', specialization: 'Writer' }
-];
+import { useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Pagination from '../../components/pagination/Pagination';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteFriendship, getReceivedRequests, getSentRequests, updateStatus } from '../../redux/slices/friendshipSlice';
+import { toast } from 'react-toastify';
 
 
 function PartnersRequests() {
 
+   const dispatch = useDispatch();
+   const location = useLocation();
    const navigate = useNavigate();
    const tabs = ['Received', 'Sent'];
-   const [searchParams] = useSearchParams();
+   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
    const activeTabFromURL = searchParams.get('tab') || 'received';
    const [activeTab, setActiveTab] = useState(activeTabFromURL);
    const [isModalOpened, setIsModalOpened] = useState(false);
-   const [modalAction, setModalAction] = useState(null);
+   const [deletedRequestId, setDeletedRequestId] = useState(null);
+   const { receivedRequests, receivedPagination, sentRequests, sentPagination } = useSelector((state) => state.friendship);
 
 
    // -------------- Control Opening Confirmation Modal -------------
-   const openModal = (actionType) => {
-      setModalAction(actionType);
+   const openModal = (friendshipId) => {
+      setDeletedRequestId(friendshipId);
       setIsModalOpened(true);
    };
 
-   const handleAcceptRequest = () => {
-      // Backend logic to add new partner in user's partner list
+   // -------------- Handle accept friendship request ---------------
+   const handleAcceptRequest = async (friendshipId) => {
+      try {
+         await dispatch(updateStatus({ id: friendshipId, newStatus: 'accepted' })).unwrap();
+         toast.success("The request is successfully accepted!");
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
-   const handleRemoveReceivedReq = () => {
-      // Backend logic to ignore the received partnership request
+   // -------------- Handle delete friendship request ---------------
+   const handleDeleteRequest = async () => {
+      try {
+         await dispatch(deleteFriendship({ id: deletedRequestId, status: 'pending' })).unwrap();
+         setIsModalOpened(false);
+         toast.success("The request is successfully deleted!");
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
-   const handleRemoveSentReq = () => {
-      // Backend logic to cancel the sent partnership request
+   // --------------- Update URL on page change ----------------
+   const handlePageChange = (newPage) => {
+      searchParams.set("page", newPage);
+      navigate(`${location.pathname}?${searchParams.toString()}`);
    };
-
-   // --------- Conditional render for modal confirm action ---------
-   const modalConfirmAction = modalAction === 'removeReceivedReq' ? handleRemoveReceivedReq : handleRemoveSentReq;
 
 
    // Synchronize state with URL query parameters on mount and back/forward navigation
@@ -65,6 +73,20 @@ function PartnersRequests() {
          navigate(`?tab=${formattedTab}`, { replace: true }); // Use replace to avoid unnecessary history entries
       }
    }, [activeTab, navigate, searchParams]);
+
+   // ------------------ Fetch received requests -------------------
+   useEffect(() => {
+      if (receivedRequests.length === 0) {
+         dispatch(getReceivedRequests());
+      }
+   }, [dispatch, receivedRequests.length]);
+
+   // -------------------- Fetch sent requests ---------------------
+   useEffect(() => {
+      if (sentRequests.length === 0) {
+         dispatch(getSentRequests());
+      }
+   }, [dispatch, sentRequests.length]);
 
 
    return (
@@ -82,22 +104,22 @@ function PartnersRequests() {
             <div className={styles.info_container}>
                {activeTab === 'received' ? (
                   // ---------------- Received Requests -----------------
-                  (!receivedRequests || receivedRequests.length === 0) ? (
+                  (receivedRequests?.length === 0) ? (
                      <EmptyState />
                   ) : (
                      <>
-                        {receivedRequests.map((partner, index) => (
-                           <div key={index} className={styles.section}>
+                        {receivedRequests.map((request) => (
+                           <div key={request.id} className={styles.section}>
                               <div className={styles.left_subsection}>
                                  <div
                                     className={styles.partnet_img}
-                                    onClick={() => navigate(`/profile/${partner.username}`)}
+                                    onClick={() => navigate(`/profile/${request.user?.username}`)}
                                  >
-                                    <img src={partner.profileImg ? partner.profileImg : DefaultImg} alt="" />
+                                    <img src={request.user?.image ? request.user?.image : DefaultImg} alt="" />
                                  </div>
                                  <div>
-                                    <h4> {partner.full_name ? partner.full_name : partner.username} </h4>
-                                    <span className='small_font'> {partner.specialization} </span>
+                                    <h4> {request.user?.full_name ? request.user?.full_name : request.user?.username} </h4>
+                                    <span className='small_font'> {request.user?.specialization} </span>
                                  </div>
                               </div>
 
@@ -105,12 +127,12 @@ function PartnersRequests() {
                                  <MainButton
                                     label="Accept"
                                     customStyles={{ minWidth: 'auto' }}
-                                    onClick={handleAcceptRequest}
+                                    onClick={() => handleAcceptRequest(request.id)}
                                  />
                                  <FontAwesomeIcon
                                     icon="fa-solid fa-xmark"
                                     className={styles.remove_icon}
-                                    onClick={() => openModal('removeReceivedReq')}
+                                    onClick={() => openModal(request.id)}
                                  />
                               </div>
                            </div>
@@ -120,22 +142,22 @@ function PartnersRequests() {
 
                ) : (
                   // ------------------ Sent Requests --------------------
-                  (!sentRequests || sentRequests.length === 0) ? (
+                  (sentRequests?.length === 0) ? (
                      <EmptyState />
                   ) : (
                      <>
-                        {sentRequests.map((partner, index) => (
-                           <div key={index} className={styles.section}>
+                        {sentRequests.map((request) => (
+                           <div key={request.id} className={styles.section}>
                               <div className={styles.left_subsection}>
                                  <div
                                     className={styles.partnet_img}
-                                    onClick={() => navigate(`/profile/${partner.username}`)}
+                                    onClick={() => navigate(`/profile/${request.user?.username}`)}
                                  >
-                                    <img src={partner.profileImg ? partner.profileImg : DefaultImg} alt="" />
+                                    <img src={request.user?.profileImg ? request.user?.profileImg : DefaultImg} alt="" />
                                  </div>
                                  <div>
-                                    <h4> {partner.full_name ? partner.full_name : partner.username} </h4>
-                                    <span className='small_font'> {partner.specialization} </span>
+                                    <h4> {request.user?.full_name ? request.user?.full_name : request.user?.username} </h4>
+                                    <span className='small_font'> {request.user?.specialization} </span>
                                  </div>
                               </div>
 
@@ -143,7 +165,7 @@ function PartnersRequests() {
                                  <FontAwesomeIcon
                                     icon="fa-solid fa-xmark"
                                     className={styles.remove_icon}
-                                    onClick={() => openModal('removeSentReq')}
+                                    onClick={() => openModal(request.id)}
                                  />
                               </div>
                            </div>
@@ -152,6 +174,22 @@ function PartnersRequests() {
                   )
                )}
             </div>
+
+            {/* Pagination section */}
+            {(activeTab === 'received' && receivedPagination?.total > receivedPagination?.per_page) && (
+               <Pagination
+                  currentPage={receivedPagination.current_page}
+                  lastPage={sentPagination?.last_page}
+                  onPageChange={handlePageChange}
+               />
+            )}
+            {(activeTab === 'sent' && sentPagination?.total > sentPagination?.per_page) && (
+               <Pagination
+                  currentPage={sentPagination?.current_page}
+                  lastPage={sentPagination?.last_page}
+                  onPageChange={handlePageChange}
+               />
+            )}
          </div>
 
          {/* ---------------- Confirmation Modal ----------------- */}
@@ -162,9 +200,7 @@ function PartnersRequests() {
             children={
                <>
                   <span>
-                     Are you sure you want to
-                     {modalAction === 'removeReceivedReq' ? ' ignore ' : ' cancel '}
-                     this partnership request?
+                     Are you sure you want to delete this partnership request?
                   </span>
                   <div className={styles.modal_btns}>
                      <MainButton
@@ -178,7 +214,7 @@ function PartnersRequests() {
                      <MainButton
                         label="Confirm"
                         customStyles={{ minWidth: 'auto' }}
-                        onClick={modalConfirmAction}
+                        onClick={handleDeleteRequest}
                      />
                   </div>
                </>
