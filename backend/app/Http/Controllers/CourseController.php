@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CourseController extends Controller
@@ -115,6 +116,32 @@ class CourseController extends Controller
                 'per_page' => $courses->perPage(),
                 'total' => $courses->total(),
             ]
+        ]);
+    }
+
+    /**
+     * Add the user to course's partner list
+     */
+    public function addToPartnerList(Request $request, $courseId)
+    {
+        $user = $request->user();
+        $user->courses()->syncWithoutDetaching([$courseId]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Added to partner list'
+        ], 201);
+    }
+
+    /**
+     * Remove the user from course's partner list
+     */
+    public function removeFromPartnerList(Request $request, $courseId)
+    {
+        $user = $request->user();
+        $user->courses()->detach($courseId);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Removed from partner list'
         ]);
     }
 }

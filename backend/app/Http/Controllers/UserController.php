@@ -137,4 +137,14 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * Display all courses where the user registered himself in partner list
+     */
+    public function getUserCourses(Request $request, $id)
+    {
+        $user = $request->user();
+        $courseIds = $user->courses()->pluck('courses.id'); // get only course IDs
+        return response()->json($courseIds);
+    }
+
 }

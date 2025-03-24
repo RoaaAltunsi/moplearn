@@ -9,8 +9,9 @@ import CurvedLine from '../../components/curvedLine/CurvedLine';
 import CourseCard from '../../components/courseCard/CourseCard';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getNewestCourses, getCheapestCourses } from '../../redux/slices/courseSlice';
+import { getNewestCourses, getCheapestCourses, addToPartnerList, removeFromPartnerList } from '../../redux/slices/courseSlice';
 import { toast } from 'react-toastify';
+import { getUserCourses } from '../../redux/slices/userSlice';
 
 
 function Courses() {
@@ -18,6 +19,9 @@ function Courses() {
    const dispatch = useDispatch();
    const [partnerChecked, setPartnerChecked] = useState({}); // For partner list checkbox
    const { newCourses, cheapestCourses } = useSelector((state) => state.course);
+   const { userCourseIds } = useSelector((state) => state.user);
+   const { user } = useSelector((state) => state.auth);
+   const [toastMsg, setToastMsg] = useState(''); // fix issue of trigger toast twice in add/remove partner
 
 
    // -------------- Fetch courses from DB --------------
@@ -34,20 +38,50 @@ function Courses() {
       }
    }, [dispatch, newCourses, cheapestCourses]);
 
+   // ---------- Fetch user registered courses -----------
+   useEffect(() => {
+      let checkedMap = {};
+      if (userCourseIds?.length === 0) {
+         dispatch(getUserCourses(user?.id)).then((response) => {
+            response.payload.forEach(id => {
+               checkedMap[id] = true;
+            });
+         });
+
+      } else {
+         userCourseIds.forEach(id => {
+            checkedMap[id] = true;
+         });
+      }
+      setPartnerChecked(checkedMap); // Set pre-checked state
+   }, [dispatch, userCourseIds, user?.id]);
+
 
    // ----------- Add/Remove user from partner list -----------
-   const handlePartnerCheckboxChange = (courseId, isChecked) => {
-      setPartnerChecked(prevState => ({
-         ...prevState,
-         [courseId]: isChecked
-      }));
+   const handlePartnerCheckboxChange = async (courseId, isChecked) => {
+      try {
+         setPartnerChecked(prevState => ({
+            ...prevState,
+            [courseId]: isChecked
+         }));
 
-      if (isChecked) {
-         console.log("POST user to partner list");
-      } else {
-         console.log("DELETE user from partner list");
+         isChecked
+            ? await dispatch(addToPartnerList({ user_id: user?.id, course_id: courseId })).unwrap()
+            : await dispatch(removeFromPartnerList({ user_id: user?.id, course_id: courseId })).unwrap();
+ 
+         setToastMsg(isChecked ? "Added to partner list successfully" : "Removed from partner list successfully");
+
+      } catch (err) {
+         toast.error(err.error);
       }
    };
+
+   // -------- Handle display toast message only once ---------
+   useEffect(() => {
+      if (toastMsg) {
+         toast.success(toastMsg);
+      }
+   }, [userCourseIds?.length]);
 
 
    // ----------------- Render Courses section ----------------

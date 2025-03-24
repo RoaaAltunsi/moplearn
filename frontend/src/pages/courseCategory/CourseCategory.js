@@ -7,8 +7,9 @@ import EmptyState from '../../components/UIStates/EmptyState';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCoursesByCategory } from '../../redux/slices/courseSlice';
+import { addToPartnerList, getCoursesByCategory, removeFromPartnerList } from '../../redux/slices/courseSlice';
 import { getTopicsByCategory } from '../../redux/slices/topicSlice';
+import { toast } from 'react-toastify';
 
 
 function CourseCategory() {
@@ -31,8 +32,11 @@ function CourseCategory() {
    const { languages } = useSelector((state) => state.language);
    const { contributors } = useSelector((state) => state.contributor);
    const { topics } = useSelector((state) => state.topic);
+   const { user } = useSelector((state) => state.auth);
+   const { userCourseIds } = useSelector((state) => state.user);
    const searchParams = new URLSearchParams(location.search);
    const currentPage = parseInt(searchParams.get("page"), 10) || 1;
+   const [toastMsg, setToastMsg] = useState(''); // fix issue of trigger toast twice in add/remove partner
 
 
    // ----------- Format extracted category from URL -----------
@@ -74,16 +78,21 @@ function CourseCategory() {
    }
 
    // ----------- Add/Remove user from partner list ------------
-   const handlePartnerCheckboxChange = (courseId, isChecked) => {
-      setPartnerChecked(prevState => ({
-         ...prevState,
-         [courseId]: isChecked
-      }));
+   const handlePartnerCheckboxChange = async (courseId, isChecked) => {
+      try {
+         setPartnerChecked(prevState => ({
+            ...prevState,
+            [courseId]: isChecked
+         }));
 
-      if (isChecked) {
-         console.log("POST user to partner list");
-      } else {
-         console.log("DELETE user from partner list");
+         isChecked
+            ? await dispatch(addToPartnerList({ user_id: user?.id, course_id: courseId })).unwrap()
+            : await dispatch(removeFromPartnerList({ user_id: user?.id, course_id: courseId })).unwrap();
+
+         setToastMsg(isChecked ? "Added to partner list successfully" : "Removed from partner list successfully");
+
+      } catch (err) {
+         toast.error(err.error);
       }
    };
 
@@ -187,6 +196,13 @@ function CourseCategory() {
          params
       }));
    }, [dispatch, categoryId, transformFiltersToQueryParams]);
+
+   // --------- Handle display toast message only once ----------
+   useEffect(() => {
+      if (toastMsg) {
+         toast.success(toastMsg);
+      }
+   }, [userCourseIds?.length]);
 
 
    return (

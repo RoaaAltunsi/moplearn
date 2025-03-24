@@ -6,6 +6,7 @@ import { logout, updateAuthUser } from "./authSlice";
 const initialState = {
    users: [], // summary users (used in partner card)
    fullUsers: {}, // to display complete user info in profile
+   userCourseIds: [],
    pagination: {},
    loading: false,
    validationErrors: {},
@@ -79,6 +80,17 @@ export const deleteAccount = createAsyncThunk('user/deleteAccount', async (passw
       return thunkAPI.rejectWithValue({
          error: error.response?.data?.message || 'Failed to delete account'
       })
+   }
+});
+
+// GET-USER-COURSES: Fetch registered courses for this user
+export const getUserCourses = createAsyncThunk('user/courses', async (user_id, thunkAPI) => {
+   try {
+      const response = await apiClient.get(`users/${user_id}/courses`);
+      return response.data;
+      
+   } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch user courses");
    }
 });
 
@@ -156,6 +168,20 @@ export const userSlice = createSlice({
             state.loading = false;
             state.validationErrors = action.payload?.validationErrors || {};
             state.error = action.payload?.error || '';
+         })
+
+         // ------------------- get user courses --------------------
+         .addCase(getUserCourses.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(getUserCourses.fulfilled, (state, action) => {
+            state.loading = false;
+            state.userCourseIds = action.payload;
+            state.error = '';
+         })
+         .addCase(getUserCourses.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
          })
    }
 });

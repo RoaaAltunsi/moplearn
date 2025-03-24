@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../apiClient";
+import { getUserCourses } from "./userSlice";
 
 const initialState = {
    newCourses: [],
@@ -35,18 +36,43 @@ export const getCheapestCourses = createAsyncThunk('course/getCheapest', async (
 });
 
 // GET-COURSES-BY-CATEGORY: Fetch all courses under specific category
-export const getCoursesByCategory = createAsyncThunk('course/getCoursesByCategory', 
+export const getCoursesByCategory = createAsyncThunk('course/getCoursesByCategory',
    async ({ categoryId, params }, thunkAPI) => {
-   try {
-      const response = await apiClient.get(`courses/categories/${categoryId}`, {
-         params
-      });
-      return response.data;
+      try {
+         const response = await apiClient.get(`courses/categories/${categoryId}`, {
+            params
+         });
+         return response.data;
 
-   } catch (error) {
-      return thunkAPI.rejectWithValue("Failed to fetch courses for this category");
-   }
-});
+      } catch (error) {
+         return thunkAPI.rejectWithValue("Failed to fetch courses for this category");
+      }
+   });
+
+// ADD-TO-PARTNER-LIST: Add user to course's partner list 
+export const addToPartnerList = createAsyncThunk('course/addToPartnerList',
+   async ({ user_id, course_id }, thunkAPI) => {
+      try {
+         await apiClient.post(`courses/${course_id}/partner-list`);
+         thunkAPI.dispatch(getUserCourses(user_id));
+
+      } catch (error) {
+         return thunkAPI.rejectWithValue("Failed to add user to partner list");
+      }
+   });
+
+// REMOVE-FROM-PARTNER-LIST: Remove user from course's partner list 
+export const removeFromPartnerList = createAsyncThunk('course/removeFromPartnerList',
+   async ({ user_id, course_id }, thunkAPI) => {
+      try {
+         await apiClient.delete(`courses/${course_id}/partner-list`);
+         thunkAPI.dispatch(getUserCourses(user_id));
+
+      } catch (error) {
+         return thunkAPI.rejectWithValue("Failed to remove user from partner list");
+      }
+   });
+
 
 const courseSlice = createSlice({
    name: 'course',
@@ -97,6 +123,32 @@ const courseSlice = createSlice({
             state.error = '';
          })
          .addCase(getCoursesByCategory.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // -------------- add to course's partner list ----------------
+         .addCase(addToPartnerList.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(addToPartnerList.fulfilled, (state) => {
+            state.loading = false;
+            state.error = '';
+         })
+         .addCase(addToPartnerList.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // ------------ remove from course's partner list --------------
+         .addCase(removeFromPartnerList.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(removeFromPartnerList.fulfilled, (state) => {
+            state.loading = false;
+            state.error = '';
+         })
+         .addCase(removeFromPartnerList.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
          })

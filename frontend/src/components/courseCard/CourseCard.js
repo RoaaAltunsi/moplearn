@@ -3,6 +3,7 @@ import MainButton from '../button/MainButton';
 import CheckboxInput from '../inputFields/CheckboxInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function CourseCard({
    id,
@@ -19,6 +20,7 @@ function CourseCard({
 }) {
 
    const navigate = useNavigate();
+   const { isAuthenticated } = useSelector((state) => state.auth);
 
    // ---------------- Format Course Title for URL -----------------
    const formatTitleForURL = () => {
@@ -92,13 +94,15 @@ function CourseCard({
                   )}
                </div>
 
-               <div className={styles.partner_section}>
-                  <CheckboxInput
-                     label="Add Me to Partner List"
-                     isChecked={isChecked}
-                     onChange={handleCheckboxChange}
-                  />
-               </div>
+               {isAuthenticated && (
+                  <div className={styles.partner_section}>
+                     <CheckboxInput
+                        label="Add Me to Partner List"
+                        isChecked={isChecked}
+                        onChange={handleCheckboxChange}
+                     />
+                  </div>
+               )}
             </div>
          </a>
       </div>

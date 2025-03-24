@@ -28,6 +28,7 @@ Route::post('password/reset', [AuthController::class, 'resetPassword']);
 Route::middleware(['auth'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('users', [UserController::class, 'getUsers']);
+    Route::get('users/{id}/courses', [UserController::class, 'getUserCourses']);
     Route::get('users/username/{username}', [UserController::class, 'getUserByUsername']);
     Route::put('account', [UserController::class, 'updateAccount']);
     Route::delete('account', [UserController::class, 'deleteAccount']);
@@ -44,8 +45,11 @@ Route::prefix('courses')->group(function () {
     Route::get('new', [CourseController::class, 'getNewCourses']);
     Route::get('cheapest', [CourseController::class, 'getCheapestCourses']);
     Route::get('categories/{categoryId}', [CourseController::class, 'getCoursesByCategory']);
+    Route::middleware(['auth'])->group(function () {
+        Route::post('{courseId}/partner-list', [CourseController::class, 'addToPartnerList']);
+        Route::delete('{courseId}/partner-list', [CourseController::class, 'removeFromPartnerList']);
+    });
 });
-
 
 Route::apiResource('contribution-forms', controller: ContributionFormController::class)->only(['store', 'update']);
 Route::apiResource('contributors',ContributorController::class)->only(['index', 'show']);
