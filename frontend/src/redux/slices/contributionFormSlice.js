@@ -12,8 +12,7 @@ const initialState = {
 // SUBMIT-FORM: create new contribution form
 export const submitForm = createAsyncThunk('contributionForm/submit', async (data, thunkAPI) => {
    try {
-      const response = await apiClient.post('contribution-forms', data);
-      return response.data;
+      await apiClient.post('contribution-forms', data);
 
    } catch (error) {
       if (error.response?.status === 422) {

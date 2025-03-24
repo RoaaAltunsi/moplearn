@@ -247,7 +247,7 @@ function Navbar() {
                />
                {/* Logo */}
                <Link to="/">
-                  <img src={Logo} alt="Loog" className={styles.logo} />
+                  <img src={Logo} alt="Loog" className={styles.logo} loading="lazy" />
                </Link>
             </div>
 
@@ -275,7 +275,7 @@ function Navbar() {
                            onClick={() => setIsProfileDtDropOpened(!isProfileDtDropOpened)}
                         >
                            <div className={styles.img_container}>
-                              <img src={user?.image ? user.image : DefaultImg} alt="" />
+                              <img src={user?.image ? user.image : DefaultImg} alt="" loading="lazy" />
                            </div>
                            <FontAwesomeIcon icon="fa-solid fa-caret-down" />
                         </div>
@@ -366,7 +366,7 @@ function Navbar() {
                {/* Logo && Close icon */}
                <div className={styles.header}>
                   <Link to="/">
-                     <img src={Logo} alt="Loog" className={styles.logo} />
+                     <img src={Logo} alt="Loog" className={styles.logo} loading="lazy" />
                   </Link>
                   <FontAwesomeIcon
                      icon="fa-solid fa-xmark"
@@ -395,7 +395,7 @@ function Navbar() {
                            onClick={() => setIsProfileMbDropOpened(!isProfileMbDropOpened)}
                         >
                            <div className={styles.img_container}>
-                              <img src={user?.image ? user.image : DefaultImg} alt="" />
+                              <img src={user?.image ? user.image : DefaultImg} alt="" loading="lazy" />
                            </div>
                            <h3> Ola Saber </h3>
                         </div>

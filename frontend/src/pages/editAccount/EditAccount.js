@@ -230,6 +230,7 @@ function EditAccount() {
                                  <img
                                     src={fields['image'] instanceof File ? URL.createObjectURL(fields['image']) : fields['image'] || DefaultImg}
                                     alt="Profile"
+                                    loading='lazy'
                                  />
                                  {/* Edit button */}
                                  <div ref={editBtnRef} className={styles.edit_img_btn}>

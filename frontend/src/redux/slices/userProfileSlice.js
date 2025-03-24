@@ -15,7 +15,6 @@ export const updateProfile = createAsyncThunk('userProfile/update', async (data,
    try {
       const response = await apiClient.post('profile', data);
       thunkAPI.dispatch(updateAuthUser(response.data?.user));
-      return response.data;
 
    } catch (error) {
       if (error.response?.status === 422) {

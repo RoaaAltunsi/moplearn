@@ -5,7 +5,6 @@ import MainButton from '../../components/button/MainButton';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useFormFields from '../../hooks/useFormFields';
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
 import { login } from '../../redux/slices/authSlice';
 import { toast } from 'react-toastify';
 
@@ -19,24 +18,18 @@ function Login() {
    const navigate = useNavigate();
    const dispatch = useDispatch();
    const { fields, handleChange } = useFormFields(initialValues);
-   const { validationErrors, isAuthenticated } = useSelector((state) => state.auth);
+   const { validationErrors } = useSelector((state) => state.auth);
 
    const handleSubmission = async (e) => {
       e.preventDefault();
       try {
          await dispatch(login(fields)).unwrap();
+         navigate(location.state?.from || '/', { replace: true });
       } catch (err) {
          // Show error toast
          toast.error(err.error);
       }
    };
-
-   // --------- Redirect to homepage after login ---------
-   useEffect(() => {
-      if (isAuthenticated) {
-         navigate(location.state?.from || '/', { replace: true });
-      }
-   }, [isAuthenticated, navigate]);
 
 
    return (

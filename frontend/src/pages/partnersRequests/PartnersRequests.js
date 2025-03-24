@@ -115,7 +115,7 @@ function PartnersRequests() {
                                     className={styles.partnet_img}
                                     onClick={() => navigate(`/profile/${request.user?.username}`)}
                                  >
-                                    <img src={request.user?.image ? request.user?.image : DefaultImg} alt="" />
+                                    <img src={request.user?.image ? request.user?.image : DefaultImg} alt="" loading='lazy' />
                                  </div>
                                  <div>
                                     <h4> {request.user?.full_name ? request.user?.full_name : request.user?.username} </h4>
@@ -153,7 +153,7 @@ function PartnersRequests() {
                                     className={styles.partnet_img}
                                     onClick={() => navigate(`/profile/${request.user?.username}`)}
                                  >
-                                    <img src={request.user?.profileImg ? request.user?.profileImg : DefaultImg} alt="" />
+                                    <img src={request.user?.profileImg ? request.user?.profileImg : DefaultImg} alt="" loading='lazy' />
                                  </div>
                                  <div>
                                     <h4> {request.user?.full_name ? request.user?.full_name : request.user?.username} </h4>

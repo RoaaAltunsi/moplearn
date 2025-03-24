@@ -46,6 +46,7 @@ function Contributors() {
                      key={index}
                      src={contributor.logo}
                      alt={`Platform ${index}`}
+                     loading='lazy'
                      className={styles.platform}
                   />
                ))}

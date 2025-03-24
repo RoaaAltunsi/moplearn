@@ -58,7 +58,7 @@ function PartnerCard({
             {/* ---------- Descriptive User Information ---------- */}
             <div className={styles.dscrp_section}>
                <div className={styles.image_container}>
-                  <img src={image ? image : DefaultImg} alt="partner" />
+                  <img src={image ? image : DefaultImg} alt="partner" loading='lazy' />
                </div>
 
                <h3> {fullName ?? username} </h3>

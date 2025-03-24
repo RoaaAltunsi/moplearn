@@ -13,8 +13,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return CategoryResource::collection(
+        return response()->json(CategoryResource::collection(
             Category::select('id', 'title')->get()
-        );
+        ));
     }
 }

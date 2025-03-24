@@ -44,7 +44,6 @@ export const updateAccount = createAsyncThunk('user/updateAccount', async (data,
    try {
       const response = await apiClient.put('account', data);
       thunkAPI.dispatch(updateAuthUser(response.data?.user));
-      return response.data;
 
    } catch (error) {
       if (error.response?.status === 422) {
@@ -63,11 +62,10 @@ export const updateAccount = createAsyncThunk('user/updateAccount', async (data,
 // DELETE-ACCOUNT: Delete user account
 export const deleteAccount = createAsyncThunk('user/deleteAccount', async (password, thunkAPI) => {
    try {
-      const response = await apiClient.delete('account', {
+      await apiClient.delete('account', {
          data: { password }
       });
       thunkAPI.dispatch(logout());
-      return response.data;
 
    } catch (error) {
       if (error.response?.status === 422) {

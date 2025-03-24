@@ -6,7 +6,6 @@ import MainButton from '../../components/button/MainButton';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { register } from '../../redux/slices/authSlice';
-import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 const textFields = ['Username', 'Email', 'Password', 'Password Confirmation'];
@@ -22,7 +21,7 @@ function Signup() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
    const { fields, handleChange } = useFormFields(initialValues);
-   const { validationErrors, isAuthenticated } = useSelector((state) => state.auth);
+   const { validationErrors } = useSelector((state) => state.auth);
 
    // --------------- Handle submit register form ---------------
    const handleSubmission = async (e) => {
@@ -30,21 +29,15 @@ function Signup() {
       
       try {
          await dispatch(register(fields)).unwrap();
+         toast.success("Successful Registration!");
+         setTimeout(() => {
+            navigate('/');
+         }, 2000);
       } catch (error) {
          // Show error toast
          toast.error(error.error);
       }
    };
-
-   // --------- Redirect to homepage after registration ---------
-   useEffect(() => {
-      if (isAuthenticated) {
-         toast.success("Successful Registration!");
-         setTimeout(() => {
-            navigate('/');
-         }, 2000);
-      }
-   }, [isAuthenticated, navigate]);
 
 
    return (

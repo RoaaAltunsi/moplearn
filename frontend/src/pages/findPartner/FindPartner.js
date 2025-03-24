@@ -153,13 +153,13 @@ function FindPartner() {
                         <SelectInput
                            label="Interests"
                            value={selectedTopic}
-                           options={topics.map(topic => topic.title)}
+                           options={topics?.map(topic => topic.title)}
                            onChange={handleTopicChange}
                         />
                         <SelectInput
                            label="Language"
                            value={selectedLang}
-                           options={languages.map(language => language.language)}
+                           options={languages?.map(language => language.language)}
                            onChange={handleLanguageChange}
                         />
                      </div>

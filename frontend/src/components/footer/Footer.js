@@ -21,7 +21,7 @@ function Footer() {
       <footer className={styles.container}>
          {/* Logo */}
          <div className={styles.logo}>
-            <img src={FullLogo} alt="Loog" />
+            <img src={FullLogo} alt="Loog" loading="lazy" />
          </div>
 
          <div className={styles.sections}>

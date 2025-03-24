@@ -62,7 +62,7 @@ function CourseCard({
          >
             {/* Course Image */}
             <div className={styles.img}>
-               <img src={image} alt="course" />
+               <img src={image} alt="course" loading="lazy" />
             </div>
 
             {/* Course Descriptive data */}

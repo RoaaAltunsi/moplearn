@@ -326,7 +326,7 @@ function Profile() {
          <div className={styles.content_wrap}>
             {/* Profile image */}
             <div className={styles.profile_img}>
-               <img src={profileUser?.image ? profileUser.image : DefaultImg} alt="" />
+               <img src={profileUser?.image ? profileUser.image : DefaultImg} alt="" loading='lazy' />
             </div>
 
             {/* Username and specialization */}
@@ -428,7 +428,7 @@ function Profile() {
                                     className={styles.partnet_img}
                                     onClick={() => navigate(`/profile/${partner.user?.username}`)}
                                  >
-                                    <img src={partner.user?.image ? partner.user?.image : DefaultImg} alt="" />
+                                    <img src={partner.user?.image ? partner.user?.image : DefaultImg} alt="" loading='lazy' />
                                  </div>
                                  <div>
                                     <h4> {partner.user?.full_name ? partner.user?.full_name : partner.user?.username} </h4>
