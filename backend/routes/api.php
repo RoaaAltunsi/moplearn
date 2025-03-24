@@ -25,31 +25,37 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('email/validation', [AuthController::class, 'validateEmail']);
 Route::post('password/reset', [AuthController::class, 'resetPassword']);
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('users', [UserController::class, 'getUsers']);
-    Route::get('users/{id}/courses', [UserController::class, 'getUserCourses']);
-    Route::get('users/username/{username}', [UserController::class, 'getUserByUsername']);
     Route::put('account', [UserController::class, 'updateAccount']);
     Route::delete('account', [UserController::class, 'deleteAccount']);
     Route::post('profile', [UserProfileController::class, 'storeOrUpdateProfile']);
-    Route::get('users/{id}/friends', action: [FriendshipController::class, 'getFriends']);
-    Route::get('friends/requests/received', [FriendshipController::class, 'getReceivedRequests']);
-    Route::get('friends/requests/sent', [FriendshipController::class, 'getSentRequests']);
-    Route::patch('friends/{id}/status', [FriendshipController::class, 'updateStatus']);
-    Route::delete('friends/{id}', [FriendshipController::class, 'destroy']);
-    Route::post('friends', [FriendshipController::class, 'store']);
+
+    Route::prefix('users')->group(function() {
+        Route::get('/', [UserController::class, 'getUsers']);
+        Route::get('{id}/courses', [UserController::class, 'getUserCourses']);
+        Route::get('username/{username}', [UserController::class, 'getUserByUsername']);
+        Route::get('{id}/friends',[FriendshipController::class, 'getFriends']);
+    });
+
+    Route::prefix('friends')->group(function() {
+        Route::post('/', [FriendshipController::class, 'store']);
+        Route::delete('{id}', [FriendshipController::class, 'destroy']);
+        Route::get('requests/received', [FriendshipController::class, 'getReceivedRequests']);
+        Route::get('requests/sent', [FriendshipController::class, 'getSentRequests']);
+        Route::patch('{id}/status', [FriendshipController::class, 'updateStatus']);
+    });
 });
 
 Route::prefix('courses')->group(function () {
     Route::get('new', [CourseController::class, 'getNewCourses']);
     Route::get('cheapest', [CourseController::class, 'getCheapestCourses']);
     Route::get('categories/{categoryId}', [CourseController::class, 'getCoursesByCategory']);
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('{courseId}/partner-list', [CourseController::class, 'addToPartnerList']);
         Route::delete('{courseId}/partner-list', [CourseController::class, 'removeFromPartnerList']);
     });
 });
 
-Route::apiResource('contribution-forms', controller: ContributionFormController::class)->only(['store', 'update']);
+Route::apiResource('contribution-forms', ContributionFormController::class)->only(['store', 'update']);
 Route::apiResource('contributors',ContributorController::class)->only(['index', 'show']);

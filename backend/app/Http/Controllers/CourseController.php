@@ -120,7 +120,7 @@ class CourseController extends Controller
     }
 
     /**
-     * Add the user to course's partner list
+     * Add user to course partner list
      */
     public function addToPartnerList(Request $request, $courseId)
     {
@@ -133,7 +133,7 @@ class CourseController extends Controller
     }
 
     /**
-     * Remove the user from course's partner list
+     * Remove user from course partner list
      */
     public function removeFromPartnerList(Request $request, $courseId)
     {

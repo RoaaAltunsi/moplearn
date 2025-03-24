@@ -13,8 +13,9 @@ class TopicController extends Controller
      */
     public function index()
     {
-        $topics = Topic::all();
-        return response()->json(TopicResource::collection($topics));
+        return TopicResource::collection(
+            Topic::select('id', 'title')->get()
+        );
     }
 
     /**

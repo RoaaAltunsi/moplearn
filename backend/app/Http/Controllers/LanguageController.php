@@ -13,7 +13,8 @@ class LanguageController extends Controller
      */
     public function index()
     {
-        $languages = Language::select('id', 'language')->get();
-        return response()->json(LanguageResource::collection($languages));
+        return LanguageResource::collection(
+            Language::select('id', 'language')->get()
+        );
     }
 }
