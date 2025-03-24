@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserByUsername } from '../../redux/slices/userSlice';
 import { updateProfile } from '../../redux/slices/userProfileSlice';
 import { toast } from 'react-toastify';
-import { getFriends, getUserFriends } from '../../redux/slices/friendshipSlice';
+import { createFriendship, deleteFriendship, getFriends, getUserFriends } from '../../redux/slices/friendshipSlice';
 
 
 // ------------ Account section component ------------
@@ -54,10 +54,11 @@ function Profile() {
    const { username } = useParams(); // Get username from URL
    const { user, isAuthenticated } = useSelector((state) => state.auth);
    const { fullUsers } = useSelector((state) => state.user);
-   const { myFriends, myPagination, userPagination } = useSelector((state) => state.friendship);
+   const { myFriends, myPagination, userPagination, sentRequests, receivedRequests } = useSelector((state) => state.friendship);
    const isOwnProfile = isAuthenticated && user?.username === username;
    const pagination = isOwnProfile ? myPagination : userPagination;
    const [profileUser, setProfileUser] = useState(null);
+   const [selectedPartner, setSelectedPartner] = useState(null); // for deleting friendship 
 
 
    // ----------- Handle clicking Upload Photo in Header ------------
@@ -119,8 +120,24 @@ function Profile() {
    };
 
    // ----------- Handle remove partner from partner list -----------
-   const handleRemovePartner = () => {
-      // Backend logic to remove partner from partner list 
+   const handleRemovePartner = async () => {
+      try {
+         await dispatch(deleteFriendship({ id: selectedPartner, status: 'accepted' })).unwrap();
+         setIsModalOpened(false);
+         toast.success("This user is successfully deleted from your list!");
+      } catch (err) {
+         toast.error(err.error);
+      }
+   };
+
+   // --------- Handle send friendship request to this user ---------
+   const handleSendFriendshipRequest = async () => {
+      try {
+         await dispatch(createFriendship({ receiver_id: profileUser?.id })).unwrap();
+         toast.success("Friend request sent successfully");
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
    // --------- Conditional render for modal confirm action ---------
@@ -184,18 +201,14 @@ function Profile() {
 
    // ---------------- Fetch partner list for user ------------------
    useEffect(() => {
-      if (
-         activeTab !== 'partners' ||
-         !profileUser?.id ||            // Wait until user is ready
-         profileUser?.partners          // Already has partners
-      ) return;
+      if (activeTab !== 'partners' || !profileUser?.id) return;
 
       const fetchFriends = async () => {
          let friends = [];
          // User own friends
          if (isOwnProfile) {
             if (myFriends.length === 0) {
-               await dispatch(getFriends({ page: currentPage, size: itemsPerPage }))
+               await dispatch(getFriends({ user_id: profileUser?.id, page: currentPage, size: itemsPerPage }))
                   .then((response) => { friends = response?.payload?.friends });
             } else {
                friends = myFriends;
@@ -203,6 +216,7 @@ function Profile() {
 
          } else {
             // Other users friends
+            if (profileUser?.partners) return
             await dispatch(getUserFriends({ user_id: profileUser?.id, page: currentPage, size: itemsPerPage }))
                .then((response) => { friends = response?.payload?.friends });
          }
@@ -212,6 +226,16 @@ function Profile() {
       fetchFriends();
    }, [dispatch, activeTab, isOwnProfile, myFriends, currentPage, profileUser?.partners, profileUser?.id]);
 
+
+   // ------------ Control displaying add partner icon --------------
+   const isNotPartner = useMemo(() => {
+      if (!profileUser?.id) return false;
+      const userId = profileUser.id;
+      const isFriend = myFriends?.some(f => f.user?.id === userId);
+      const isSent = sentRequests?.some(r => r.user?.id === userId);
+      const isReceived = receivedRequests?.some(r => r.user?.id === userId);
+      return !isFriend && !isSent && !isReceived;
+   }, [profileUser?.id, myFriends, sentRequests, receivedRequests]);
 
    // ----------- Track empty state for each tab section ------------
    const isAccountEmpty = !profileUser?.bio
@@ -309,13 +333,20 @@ function Profile() {
             <div className={styles.desc_container}>
                <h3> {profileUser?.full_name ? profileUser?.full_name : profileUser?.username} </h3>
                <span> {profileUser?.specialization} </span>
-               {isOwnProfile && (
+               {isOwnProfile ? (
                   <FontAwesomeIcon
                      icon="fa-solid fa-pen"
                      className={styles.edit_icon}
                      onClick={() => navigate('/edit-account')}
                   />
-               )}
+               ) :
+                  isNotPartner ? (
+                     <FontAwesomeIcon
+                        icon="fa-solid fa-user-plus"
+                        className={styles.edit_icon}
+                        onClick={handleSendFriendshipRequest}
+                     />
+                  ) : null}
             </div>
 
             {/* Tabs switch */}
@@ -378,7 +409,9 @@ function Profile() {
                      <>
                         {/* Results number && Search input field */}
                         <div className={styles.partners_header}>
-                           <span className='small_font'> {pagination?.total} results </span>
+                           <span className='small_font'> {
+                              isOwnProfile ? myPagination?.total : userPagination?.total
+                           } results </span>
                            {/* <TextInput
                               placeholder="Search by Name"
                               value={searchTerm}
@@ -412,7 +445,10 @@ function Profile() {
                                     <FontAwesomeIcon
                                        icon="fa-solid fa-xmark"
                                        className={styles.remove_icon}
-                                       onClick={() => OpenModal('removePartner')}
+                                       onClick={() => {
+                                          setSelectedPartner(partner.id);
+                                          OpenModal('removePartner')
+                                       }}
                                     />
                                  </div>
                               )}

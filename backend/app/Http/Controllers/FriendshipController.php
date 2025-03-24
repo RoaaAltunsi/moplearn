@@ -2,21 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFriendshipRequest;
 use App\Http\Resources\FriendshipResource;
 use App\Models\Friendship;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class FriendshipController extends Controller
 {
     /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreFriendshipRequest $request)
+    {
+        try {
+            $senderId = Auth::id();
+            $receiverId = $request->input('receiver_id');
+
+            DB::beginTransaction();
+            $friendship = Friendship::create([
+                'sender_id' => $senderId,
+                'receiver_id' => $receiverId,
+                'status' => 'pending'
+            ]);
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Friend request sent',
+                'friendship_id' => $friendship->id,
+            ], 201);
+            
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong. Please try again later'
+            ], 500);
+        }
+    }
+
+    /**
      * Display user's friends
      */
-    public function getFriends(Request $request)
+    public function getFriends(Request $request, $id)
     {
-        $userId = $request->input('user_id') ?? Auth::id();
-        $perPage = $request->input('size', 9);
-        $currentPage = $request->input('page', 1);
+        $userId = $id;
+        $perPage = $request->input('size');
+        $currentPage = $request->input('page');
         
         // Get all friendships for this user
         $query = Friendship::where(function ($q) use ($userId) {
@@ -30,7 +64,7 @@ class FriendshipController extends Controller
         $friendships = $query->paginate($perPage, ['*'], 'page', $currentPage);
 
         return response()->json([
-            'friends' => FriendshipResource::collection($friendships),
+            'friends' => $friendships->getCollection()->map(fn($f) => (new FriendshipResource($f, $userId))->toArray($request)),
             'pagination' => [
                 'current_page' => $friendships->currentPage(),
                 'last_page' => $friendships->lastPage(),
@@ -58,7 +92,7 @@ class FriendshipController extends Controller
         $requests = $query->paginate($perPage, ['*'], 'page', $currentPage);
 
         return response()->json([
-            'requests' => FriendshipResource::collection($requests), // The actual paginated data
+            'requests' => $requests->getCollection()->map(fn($f) => (new FriendshipResource($f, $userId))->toArray($request)),
             'pagination' => [
                 'current_page' => $requests->currentPage(),
                 'last_page' => $requests->lastPage(),
@@ -86,7 +120,7 @@ class FriendshipController extends Controller
         $requests = $query->paginate($perPage, ['*'], 'page', $currentPage);
 
         return response()->json([
-            'requests' => FriendshipResource::collection($requests),
+            'requests' => $requests->getCollection()->map(fn($f) => (new FriendshipResource($f, $userId))->toArray($request)),
             'pagination' => [
                 'current_page' => $requests->currentPage(),
                 'last_page' => $requests->lastPage(),

@@ -23,13 +23,13 @@ function PartnersRequests() {
    const activeTabFromURL = searchParams.get('tab') || 'received';
    const [activeTab, setActiveTab] = useState(activeTabFromURL);
    const [isModalOpened, setIsModalOpened] = useState(false);
-   const [deletedRequestId, setDeletedRequestId] = useState(null);
+   const [selectedPartner, setSelectedPartner] = useState(null);
    const { receivedRequests, receivedPagination, sentRequests, sentPagination } = useSelector((state) => state.friendship);
 
 
    // -------------- Control Opening Confirmation Modal -------------
    const openModal = (friendshipId) => {
-      setDeletedRequestId(friendshipId);
+      setSelectedPartner(friendshipId);
       setIsModalOpened(true);
    };
 
@@ -46,7 +46,7 @@ function PartnersRequests() {
    // -------------- Handle delete friendship request ---------------
    const handleDeleteRequest = async () => {
       try {
-         await dispatch(deleteFriendship({ id: deletedRequestId, status: 'pending' })).unwrap();
+         await dispatch(deleteFriendship({ id: selectedPartner, status: 'pending' })).unwrap();
          setIsModalOpened(false);
          toast.success("The request is successfully deleted!");
       } catch (err) {

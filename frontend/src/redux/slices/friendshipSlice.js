@@ -16,10 +16,10 @@ const initialState = {
 
 // --------------------- Async Reducer Functions ---------------------
 // GET-FRIENDS: Fetch all friends of authenticated user (friendship with status accepted)
-export const getFriends = createAsyncThunk('friendship/getFriends', async (params, thunkAPI) => {
+export const getFriends = createAsyncThunk('friendship/getFriends', async ({ user_id, page = 1, size = 9 }, thunkAPI) => {
    try {
-      const response = await apiClient.get('friends', {
-         params
+      const response = await apiClient.get(`users/${user_id}/friends`, {
+         params: { page, size }
       });
       return response.data;
 
@@ -29,10 +29,10 @@ export const getFriends = createAsyncThunk('friendship/getFriends', async (param
 });
 
 // GET-USER-FRIENDS: Fetch all friends of other users (friendship with status accepted)
-export const getUserFriends = createAsyncThunk('friendship/getUserFriends', async (params, thunkAPI) => {
+export const getUserFriends = createAsyncThunk('friendship/getUserFriends', async ({ user_id, page = 1, size = 9 }, thunkAPI) => {
    try {
-      const response = await apiClient.get('friends', {
-         params
+      const response = await apiClient.get(`users/${user_id}/friends`, {
+         params: { page, size }
       });
       return response.data;
 
@@ -92,6 +92,17 @@ export const deleteFriendship = createAsyncThunk('friendship/delete', async ({ i
 
    } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to delete friendship");
+   }
+});
+
+// CREATE-FRIENDSHIP: Create new friendship request
+export const createFriendship = createAsyncThunk('friendship/create', async ({ receiver_id }, thunkAPI) => {
+   try {
+      await apiClient.post('friends', { receiver_id });
+      thunkAPI.dispatch(getSentRequests());
+
+   } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to send friendship request");
    }
 });
 
@@ -174,6 +185,19 @@ export const FriendshipSlice = createSlice({
             state.error = '';
          })
          .addCase(updateStatus.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // ------------- create friendship request ----------------
+         .addCase(createFriendship.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(createFriendship.fulfilled, (state) => {
+            state.loading = false;
+            state.error = '';
+         })
+         .addCase(createFriendship.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
          })

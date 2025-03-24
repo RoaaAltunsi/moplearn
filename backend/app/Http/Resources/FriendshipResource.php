@@ -4,22 +4,23 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 
 class FriendshipResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+    protected $viewingUserId;
+
+    public function __construct($resource, $viewingUserId = null)
+    {
+        parent::__construct($resource);
+        $this->viewingUserId = $viewingUserId;
+    }
+
     public function toArray(Request $request): array
     {
-        // Get the current authenticated user ID
-        $authUserId = Auth::id();
-
-        // Decide whether to show the sender or receiver
-        $friend = $this->sender_id === $authUserId ? $this->receiver : $this->sender;
+        // Get the user who is NOT the viewer
+        $friend = $this->sender_id == $this->viewingUserId
+            ? $this->receiver
+            : $this->sender;
 
         return [
             'id' => $this->id,
