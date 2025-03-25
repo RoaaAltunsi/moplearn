@@ -69,6 +69,7 @@ class AuthController extends Controller
 
         // Get authenticated user
         $user = Auth::user();
+        $request->session()->regenerate();
 
         return response()->json([
             'status' => 'success',

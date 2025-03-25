@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../apiClient";
+import axios from "axios";
 
 const initialState = {
    user: {},
@@ -14,6 +15,7 @@ const initialState = {
 // REGISTER: register new user
 export const register = createAsyncThunk('auth/register', async (userData, thunkAPI) => {
    try {
+      await axios.get('/sanctum/csrf-cookie');
       const response = await apiClient.post('register', userData);
       return response.data;
 
@@ -34,6 +36,7 @@ export const register = createAsyncThunk('auth/register', async (userData, thunk
 // LOGIN: authenticate user
 export const login = createAsyncThunk('auth/login', async (credentials, thunkAPI) => {
    try {
+      await axios.get('/sanctum/csrf-cookie');
       const response = await apiClient.post('login', credentials);
       return response.data;
 
