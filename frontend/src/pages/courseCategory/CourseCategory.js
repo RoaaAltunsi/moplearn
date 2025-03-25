@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToPartnerList, getCoursesByCategory, removeFromPartnerList } from '../../redux/slices/courseSlice';
 import { getTopicsByCategory } from '../../redux/slices/topicSlice';
 import { toast } from 'react-toastify';
+import { getUserCourses } from '../../redux/slices/userSlice';
 
 
 function CourseCategory() {
@@ -32,11 +33,10 @@ function CourseCategory() {
    const { languages } = useSelector((state) => state.language);
    const { contributors } = useSelector((state) => state.contributor);
    const { categoryTopics } = useSelector((state) => state.topic);
-   const { user } = useSelector((state) => state.auth);
+   const { user, isAuthenticated } = useSelector((state) => state.auth);
    const { userCourseIds } = useSelector((state) => state.user);
    const searchParams = new URLSearchParams(location.search);
    const currentPage = parseInt(searchParams.get("page"), 10) || 1;
-   const [toastMsg, setToastMsg] = useState(''); // fix issue of trigger toast twice in add/remove partner
 
 
    // ----------- Format extracted category from URL -----------
@@ -88,8 +88,6 @@ function CourseCategory() {
          isChecked
             ? await dispatch(addToPartnerList({ user_id: user?.id, course_id: courseId })).unwrap()
             : await dispatch(removeFromPartnerList({ user_id: user?.id, course_id: courseId })).unwrap();
-
-         setToastMsg(isChecked ? "Added to partner list successfully" : "Removed from partner list successfully");
 
       } catch (err) {
          toast.error(err.error);
@@ -197,12 +195,25 @@ function CourseCategory() {
       }));
    }, [dispatch, categoryId, transformFiltersToQueryParams]);
 
-   // --------- Handle display toast message only once ----------
+   // ---------- Fetch user registered courses -----------
    useEffect(() => {
-      if (toastMsg) {
-         toast.success(toastMsg);
+      if (isAuthenticated) {
+         let checkedMap = {};
+         if (userCourseIds?.length === 0) {
+            dispatch(getUserCourses(user?.id)).then((response) => {
+               response.payload.forEach(id => {
+                  checkedMap[id] = true;
+               });
+            });
+
+         } else {
+            userCourseIds.forEach(id => {
+               checkedMap[id] = true;
+            });
+         }
+         setPartnerChecked(checkedMap); // Set pre-checked state
       }
-   }, [userCourseIds?.length]);
+   }, [dispatch, userCourseIds, user?.id, isAuthenticated]);
 
 
    return (

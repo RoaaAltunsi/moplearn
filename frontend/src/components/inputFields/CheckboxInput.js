@@ -10,7 +10,7 @@ function CheckboxInput({
       <label className={`${styles.custom_ckeckbox} small_font`}>
          <input
             type="checkbox"
-            checked={isChecked} // Receive checked value from the parent
+            checked={isChecked ?? false} // Receive checked value from the parent
             onChange={(e) => onChange(e.target.checked)}
          />
          <span className={styles.checkmark} />

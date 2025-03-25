@@ -31,16 +31,11 @@ const contributorSlice = createSlice({
    extraReducers: (builder) => {
       builder
       // --------------------- get contributors ---------------------
-      .addCase(getContributors.pending, (state) => {
-         state.loading = true;
-      })
       .addCase(getContributors.fulfilled, (state, action) => {
-         state.loading = false;
          state.contributors = action.payload;
          state.error = '';
       })
       .addCase(getContributors.rejected, (state, action) => {
-         state.loading = false;
          state.error = action.payload;
       })
    }

@@ -10,10 +10,11 @@ import EmptyState from '../../components/UIStates/EmptyState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import MainButton from '../../components/button/MainButton';
-import { getUsers, resetUsers } from '../../redux/slices/userSlice';
+import { getUserCourses, getUsers, resetUsers } from '../../redux/slices/userSlice';
 import { getAllTopics } from '../../redux/slices/topicSlice';
 import { createFriendship, deleteFriendship, getFriendsSummaries, getReceivedRequestSummaries, getSentRequestSummaries } from '../../redux/slices/friendshipSlice';
 import { toast } from 'react-toastify';
+import { addToPartnerList, removeFromPartnerList } from '../../redux/slices/courseSlice';
 
 
 function FindPartner() {
@@ -22,7 +23,7 @@ function FindPartner() {
    const navigate = useNavigate();
    const dispatch = useDispatch();
    const { user, isAuthenticated } = useSelector((state) => state.auth);
-   const { users, pagination } = useSelector((state) => state.user);
+   const { users, pagination, userCourseIds } = useSelector((state) => state.user);
    const { friendReqSummaries, receivedReqSummaries, sentRequestsSummaries } = useSelector((state) => state.friendship);
    const { languages } = useSelector((state) => state.language);
    const { topics } = useSelector((state) => state.topic);
@@ -32,17 +33,20 @@ function FindPartner() {
    const selectedTopic = searchParams.get('topic') || '';
    const [partnerChecked, setPartnerChecked] = useState(false); // For partner list checkbox
    const currentPage = parseInt(searchParams.get("page"), 10) || 1;
-   const courseId = searchParams.get("courseId");
+   const courseId = Number(searchParams.get("courseId"));
 
 
    // ----------- Add/Remove user from partner list -----------
-   const handlePartnerCheckboxChange = (value) => {
-      setPartnerChecked(!partnerChecked);
+   const handlePartnerCheckboxChange = async (courseId, isChecked) => {
+      try {
+         setPartnerChecked(isChecked);
 
-      if (value) {
-         console.log("POST user to partner list");
-      } else {
-         console.log("DELETE user from partner list");
+         isChecked
+            ? await dispatch(addToPartnerList({ user_id: user?.id, course_id: courseId })).unwrap()
+            : await dispatch(removeFromPartnerList({ user_id: user?.id, course_id: courseId })).unwrap();
+
+      } catch (err) {
+         toast.error(err.error);
       }
    };
 
@@ -112,13 +116,13 @@ function FindPartner() {
    // ---------- Fetch partners when filters change -----------
    useEffect(() => {
       const shouldFetchUsers = () => {
-         return users.length === 0 || selectedLang || selectedTopic || courseId || currentPage > 1;
+         return isAuthenticated && (users.length === 0 || selectedLang || selectedTopic || courseId || currentPage > 1);
       };
 
       if (shouldFetchUsers()) {
          dispatch(getUsers(transformFiltersToQueryParams()));
       }
-   }, [dispatch, transformFiltersToQueryParams, selectedLang, selectedTopic, courseId, currentPage, users.length]);
+   }, [dispatch, transformFiltersToQueryParams, isAuthenticated, selectedLang, selectedTopic, courseId, currentPage, users.length]);
 
    // --------------- Fetch topics on page load ---------------
    useEffect(() => {
@@ -126,6 +130,20 @@ function FindPartner() {
          dispatch(getAllTopics());
       }
    }, [dispatch, topics?.length, isAuthenticated]);
+
+   // ---------- Fetch user registered courses -----------
+   useEffect(() => {
+      if (isAuthenticated && courseId) {
+         if (userCourseIds?.length === 0) {
+            dispatch(getUserCourses(user?.id)).then((response) => {
+               setPartnerChecked(!!response.payload.find(id => id === courseId));
+            });
+
+         } else {
+            setPartnerChecked(!!userCourseIds.find(id => id === courseId));
+         }
+      }
+   }, [dispatch, userCourseIds, user?.id, isAuthenticated, courseId]);
 
    // -------- Fetch friendship requests on page load ---------
    useEffect(() => {
@@ -197,7 +215,7 @@ function FindPartner() {
                            <CheckboxInput
                               label="Add Me to Partner List"
                               isChecked={partnerChecked}
-                              onChange={(value) => handlePartnerCheckboxChange(value)}
+                              onChange={(isChecked) => handlePartnerCheckboxChange(courseId, isChecked)}
                            />
                         )}
                         <SelectInput
