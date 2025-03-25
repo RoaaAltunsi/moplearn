@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
@@ -12,9 +13,13 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserProfileController;
 
-Route::get('csrf-token', function() {
-    return response()->json(['csrf_token' => csrf_token()]);
-});
+// Route::get('csrf-token', function() {
+//     return response()->json(['csrf_token' => csrf_token()]);
+// });
+// Route::get('user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
+
 Route::get('categories', [CategoryController::class, 'index']);
 Route::get('languages', [LanguageController::class, 'index']);
 Route::get('topics/categories/{categoryId}', [TopicController::class, 'getTopicsByCategory']);
@@ -36,13 +41,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('{id}/courses', [UserController::class, 'getUserCourses']);
         Route::get('username/{username}', [UserController::class, 'getUserByUsername']);
         Route::get('{id}/friends',[FriendshipController::class, 'getFriends']);
+        Route::get('{id}/friends-summary',[FriendshipController::class, 'getFriendsSummaries']);
     });
 
     Route::prefix('friends')->group(function() {
         Route::post('/', [FriendshipController::class, 'store']);
         Route::delete('{id}', [FriendshipController::class, 'destroy']);
         Route::get('requests/received', [FriendshipController::class, 'getReceivedRequests']);
+        Route::get('requests-summary/received', [FriendshipController::class, 'getReceivedRequestsSummaries']);
         Route::get('requests/sent', [FriendshipController::class, 'getSentRequests']);
+        Route::get('requests-summary/sent', [FriendshipController::class, 'getSentRequestsSummaries']);
         Route::patch('{id}/status', [FriendshipController::class, 'updateStatus']);
     });
 });

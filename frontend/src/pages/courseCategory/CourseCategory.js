@@ -31,7 +31,7 @@ function CourseCategory() {
    const { coursesByCategory, pagination } = useSelector((state) => state.course);
    const { languages } = useSelector((state) => state.language);
    const { contributors } = useSelector((state) => state.contributor);
-   const { topics } = useSelector((state) => state.topic);
+   const { categoryTopics } = useSelector((state) => state.topic);
    const { user } = useSelector((state) => state.auth);
    const { userCourseIds } = useSelector((state) => state.user);
    const searchParams = new URLSearchParams(location.search);
@@ -106,7 +106,7 @@ function CourseCategory() {
    const getFilterIds = useCallback((filterType) => {
       switch (filterType) {
          case 'topics':
-            return topics
+            return categoryTopics
                .filter(topic => filters[filterType][topic.title])
                .map(topic => topic.id);
          case 'platforms':
@@ -120,7 +120,7 @@ function CourseCategory() {
          default:
             return [];
       }
-   }, [topics, contributors, languages, filters]);
+   }, [categoryTopics, contributors, languages, filters]);
 
    // ---------- Format filters for backend end point -----------
    const transformFiltersToQueryParams = useCallback(() => {
@@ -161,7 +161,7 @@ function CourseCategory() {
    // ------- Initialize some filters state dynamically --------
    useEffect(() => {
       const initialTopicFilters = {};
-      topics.forEach(topic => {
+      categoryTopics.forEach(topic => {
          initialTopicFilters[topic.title] = false;
       });
 
@@ -182,7 +182,7 @@ function CourseCategory() {
          platforms: initialPlatformFilters,
          languages: initialLanguageFilters,
       }));
-   }, [topics, contributors, languages]);
+   }, [categoryTopics, contributors, languages]);
 
    // ---------- Fetch topics and courses for category ----------
    useEffect(() => {

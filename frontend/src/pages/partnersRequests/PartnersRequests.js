@@ -23,13 +23,15 @@ function PartnersRequests() {
    const activeTabFromURL = searchParams.get('tab') || 'received';
    const [activeTab, setActiveTab] = useState(activeTabFromURL);
    const [isModalOpened, setIsModalOpened] = useState(false);
-   const [selectedPartner, setSelectedPartner] = useState(null);
+   const [selectedPartner, setSelectedPartner] = useState(null); // for a delete request operation
+   const [requestStatus, setRequestStatus] = useState(''); // for a delete request operation
    const { receivedRequests, receivedPagination, sentRequests, sentPagination } = useSelector((state) => state.friendship);
 
 
    // -------------- Control Opening Confirmation Modal -------------
-   const openModal = (friendshipId) => {
+   const openModal = (friendshipId, status) => {
       setSelectedPartner(friendshipId);
+      setRequestStatus(status);
       setIsModalOpened(true);
    };
 
@@ -46,7 +48,7 @@ function PartnersRequests() {
    // -------------- Handle delete friendship request ---------------
    const handleDeleteRequest = async () => {
       try {
-         await dispatch(deleteFriendship({ id: selectedPartner, status: 'pending' })).unwrap();
+         await dispatch(deleteFriendship({ id: selectedPartner, status: requestStatus })).unwrap();
          setIsModalOpened(false);
          toast.success("The request is successfully deleted!");
       } catch (err) {
@@ -132,7 +134,7 @@ function PartnersRequests() {
                                  <FontAwesomeIcon
                                     icon="fa-solid fa-xmark"
                                     className={styles.remove_icon}
-                                    onClick={() => openModal(request.id)}
+                                    onClick={() => openModal(request.id, 'received')}
                                  />
                               </div>
                            </div>
@@ -165,7 +167,7 @@ function PartnersRequests() {
                                  <FontAwesomeIcon
                                     icon="fa-solid fa-xmark"
                                     className={styles.remove_icon}
-                                    onClick={() => openModal(request.id)}
+                                    onClick={() => openModal(request.id, 'sent')}
                                  />
                               </div>
                            </div>

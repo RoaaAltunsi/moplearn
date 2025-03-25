@@ -7,6 +7,7 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
@@ -91,7 +92,8 @@ class CourseController extends Controller
 
         // Sort Filter
         if ($request->has('sort')) {
-            switch($request->input('sort')) {
+            $sort = Str::slug($request->input('sort'));
+            switch($sort) {
                 case 'highest-rated':
                     $query->orderBy('rating', 'desc');
                     break;

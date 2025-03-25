@@ -44,7 +44,7 @@ class FriendshipController extends Controller
     }
 
     /**
-     * Display user's friends
+     * Display paginated friends
      */
     public function getFriends(Request $request, $id)
     {
@@ -75,7 +75,33 @@ class FriendshipController extends Controller
     }
 
     /**
-     * Display all received pending requests for authenticated user
+     * Display all summaries of friends for the authenticatd user
+     */
+    public function getFriendsSummaries($id)
+    {
+        $userId = $id;
+        
+        // Get all friendships for this user
+        $friendships = Friendship::where(function ($q) use ($userId) {
+            $q->where('sender_id', $userId)
+                ->orWhere('receiver_id', $userId);
+        })
+        ->where('status', 'accepted')
+        ->get();
+
+        // Extract both friendship ID and user ID (the one who is NOT the authenticated user)
+        $friendIds = $friendships->map(function ($f) use ($userId) {
+            return [
+                'id' => $f->id, // friendship id
+                'user_id' => $f->sender_id == $userId ? $f->receiver_id : $f->sender_id
+            ];
+        });
+
+        return response()->json($friendIds);
+    }
+
+    /**
+     * Display paginated received requests for the authenticated user
      */
     public function getReceivedRequests(Request $request)
     {
@@ -103,7 +129,30 @@ class FriendshipController extends Controller
     }
 
     /**
-     * Display all sent pending requests for authenticated user
+     * Display all summaries of received requests for the authenticatd user
+     */
+    public function getReceivedRequestsSummaries()
+    {
+        $userId = Auth::id();
+
+        // Get pending requests where current user is the receiver
+        $requests = Friendship::where('receiver_id', $userId)
+            ->where('status', 'pending')
+            ->get();
+
+        // Extract both friendship ID and sender ID
+        $requestIds = $requests->map(function ($f) {
+            return [
+                'id' => $f->id, // friendship id
+                'user_id' => $f->sender_id
+            ];
+        });
+
+        return response()->json($requestIds);
+    }
+
+    /**
+     * Display paginated sent requests for the authenticated user
      */
     public function getSentRequests(Request $request)
     {
@@ -128,6 +177,29 @@ class FriendshipController extends Controller
                 'total' => $requests->total(),
             ]
         ]);
+    }
+
+    /**
+     * Display all summaries of sent requests for the authenticatd user
+     */
+    public function getSentRequestsSummaries()
+    {
+        $userId = Auth::id();
+
+        // Get pending requests where current user is the receiver
+        $requests = Friendship::where('sender_id', $userId)
+            ->where('status', 'pending')
+            ->get();
+
+        // Extract both friendship ID and receiver ID
+        $requestIds = $requests->map(function ($f) {
+            return [
+                'id' => $f->id, // friendship id
+                'user_id' => $f->receiver_id
+            ];
+        });
+
+        return response()->json($requestIds);
     }
 
     /**

@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import MainButton from '../../components/button/MainButton';
 import { getUsers, resetUsers } from '../../redux/slices/userSlice';
 import { getAllTopics } from '../../redux/slices/topicSlice';
+import { createFriendship, deleteFriendship, getFriendsSummaries, getReceivedRequestSummaries, getSentRequestSummaries } from '../../redux/slices/friendshipSlice';
+import { toast } from 'react-toastify';
 
 
 function FindPartner() {
@@ -19,8 +21,9 @@ function FindPartner() {
    const location = useLocation();
    const navigate = useNavigate();
    const dispatch = useDispatch();
-   const { isAuthenticated } = useSelector((state) => state.auth);
+   const { user, isAuthenticated } = useSelector((state) => state.auth);
    const { users, pagination } = useSelector((state) => state.user);
+   const { friendReqSummaries, receivedReqSummaries, sentRequestsSummaries } = useSelector((state) => state.friendship);
    const { languages } = useSelector((state) => state.language);
    const { topics } = useSelector((state) => state.topic);
    const { courseTitle } = useParams();
@@ -28,7 +31,6 @@ function FindPartner() {
    const selectedLang = searchParams.get('language') || '';
    const selectedTopic = searchParams.get('topic') || '';
    const [partnerChecked, setPartnerChecked] = useState(false); // For partner list checkbox
-   const [friendList, setFriendList] = useState([]); // LATER: Fetch user's friend list from DB
    const currentPage = parseInt(searchParams.get("page"), 10) || 1;
    const courseId = searchParams.get("courseId");
 
@@ -60,6 +62,25 @@ function FindPartner() {
    const handleTopicChange = (value) => {
       searchParams.set('topic', value);
       handlePageChange(1); // reset page
+   };
+
+   // ------------ Handle change friendship requests ------------
+   const handleFriendshipOperations = async (data) => {
+      try {
+         if (data?.status === 'none') {
+            // Create new Friendship request
+            await dispatch(createFriendship({ receiver_id: data?.id })).unwrap();
+            toast.success("Partnership request sent successfully");
+
+         } else {
+            // Delete existing friendship request
+            await dispatch(deleteFriendship({ id: data?.id, status: data?.status })).unwrap();
+            toast.success("The Partnership removed successfully");
+         }
+
+      } catch (err) {
+         toast.error(err.error);
+      }
    };
 
    // ---------- Format filters for backend end point -----------
@@ -98,26 +119,55 @@ function FindPartner() {
          dispatch(getUsers(transformFiltersToQueryParams()));
       }
    }, [dispatch, transformFiltersToQueryParams, selectedLang, selectedTopic, courseId, currentPage, users.length]);
-   
+
    // --------------- Fetch topics on page load ---------------
    useEffect(() => {
-      if (topics.length === 0 && isAuthenticated) {
+      if (topics?.length === 0 && isAuthenticated) {
          dispatch(getAllTopics());
       }
-   }, [dispatch, topics.length, isAuthenticated]);
+   }, [dispatch, topics?.length, isAuthenticated]);
+
+   // -------- Fetch friendship requests on page load ---------
+   useEffect(() => {
+      if (!isAuthenticated) return;
+
+      if (friendReqSummaries?.length === 0) {
+         dispatch(getFriendsSummaries(user?.id));
+      }
+      if (receivedReqSummaries.length === 0) {
+         dispatch(getReceivedRequestSummaries());
+      }
+      if (sentRequestsSummaries.length === 0) {
+         dispatch(getSentRequestSummaries());
+      }
+   }, [dispatch, isAuthenticated, user?.id, friendReqSummaries?.length, receivedReqSummaries?.length, sentRequestsSummaries?.length]);
+
+   // -- Get friendship status for this user with all users ---
+   const getFriendshipStatus = useCallback((userId) => {
+      const friend = friendReqSummaries.find(req => req.user_id === userId);
+      if (friend) return { status: 'accepted', user_id: friend.id };
+
+      const received = receivedReqSummaries.find(req => req.user_id === userId);
+      if (received) return { status: 'received', id: received.id };
+
+      const sent = sentRequestsSummaries.find(req => req.user_id === userId);
+      if (sent) return { status: 'sent', id: sent.id };
+
+      return { status: 'none', id: userId };
+   }, [friendReqSummaries, receivedReqSummaries, sentRequestsSummaries]);
 
    // - Reset users when leaving the page with active filters -
    useEffect(() => {
       return () => {
          const searchParams = new URLSearchParams(location.search);
          const hasActiveFilters = searchParams.get('language') || searchParams.get('topic') || searchParams.get('courseId');
-   
+
          if (hasActiveFilters) {
             dispatch(resetUsers());
          }
       };
    }, [dispatch, location.search]);
-   
+
 
    return (
       <div className='container'>
@@ -178,7 +228,8 @@ function FindPartner() {
                                  image={partner.image}
                                  specialization={partner.specialization}
                                  interests={partner.interests}
-                                 isFriend={friendList.includes(partner.id)}
+                                 friendshipReq={getFriendshipStatus(partner.id)}
+                                 handleFriendship={(data) => handleFriendshipOperations(data)}
                               />
                            ))}
                         </div>

@@ -12,21 +12,14 @@ function PartnerCard({
    username,
    specialization,
    interests,
-   isFriend,
+   friendshipReq, // { friendship_id , user_id }
+   handleFriendship
 }) {
 
    const tagsContainerRef = useRef();
    const [isTagsOverflowed, setIsTagsOverFlowed] = useState(false);
+   const friendshipStatus = friendshipReq?.status;
 
-
-   // ---------- Handle Sending/Removing Partner Request ----------
-   const handleClickButton = () => {
-      if (isFriend) {
-         console.log("DELETE from friend list");
-      } else {
-         console.log("POST friend request");
-      }
-   };
 
    // ------------------ Format Username for URL ------------------
    const formatNameForURL = () => {
@@ -93,9 +86,25 @@ function PartnerCard({
          <div className={styles.btn_container}>
             <MainButton
                width="100%"
-               isDestructive={isFriend}
-               label={`${isFriend ? 'Remove' : 'Request'} Partnership`}
-               onClick={handleClickButton}
+               isDestructive={friendshipStatus === 'accepted'}
+               label={
+                  friendshipStatus === 'accepted'
+                     ? 'Remove Partnership'
+                     : friendshipStatus === 'sent' || friendshipStatus === 'received'
+                        ? 'Pending Request'
+                        : 'Request Partnership'
+               }
+               backgroundColor={
+                  friendshipStatus === 'sent' || friendshipStatus === 'received'
+                     ? 'var(--light-grey-color)'
+                     : null
+               }
+               customStyles={
+                  friendshipStatus === 'sent' || friendshipStatus === 'received'
+                     ? { pointerEvents: 'none' }
+                     : {}
+               }
+               onClick={() => handleFriendship(friendshipReq)}
             />
          </div>
 

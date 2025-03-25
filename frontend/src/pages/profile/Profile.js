@@ -54,9 +54,9 @@ function Profile() {
    const { username } = useParams(); // Get username from URL
    const { user, isAuthenticated } = useSelector((state) => state.auth);
    const { fullUsers } = useSelector((state) => state.user);
-   const { myFriends, myPagination, userPagination, sentRequests, receivedRequests } = useSelector((state) => state.friendship);
+   const { myFriends, friendsPagination, sentRequests, receivedRequests } = useSelector((state) => state.friendship);
    const isOwnProfile = isAuthenticated && user?.username === username;
-   const pagination = isOwnProfile ? myPagination : userPagination;
+   const [pagination, setPagination] = useState(isOwnProfile ? friendsPagination : null);
    const [profileUser, setProfileUser] = useState(null);
    const [selectedPartner, setSelectedPartner] = useState(null); // for deleting friendship 
 
@@ -134,7 +134,7 @@ function Profile() {
    const handleSendFriendshipRequest = async () => {
       try {
          await dispatch(createFriendship({ receiver_id: profileUser?.id })).unwrap();
-         toast.success("Friend request sent successfully");
+         toast.success("Partnership request sent successfully");
       } catch (err) {
          toast.error(err.error);
       }
@@ -218,7 +218,10 @@ function Profile() {
             // Other users friends
             if (profileUser?.partners) return
             await dispatch(getUserFriends({ user_id: profileUser?.id, page: currentPage, size: itemsPerPage }))
-               .then((response) => { friends = response?.payload?.friends });
+               .then((response) => {
+                  friends = response?.payload?.friends;
+                  setPagination(response?.payload?.pagination);
+               });
          }
          setProfileUser((prev) => ({ ...prev, partners: friends }));
       };
@@ -409,9 +412,7 @@ function Profile() {
                      <>
                         {/* Results number && Search input field */}
                         <div className={styles.partners_header}>
-                           <span className='small_font'> {
-                              isOwnProfile ? myPagination?.total : userPagination?.total
-                           } results </span>
+                           <span className='small_font'> {pagination?.total} results </span>
                            {/* <TextInput
                               placeholder="Search by Name"
                               value={searchTerm}
@@ -460,7 +461,7 @@ function Profile() {
             </div>
 
             {/* Pagination section */}
-            {(activeTab === 'partners' && pagination.total > pagination.per_page) && (
+            {(activeTab === 'partners' && pagination && pagination.total > pagination.per_page) && (
                <Pagination
                   currentPage={pagination.current_page}
                   lastPage={pagination.last_page}

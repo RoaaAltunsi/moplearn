@@ -4,18 +4,20 @@ import apiClient from "../apiClient";
 
 const initialState = {
    myFriends: [],
-   myPagination: {},
-   userPagination: {},
+   friendsPagination: {}, // pagination for authenticated user friends
+   friendReqSummaries: [],
    receivedRequests: [],
    receivedPagination: {},
+   receivedReqSummaries: [],
    sentRequests: [],
    sentPagination: {},
+   sentRequestsSummaries: [],
    loading: false,
    error: ''
 };
 
 // --------------------- Async Reducer Functions ---------------------
-// GET-FRIENDS: Fetch all friends of authenticated user (friendship with status accepted)
+// GET-FRIENDS: Fetch paginated friends of authenticated user (friendship with status accepted)
 export const getFriends = createAsyncThunk('friendship/getFriends', async ({ user_id, page = 1, size = 9 }, thunkAPI) => {
    try {
       const response = await apiClient.get(`users/${user_id}/friends`, {
@@ -28,20 +30,30 @@ export const getFriends = createAsyncThunk('friendship/getFriends', async ({ use
    }
 });
 
-// GET-USER-FRIENDS: Fetch all friends of other users (friendship with status accepted)
+// GET-FRIEND-SUMMARIES: Fetch all summaries of friends for the authenticatd user
+export const getFriendsSummaries = createAsyncThunk('friendship/getFriendsSummaries', async (user_id, thunkAPI) => {
+   try {
+      const response = await apiClient.get(`users/${user_id}/friends-summary`);
+      return response.data;
+
+   } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch friend summaries");
+   }
+});
+
+// GET-USER-FRIENDS: Fetch paginated friends of other users (friendship with status accepted)
 export const getUserFriends = createAsyncThunk('friendship/getUserFriends', async ({ user_id, page = 1, size = 9 }, thunkAPI) => {
    try {
-      const response = await apiClient.get(`users/${user_id}/friends`, {
+      await apiClient.get(`users/${user_id}/friends`, {
          params: { page, size }
       });
-      return response.data;
 
    } catch (error) {
       return thunkAPI.rejectWithValue("Failed to fetch friends");
    }
 });
 
-// GET-RECEIVED-REQUESTS: Fetch all pending requests received from other users
+// GET-RECEIVED-REQUESTS: Fetch paginated received requests for the authenticated user
 export const getReceivedRequests = createAsyncThunk('friendship/getReceivedRequests', async (_, thunkAPI) => {
    try {
       const response = await apiClient.get('friends/requests/received');
@@ -52,7 +64,18 @@ export const getReceivedRequests = createAsyncThunk('friendship/getReceivedReque
    }
 });
 
-// GET-SENT-REQUESTS: Fetch all pending requests sent by the user
+// GET-RECEIVED-REQUEST-SUMMARIES: Fetch all summaries of received requests for the authenticatd user
+export const getReceivedRequestSummaries = createAsyncThunk('friendship/getReceivedRequestSummaries', async (_, thunkAPI) => {
+   try {
+      const response = await apiClient.get('friends/requests-summary/received');
+      return response.data;
+
+   } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch received request summaries");
+   }
+});
+
+// GET-SENT-REQUESTS: Fetch paginated sent requests for the authenticated user
 export const getSentRequests = createAsyncThunk('friendship/getSentRequests', async (_, thunkAPI) => {
    try {
       const response = await apiClient.get('friends/requests/sent');
@@ -60,6 +83,17 @@ export const getSentRequests = createAsyncThunk('friendship/getSentRequests', as
 
    } catch (error) {
       return thunkAPI.rejectWithValue("Failed to fetch sent friendship requests");
+   }
+});
+
+// GET-SENT-REQUEST-SUMMARIES: Fetch all summaries of sent requests for the authenticatd user
+export const getSentRequestSummaries = createAsyncThunk('friendship/getSentRequestSummaries', async (_, thunkAPI) => {
+   try {
+      const response = await apiClient.get('friends/requests-summary/sent');
+      return response.data;
+
+   } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch received request summaries");
    }
 });
 
@@ -85,9 +119,13 @@ export const deleteFriendship = createAsyncThunk('friendship/delete', async ({ i
       await apiClient.delete(`friends/${id}`);
       if (status === 'accepted') {
          thunkAPI.dispatch(getFriends());
-      } else {
+         thunkAPI.dispatch(getFriendsSummaries());
+      } else if (status === 'received') {
          thunkAPI.dispatch(getReceivedRequests());
+         thunkAPI.dispatch(getReceivedRequestSummaries());
+      } else {
          thunkAPI.dispatch(getSentRequests());
+         thunkAPI.dispatch(getSentRequestSummaries());
       }
 
    } catch (error) {
@@ -100,6 +138,7 @@ export const createFriendship = createAsyncThunk('friendship/create', async ({ r
    try {
       await apiClient.post('friends', { receiver_id });
       thunkAPI.dispatch(getSentRequests());
+      thunkAPI.dispatch(getSentRequestSummaries());
 
    } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to send friendship request");
@@ -124,10 +163,24 @@ export const FriendshipSlice = createSlice({
          .addCase(getFriends.fulfilled, (state, action) => {
             state.loading = false;
             state.myFriends = action.payload?.friends;
-            state.myPagination = action.payload?.pagination;
+            state.friendsPagination = action.payload?.pagination;
             state.error = '';
          })
          .addCase(getFriends.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // --------------- get friends summaries -----------------
+         .addCase(getFriendsSummaries.pending, (state) => {
+            state.loading = true;
+         })
+         .addCase(getFriendsSummaries.fulfilled, (state, action) => {
+            state.loading = false;
+            state.friendReqSummaries = action.payload;
+            state.error = '';
+         })
+         .addCase(getFriendsSummaries.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
          })
@@ -138,7 +191,6 @@ export const FriendshipSlice = createSlice({
          })
          .addCase(getUserFriends.fulfilled, (state, action) => {
             state.loading = false;
-            state.userPagination = action.payload?.pagination;
             state.error = '';
          })
          .addCase(getUserFriends.rejected, (state, action) => {
@@ -161,6 +213,20 @@ export const FriendshipSlice = createSlice({
             state.error = action.payload;
          })
 
+         // ----------- get received requests summaries -------------
+         .addCase(getReceivedRequestSummaries.pending, (state) => {
+            state.pending = true;
+         })
+         .addCase(getReceivedRequestSummaries.fulfilled, (state, action) => {
+            state.loading = false;
+            state.receivedReqSummaries = action.payload;
+            state.error = '';
+         })
+         .addCase(getReceivedRequestSummaries.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
          // ------------------ get sent requests -------------------
          .addCase(getSentRequests.pending, (state) => {
             state.pending = true;
@@ -172,6 +238,20 @@ export const FriendshipSlice = createSlice({
             state.error = '';
          })
          .addCase(getSentRequests.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+         })
+
+         // ------------ get sent requests summaries ----------------
+         .addCase(getSentRequestSummaries.pending, (state) => {
+            state.pending = true;
+         })
+         .addCase(getSentRequestSummaries.fulfilled, (state, action) => {
+            state.loading = false;
+            state.sentRequestsSummaries = action.payload;
+            state.error = '';
+         })
+         .addCase(getSentRequestSummaries.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
          })
