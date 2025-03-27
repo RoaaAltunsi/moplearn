@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import './assets/styles/global.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import Navbar from './components/navbar/Navbar.js';
@@ -17,6 +17,8 @@ import { useEffect } from 'react';
 import { getCategories } from './redux/slices/categorySlice.js';
 import { getContributors } from './redux/slices/contributorSlice.js';
 import { getLanguages } from './redux/slices/languageSlice.js';
+import { persistor } from './redux/store.js';
+import { checkAuthStatus } from './redux/slices/authSlice.js';
 
 library.add(
   ...Object.values(solidIcons).filter(icon => icon.iconName),
@@ -28,6 +30,8 @@ function App() {
 
   const location = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const { categories } = useSelector((state) => state.category);
   const { languages } = useSelector((state) => state.language);
   const { contributors } = useSelector((state) => state.contributor);
@@ -53,6 +57,20 @@ function App() {
       dispatch(getContributors());
     }
   }, [dispatch, contributors.length, categories.length, languages.length]);
+
+  // Check session status if the frontend thinks the user is logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(checkAuthStatus())
+        .unwrap()
+        .catch((err) => {
+          if (err?.expired) {
+            persistor.purge();
+            navigate('/login');
+          }
+        });
+    }
+  }, [dispatch, isAuthenticated, navigate]);
 
 
   return (

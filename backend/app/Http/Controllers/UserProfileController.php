@@ -73,13 +73,13 @@ class UserProfileController extends Controller
         $profile->save();
 
         // -------------- Update languages --------------
-        if ($request->filled('languages')) {
+        if ($request->has('languages')) {
             $languageIds = explode(',', $request->input('languages'));
             $user->languages()->sync(array_filter($languageIds)); // Sync (remove old & add new)
         }
 
         // -------------- Update interests --------------
-        if ($request->filled('interests')) {
+        if ($request->has('interests')) {
             $interestIds = explode(',', $request->input('interests'));
             $user->interests()->sync(array_filter($interestIds)); // Sync (remove old & add new)
         }

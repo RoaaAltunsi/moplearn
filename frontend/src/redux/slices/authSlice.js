@@ -54,6 +54,20 @@ export const login = createAsyncThunk('auth/login', async (credentials, thunkAPI
    }
 });
 
+// CHECK-AUTH-STATUS: Check authentication by fetching authenticated user
+export const checkAuthStatus = createAsyncThunk('auth/check', async (_, thunkAPI) => {
+   try {
+      const response = await apiClient.get('/user');
+      return response.data;
+   } catch (error) {
+      if (error.response?.status === 401) {
+         // Session expired or not logged in
+         return thunkAPI.rejectWithValue({ expired: true, error: "Session expired. Please log in again" });
+      }
+      return thunkAPI.rejectWithValue("Something went wrong");
+   }
+});
+
 // LOGOUT: logout user from the system
 export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
    try {
@@ -146,6 +160,15 @@ const authSlice = createSlice({
             state.loading = false;
             state.validationErrors = action.payload?.validationErrors || {};
             state.error = action.payload?.error || '';
+         })
+
+         // --------------- check auth status ----------------
+         .addCase(checkAuthStatus.rejected, (state, action) => {
+            if (action.payload?.expired) {
+               state.isAuthenticated = false;
+               state.user = {};
+               state.error = action.payload?.error;
+            }
          })
 
          // --------------------- logout ---------------------

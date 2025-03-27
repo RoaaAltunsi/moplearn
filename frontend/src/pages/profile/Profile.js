@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserByUsername } from '../../redux/slices/userSlice';
 import { updateProfile } from '../../redux/slices/userProfileSlice';
 import { toast } from 'react-toastify';
-import { createFriendship, deleteFriendship, getFriends, getUserFriends } from '../../redux/slices/friendshipSlice';
+import { createFriendship, deleteFriendship, getFriends, getFriendsSummaries, getReceivedRequestSummaries, getSentRequestSummaries, getUserFriends } from '../../redux/slices/friendshipSlice';
 
 
 // ------------ Account section component ------------
@@ -54,7 +54,7 @@ function Profile() {
    const { username } = useParams(); // Get username from URL
    const { user, isAuthenticated } = useSelector((state) => state.auth);
    const { fullUsers } = useSelector((state) => state.user);
-   const { myFriends, friendsPagination, sentRequests, receivedRequests } = useSelector((state) => state.friendship);
+   const { myFriends, friendsPagination, friendReqSummaries, sentRequestsSummaries, receivedReqSummaries } = useSelector((state) => state.friendship);
    const isOwnProfile = isAuthenticated && user?.username === username;
    const [pagination, setPagination] = useState(isOwnProfile ? friendsPagination : null);
    const [profileUser, setProfileUser] = useState(null);
@@ -219,6 +219,7 @@ function Profile() {
             if (profileUser?.partners) return
             await dispatch(getUserFriends({ user_id: profileUser?.id, page: currentPage, size: itemsPerPage }))
                .then((response) => {
+                  console.log(response)
                   friends = response?.payload?.friends;
                   setPagination(response?.payload?.pagination);
                });
@@ -229,16 +230,31 @@ function Profile() {
       fetchFriends();
    }, [dispatch, activeTab, isOwnProfile, myFriends, currentPage, profileUser?.partners, profileUser?.id]);
 
+   // -------- Fetch friendship requests on page load ---------
+   useEffect(() => {
+      if (!isAuthenticated) return;
+
+      if (friendReqSummaries?.length === 0) {
+         dispatch(getFriendsSummaries(user?.id));
+      }
+      if (receivedReqSummaries.length === 0) {
+         dispatch(getReceivedRequestSummaries());
+      }
+      if (sentRequestsSummaries.length === 0) {
+         dispatch(getSentRequestSummaries());
+      }
+   }, [dispatch, isAuthenticated, user?.id, friendReqSummaries?.length, receivedReqSummaries?.length, sentRequestsSummaries?.length]);
+
 
    // ------------ Control displaying add partner icon --------------
    const isNotPartner = useMemo(() => {
-      if (!profileUser?.id) return false;
-      const userId = profileUser.id;
-      const isFriend = myFriends?.some(f => f.user?.id === userId);
-      const isSent = sentRequests?.some(r => r.user?.id === userId);
-      const isReceived = receivedRequests?.some(r => r.user?.id === userId);
+      if (!profileUser?.id) return;
+      const userId = profileUser?.id;
+      const isFriend = friendReqSummaries?.some(f => f.user_id === userId);
+      const isSent = sentRequestsSummaries?.some(r => r.user_id === userId);
+      const isReceived = receivedReqSummaries?.some(r => r.user_id === userId);
       return !isFriend && !isSent && !isReceived;
-   }, [profileUser?.id, myFriends, sentRequests, receivedRequests]);
+   }, [profileUser?.id, friendReqSummaries, sentRequestsSummaries, receivedReqSummaries]);
 
    // ----------- Track empty state for each tab section ------------
    const isAccountEmpty = !profileUser?.bio

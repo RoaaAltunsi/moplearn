@@ -211,7 +211,7 @@ function FindPartner() {
 
                      {/* Right sub-section */}
                      <div className={styles.inputs}>
-                        {courseId && (
+                        {!!courseId && (
                            <CheckboxInput
                               label="Add Me to Partner List"
                               isChecked={partnerChecked}

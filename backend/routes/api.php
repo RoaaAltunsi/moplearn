@@ -16,9 +16,13 @@ use App\Http\Controllers\UserProfileController;
 // Route::get('csrf-token', function() {
 //     return response()->json(['csrf_token' => csrf_token()]);
 // });
-// Route::get('user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+
+// Check for an authenticated user
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return response()->json([
+        'user' => $request->user(),
+    ]);
+});
 
 Route::get('categories', [CategoryController::class, 'index']);
 Route::get('languages', [LanguageController::class, 'index']);

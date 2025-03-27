@@ -74,6 +74,7 @@ function PartnersRequests() {
       if (formattedTab !== searchParams.get('tab')) {
          navigate(`?tab=${formattedTab}`, { replace: true }); // Use replace to avoid unnecessary history entries
       }
+      toast.dismiss(); // Close all toasts when changing tabs
    }, [activeTab, navigate, searchParams]);
 
    // ------------------ Fetch received requests -------------------

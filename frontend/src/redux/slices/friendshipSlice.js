@@ -44,9 +44,10 @@ export const getFriendsSummaries = createAsyncThunk('friendship/getFriendsSummar
 // GET-USER-FRIENDS: Fetch paginated friends of other users (friendship with status accepted)
 export const getUserFriends = createAsyncThunk('friendship/getUserFriends', async ({ user_id, page = 1, size = 9 }, thunkAPI) => {
    try {
-      await apiClient.get(`users/${user_id}/friends`, {
+      const response = await apiClient.get(`users/${user_id}/friends`, {
          params: { page, size }
       });
+      return response.data;
 
    } catch (error) {
       return thunkAPI.rejectWithValue("Failed to fetch friends");
